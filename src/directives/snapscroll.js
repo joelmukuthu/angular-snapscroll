@@ -40,23 +40,73 @@ var watchSnapIndex = function (scope, callback) {
   });
 };
 
-var snapscrollAsAnAttribute = [
-  function () {
+var snapscrollAsAnAttribute = ['$timeout',
+  function ($timeout) {
     return {
       restrict: 'A',
       scope: scopeObject,
-      link: function (scope, element) {
-        var snapTo = function (index) {
+      link: function (scope, element, attributes) {
+        var snapTo,
+            onScroll,
+            bindScroll,
+            unbindScroll,
+            scrollPromise = 0,
+            scrollDelay = attributes.scrollDelay;
+        
+        if (scrollDelay === 'false') {
+          scrollDelay = false;
+        } else {
+          scrollDelay = parseInt(scrollDelay);
+          if (isNaN(scrollDelay)) {
+            scrollDelay = 250;
+          }
+        }
+        
+        snapTo = function (index) {
+          unbindScroll();
           element[0].scrollTop = index * scope.snapHeight;
+          bindScroll();
+        };
+        
+        onScroll = function () {
+          var snap = function () {
+            var top = element[0].scrollTop,
+                previousSnapIndex = scope.snapIndex,
+                newSnapIndex = Math.round(top / scope.snapHeight);
+            if (previousSnapIndex === newSnapIndex) {
+              snapTo(newSnapIndex);
+            } else {
+              scope.$apply(function () {
+                scope.snapIndex = newSnapIndex;
+              });
+            }
+          };
+          if (scrollDelay === false) {
+            snap();
+          } else {
+            $timeout.cancel(scrollPromise);
+            scrollPromise = $timeout(snap, scrollDelay);
+          }
+        };
+        
+        bindScroll = function () {
+          element.on('scroll', onScroll);
+        };
+        
+        unbindScroll = function () {
+          element.off('scroll', onScroll);
         };
         
         watchSnapHeight(scope, element, function () {
           snapTo(scope.snapIndex);
         });
-          
+        
         watchSnapIndex(scope, function (snapIndex) {
           snapTo(snapIndex);
         });
+        
+        bindScroll();
+        
       }
     };
   }
