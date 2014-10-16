@@ -170,6 +170,23 @@ describe('Directive: snapscroll', function () {
       expect($scope.index).toBe(1);
     }));
     
+    it('stops listening on scroll event when scrop is destroyed', inject(function ($timeout) {
+      var element,
+          html = [
+            '<div snapscroll="" snap-index="index" scroll-delay="\'bad\'" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      element = compileELement(html, true);
+      $scope.$destroy();
+      element[0].scrollTop = 50;
+      element.triggerHandler('scroll');
+      expect(function () {
+        $timeout.flush();
+      }).toThrow();
+    }));
+    
     it('converts a scrollTop to the nearest-rounded snapIndex after a timeout', inject(function ($timeout) {
       var element,
           html = [

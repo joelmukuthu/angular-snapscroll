@@ -106,6 +106,7 @@ var snapscrollAsAnAttribute = ['$timeout',
         });
         
         bindScroll();
+        scope.$on('$destroy', unbindScroll);
         
       }
     };
