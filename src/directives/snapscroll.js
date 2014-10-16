@@ -7,6 +7,12 @@ var scopeObject = {
   afterSnap: '&'
 };
 
+var controller = ['$scope', function ($scope) {
+  this.setSnapHeight = function (height) {
+    $scope.snapHeight = height;
+  };
+}];
+
 var watchSnapHeight = function (scope, element, callback) {
   scope.$watch('snapHeight', function (snapHeight) {
     if (angular.isUndefined(snapHeight)) {
@@ -45,6 +51,7 @@ var snapscrollAsAnAttribute = ['$timeout',
     return {
       restrict: 'A',
       scope: scopeObject,
+      controller: controller,
       link: function (scope, element, attributes) {
         var snapTo,
             onScroll,
@@ -107,7 +114,6 @@ var snapscrollAsAnAttribute = ['$timeout',
         
         bindScroll();
         scope.$on('$destroy', unbindScroll);
-        
       }
     };
   }
@@ -118,6 +124,7 @@ var snapscrollAsAnElement = [
     return {
       restrict: 'E',
       scope: scopeObject,
+      controller: controller,
       link: function (scope, element) {
         watchSnapHeight(scope, element);
         watchSnapIndex(scope);
