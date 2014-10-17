@@ -31,7 +31,7 @@ var watchSnapHeight = function (scope, element, callback) {
 };
 
 var watchSnapIndex = function (scope, callback) {
-  scope.$watch('snapIndex', function (snapIndex) {
+  scope.$watch('snapIndex', function (snapIndex, oldSnapIndex) {
     if (angular.isUndefined(snapIndex)) {
       scope.snapIndex = 0;
       return;
@@ -40,8 +40,19 @@ var watchSnapIndex = function (scope, callback) {
       scope.snapIndex = 0;
       return;
     }
+    if (scope.ignoreThisSnapIndexChange) {
+      scope.ignoreThisSnapIndexChange = undefined;
+      return;
+    }
+    if (scope.beforeSnap({snapIndex: snapIndex}) === false) {
+      scope.ignoreThisSnapIndexChange = true;
+      scope.snapIndex = oldSnapIndex;
+      return;
+    }
     if (angular.isFunction(callback)) {
-      callback(snapIndex);
+      callback(snapIndex, function () {
+        scope.afterSnap({snapIndex: snapIndex});
+      });
     }
   });
 };
@@ -97,8 +108,11 @@ var snapscrollAsAnAttribute = ['$timeout',
           }
         };
         
-        watchSnapIndexCallback = function (snapIndex) {
+        watchSnapIndexCallback = function (snapIndex, afterSnap) {
           snapTo(snapIndex);
+          if (angular.isFunction(afterSnap)) {
+            afterSnap.call();
+          }
         };
         
         bindScroll = function () {
@@ -130,7 +144,12 @@ var snapscrollAsAnElement = [
       controller: controller,
       link: function (scope, element) {
         watchSnapHeight(scope, element);
-        watchSnapIndex(scope);
+        watchSnapIndex(scope, function (snapIndex, afterSnap) {
+          // TBD
+          if (angular.isFunction(afterSnap)) {
+            afterSnap.call();
+          }
+        });
       }
     };
   }
