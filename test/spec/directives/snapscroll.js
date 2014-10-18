@@ -623,11 +623,11 @@ describe('Directive: snapscroll', function () {
     });
     
     it('can execute a beforeSnap callback', function () {
-      testBeforeSnap('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"></div>');
+      testBeforeSnap('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div></div>');
     });
     
     it('executes the beforeSnap callback on the initial snap', function () {
-      testExecutesBeforeSnapOnInitialSnap('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"></div>');
+      testExecutesBeforeSnapOnInitialSnap('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div></div>');
     });
     
     it('passes the incoming snapIndex to the beforeSnap callback', function () {
@@ -635,19 +635,19 @@ describe('Directive: snapscroll', function () {
     });
     
     it('allows preventing snapping by returning \'false\' from the beforeSnap callback', function () {
-      testAllowsPreventingSnapping('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"></div>');
+      testAllowsPreventingSnapping('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div><div></div></div>');
     });
     
     it('resets the snapIndex if snapping is prevented', function () {
-      testResetsSnapIndexIfSnappingPrevented('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"></div>');
+      testResetsSnapIndexIfSnappingPrevented('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div><div></div></div>');
     });
     
     it('can execute an afterSnap callback', function () {
-      testAfterSnap('<div snapscroll="" snap-index="snapIndex" after-snap="afterSnap()"></div>');
+      testAfterSnap('<div snapscroll="" snap-index="snapIndex" after-snap="afterSnap()"><div></div></div>');
     });
     
     it('executes the afterSnap callback on the initial snap', function () {
-      testExecutesAfterSnapOnInitialSnap('<div snapscroll="" snap-index="snapIndex" after-snap="afterSnap()"></div>');
+      testExecutesAfterSnapOnInitialSnap('<div snapscroll="" snap-index="snapIndex" after-snap="afterSnap()"><div></div></div>');
     });
     
     it('passes the new snapIndex to the afterSnap callback', function () {
