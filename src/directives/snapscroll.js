@@ -68,7 +68,8 @@ var snapscrollAsAnAttribute = ['$timeout',
       scope: scopeObject,
       controller: controller,
       link: function (scope, element, attributes) {
-        var snapTo,
+        var init,
+            snapTo,
             onScroll,
             bindScroll,
             unbindScroll,
@@ -127,29 +128,33 @@ var snapscrollAsAnAttribute = ['$timeout',
           element.off('scroll', onScroll);
         };
         
-        scope.defaultSnapHeight = element[0].offsetHeight;
-        
-        scope.isValidSnapIndex = function (index) {
-          return index >= 0 && index < element.children().length;
+        init = function () {
+          scope.defaultSnapHeight = element[0].offsetHeight;
+
+          scope.isValidSnapIndex = function (index) {
+            return index >= 0 && index < element.children().length;
+          };
+
+          element.css('overflowY', 'auto');
+
+          watchSnapHeight(scope, function () {
+            var snaps = element.children();
+            element.css('height', scope.snapHeight + 'px');
+            if (snaps.length) {
+              angular.forEach(snaps, function (snap) {
+                angular.element(snap).css('height', scope.snapHeight + 'px');
+              });
+            }
+            snapTo(scope.snapIndex);
+          });
+
+          watchSnapIndex(scope, snapIndexChanged);
+
+          bindScroll();
+          scope.$on('$destroy', unbindScroll);
         };
         
-        element.css('overflowY', 'auto');
-        
-        watchSnapHeight(scope, function () {
-          var snaps = element.children();
-          element.css('height', scope.snapHeight + 'px');
-          if (snaps.length) {
-            angular.forEach(snaps, function (snap) {
-              angular.element(snap).css('height', scope.snapHeight + 'px');
-            });
-          }
-          snapTo(scope.snapIndex);
-        });
-        
-        watchSnapIndex(scope, snapIndexChanged);
-        
-        bindScroll();
-        scope.$on('$destroy', unbindScroll);
+        init();
       }
     };
   }
