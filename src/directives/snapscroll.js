@@ -123,6 +123,8 @@ var snapscrollAsAnAttribute = ['$timeout',
           element.off('scroll', onScroll);
         };
         
+        element.css('overflowY', 'auto');
+        
         watchSnapHeight(scope, element, function () {
           snapTo(scope.snapIndex);
         });
