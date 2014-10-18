@@ -44,6 +44,11 @@ var watchSnapIndex = function (scope, callback) {
       scope.ignoreThisSnapIndexChange = undefined;
       return;
     }
+    if (!scope.isValidSnapIndex(snapIndex)) {
+      scope.ignoreThisSnapIndexChange = true;
+      scope.snapIndex = oldSnapIndex;
+      return;
+    }
     if (scope.beforeSnap({snapIndex: snapIndex}) === false) {
       scope.ignoreThisSnapIndexChange = true;
       scope.snapIndex = oldSnapIndex;
@@ -123,6 +128,10 @@ var snapscrollAsAnAttribute = ['$timeout',
           element.off('scroll', onScroll);
         };
         
+        scope.isValidSnapIndex = function (index) {
+          return index >= 0 && index < element.children().length;
+        };
+        
         element.css('overflowY', 'auto');
         
         watchSnapHeight(scope, element, function () {
@@ -145,6 +154,10 @@ var snapscrollAsAnElement = [
       scope: scopeObject,
       controller: controller,
       link: function (scope, element) {
+        scope.isValidSnapIndex = function (index) {
+          // TBD: return index >= 0 && something else here..;
+          return index >= 0;
+        };
         watchSnapHeight(scope, element);
         watchSnapIndex(scope, function (snapIndex, afterSnap) {
           // TBD
