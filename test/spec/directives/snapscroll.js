@@ -172,7 +172,7 @@ describe('Directive: snapscroll', function () {
       expect(element[0].scrollTop).toBe(50);
     });
     
-    it('converts a scrollTop to a snapIndex after a timeout', inject(function ($timeout) {
+    it('converts a scrollTop to a snapIndex after a timeout (i.e. listens to scroll on the element)', inject(function ($timeout) {
       var element,
           html = [
             '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
@@ -295,7 +295,7 @@ describe('Directive: snapscroll', function () {
       }).toThrow();
     }));
     
-    it('converts a scrollTop to the nearest-rounded snapIndex after a timeout', inject(function ($timeout) {
+    it('resets (rounds up/down) the scrollTop after a scroll event so that a snap is always fully visible', inject(function ($timeout) {
       var element,
           html = [
             '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
@@ -316,6 +316,29 @@ describe('Directive: snapscroll', function () {
       $timeout.flush();
       expect($scope.index).toBe(0);
       expect(element[0].scrollTop).toBe(0);
+    }));
+    
+    it('doesn\'t fire before and afterSnap callbacks while resetting the scrollTop', inject(function ($timeout) {
+      var element,
+          test = 0,
+          html = [
+            '<div snapscroll="" snap-index="index" after-snap="afterSnap()" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      $scope.afterSnap = function () {
+        test += 1;
+      };
+      element = compileELement(html, true);
+      expect($scope.index).toBe(0);
+      expect(test).toBe(1);
+      element[0].scrollTop = 24;
+      element.triggerHandler('scroll');
+      $timeout.flush();
+      expect($scope.index).toBe(0);
+      expect(test).toBe(1);
     }));
     
     it('allows setting an initial snapIndex as an integer', function () {

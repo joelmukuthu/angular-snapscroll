@@ -68,7 +68,7 @@ var snapscrollAsAnAttribute = ['$timeout',
             onScroll,
             bindScroll,
             unbindScroll,
-            watchSnapIndexCallback,
+            snapIndexChanged,
             scrollPromise = 0,
             scrollDelay = attributes.scrollDelay;
         
@@ -93,7 +93,7 @@ var snapscrollAsAnAttribute = ['$timeout',
                 previousSnapIndex = scope.snapIndex,
                 newSnapIndex = Math.round(top / scope.snapHeight);
             if (previousSnapIndex === newSnapIndex) {
-              watchSnapIndexCallback(newSnapIndex);
+              snapIndexChanged(newSnapIndex);
             } else {
               scope.$apply(function () {
                 scope.snapIndex = newSnapIndex;
@@ -108,7 +108,7 @@ var snapscrollAsAnAttribute = ['$timeout',
           }
         };
         
-        watchSnapIndexCallback = function (snapIndex, afterSnap) {
+        snapIndexChanged = function (snapIndex, afterSnap) {
           snapTo(snapIndex);
           if (angular.isFunction(afterSnap)) {
             afterSnap.call();
@@ -127,7 +127,7 @@ var snapscrollAsAnAttribute = ['$timeout',
           snapTo(scope.snapIndex);
         });
         
-        watchSnapIndex(scope, watchSnapIndexCallback);
+        watchSnapIndex(scope, snapIndexChanged);
         
         bindScroll();
         scope.$on('$destroy', unbindScroll);
