@@ -13,17 +13,16 @@ var controller = ['$scope', function ($scope) {
   };
 }];
 
-var watchSnapHeight = function (scope, element, callback) {
+var watchSnapHeight = function (scope, callback) {
   scope.$watch('snapHeight', function (snapHeight) {
     if (angular.isUndefined(snapHeight)) {
-      scope.snapHeight = element[0].offsetHeight;
+      scope.snapHeight = scope.defaultSnapHeight;
       return;
     }
     if (!angular.isNumber(snapHeight)) {
-      scope.snapHeight = element[0].offsetHeight;
+      scope.snapHeight = scope.defaultSnapHeight;
       return;
     }
-    element.css('height', snapHeight + 'px');
     if (angular.isFunction(callback)) {
       callback(snapHeight);
     }
@@ -128,13 +127,22 @@ var snapscrollAsAnAttribute = ['$timeout',
           element.off('scroll', onScroll);
         };
         
+        scope.defaultSnapHeight = element[0].offsetHeight;
+        
         scope.isValidSnapIndex = function (index) {
           return index >= 0 && index < element.children().length;
         };
         
         element.css('overflowY', 'auto');
         
-        watchSnapHeight(scope, element, function () {
+        watchSnapHeight(scope, function () {
+          var snaps = element.children();
+          element.css('height', scope.snapHeight + 'px');
+          if (snaps.length) {
+            angular.forEach(snaps, function (snap) {
+              angular.element(snap).css('height', scope.snapHeight + 'px');
+            });
+          }
           snapTo(scope.snapIndex);
         });
         
@@ -154,11 +162,14 @@ var snapscrollAsAnElement = [
       scope: scopeObject,
       controller: controller,
       link: function (scope, element) {
+        scope.defaultSnapHeight = element[0].offsetHeight; // not tested
         scope.isValidSnapIndex = function (index) {
           // TBD: return index >= 0 && something else here..;
-          return index >= 0;
+          return index >= 0; // not tested
         };
-        watchSnapHeight(scope, element);
+        watchSnapHeight(scope, function () {
+          element.css('height', scope.snapHeight + 'px'); // not tested
+        });
         watchSnapIndex(scope, function (snapIndex, afterSnap) {
           // TBD
           if (angular.isFunction(afterSnap)) {
