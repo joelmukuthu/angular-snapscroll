@@ -43,7 +43,7 @@ var watchSnapIndex = function (scope, callback) {
       scope.ignoreThisSnapIndexChange = undefined;
       return;
     }
-    if (!scope.isValidSnapIndex(snapIndex)) {
+    if (!scope.snapIndexIsValid()) {
       scope.ignoreThisSnapIndexChange = true;
       scope.snapIndex = oldSnapIndex;
       return;
@@ -73,18 +73,8 @@ var snapscrollAsAnAttribute = ['$timeout',
             onScroll,
             bindScroll,
             unbindScroll,
-            snapIndexChanged,
             scrollPromise = 0,
             scrollDelay = attributes.scrollDelay;
-        
-        if (scrollDelay === 'false') {
-          scrollDelay = false;
-        } else {
-          scrollDelay = parseInt(scrollDelay);
-          if (isNaN(scrollDelay)) {
-            scrollDelay = 250;
-          }
-        }
         
         snapTo = function (index) {
           unbindScroll();
@@ -98,7 +88,7 @@ var snapscrollAsAnAttribute = ['$timeout',
                 previousSnapIndex = scope.snapIndex,
                 newSnapIndex = Math.round(top / scope.snapHeight);
             if (previousSnapIndex === newSnapIndex) {
-              snapIndexChanged(newSnapIndex);
+              snapTo(newSnapIndex);
             } else {
               scope.$apply(function () {
                 scope.snapIndex = newSnapIndex;
@@ -113,13 +103,6 @@ var snapscrollAsAnAttribute = ['$timeout',
           }
         };
         
-        snapIndexChanged = function (snapIndex, afterSnap) {
-          snapTo(snapIndex);
-          if (angular.isFunction(afterSnap)) {
-            afterSnap.call();
-          }
-        };
-        
         bindScroll = function () {
           element.on('scroll', onScroll);
         };
@@ -129,10 +112,19 @@ var snapscrollAsAnAttribute = ['$timeout',
         };
         
         init = function () {
+          if (scrollDelay === 'false') {
+            scrollDelay = false;
+          } else {
+            scrollDelay = parseInt(scrollDelay);
+            if (isNaN(scrollDelay)) {
+              scrollDelay = 250;
+            }
+          }
+          
           scope.defaultSnapHeight = element[0].offsetHeight;
 
-          scope.isValidSnapIndex = function (index) {
-            return index >= 0 && index < element.children().length;
+          scope.snapIndexIsValid = function () {
+            return scope.snapIndex >= 0 && scope.snapIndex < element.children().length;
           };
 
           element.css('overflowY', 'auto');
@@ -148,7 +140,12 @@ var snapscrollAsAnAttribute = ['$timeout',
             snapTo(scope.snapIndex);
           });
 
-          watchSnapIndex(scope, snapIndexChanged);
+          watchSnapIndex(scope, function (snapIndex, afterSnap) {
+            snapTo(snapIndex);
+            if (angular.isFunction(afterSnap)) {
+              afterSnap.call();
+            }
+          });
 
           bindScroll();
           scope.$on('$destroy', unbindScroll);
@@ -166,14 +163,14 @@ var snapscrollAsAnElement = [
       restrict: 'E',
       scope: scopeObject,
       controller: controller,
-      link: function (scope, element) {
-        scope.defaultSnapHeight = element[0].offsetHeight; // not tested
-        scope.isValidSnapIndex = function (index) {
-          // TBD: return index >= 0 && something else here..;
-          return index >= 0; // not tested
+      link: function (scope) {
+        scope.defaultSnapHeight = 0;
+        scope.snapIndexIsValid = function () {
+          // TBD: return scope.snapIndex >= 0 && something else here..;
+          return true;
         };
         watchSnapHeight(scope, function () {
-          element.css('height', scope.snapHeight + 'px'); // not tested
+          // TBD: element.css('height', scope.snapHeight + 'px');
         });
         watchSnapIndex(scope, function (snapIndex, afterSnap) {
           // TBD
