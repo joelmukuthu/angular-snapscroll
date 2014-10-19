@@ -661,7 +661,7 @@ describe('Directive: snapscroll', function () {
     expect($scope.snapIndex).toBeDefined();
   });
   
-  describe('as an element, it', function () {
+  describe('as an element', function () {
     it('defaults snapIndex to zero', function () {
       compileELement('<snapscroll snap-index="snapIndex"></snapscroll>');
       expect($scope.snapIndex).toBe(0);

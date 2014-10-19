@@ -183,9 +183,6 @@ describe('Directive: snapToWindowHeight', function () {
     }));
   });
   
-  // test also for when applied to snapscroll as an element
-  // this is not really useful since we're mocking the directives out
-  // but at least the beforeEach does some integration testing
   describe('when applied to snapscroll as an element', function () {
     beforeEach(inject(function (snapscrollDirective) {
       var snapscroll;
