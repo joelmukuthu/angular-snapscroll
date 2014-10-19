@@ -654,49 +654,4 @@ describe('Directive: snapscroll', function () {
       testCorrectSnapIndexPassedToAfterSnap('<div snapscroll="" snap-index="snapIndex" after-snap="afterSnap(snapIndex)"></div>');
     });
   });
-  
-  it('can be declared as an element', function () {
-    // TODO: better way to test this?
-    compileELement('<snapscroll snap-index="snapIndex"></snapscroll>');
-    expect($scope.snapIndex).toBeDefined();
-  });
-  
-  describe('as an element', function () {
-    it('defaults snapIndex to zero', function () {
-      compileELement('<snapscroll snap-index="snapIndex"></snapscroll>');
-      expect($scope.snapIndex).toBe(0);
-    });
-    
-    it('can execute a beforeSnap callback', function () {
-      testBeforeSnap('<snapscroll snap-index="snapIndex" before-snap="beforeSnap()"></snapscroll>');
-    });
-    
-    it('executes the beforeSnap callback on the initial snap', function () {
-      testExecutesBeforeSnapOnInitialSnap('<snapscroll snap-index="snapIndex" before-snap="beforeSnap()"></snapscroll>');
-    });
-    
-    it('passes the incoming snapIndex to the beforeSnap callback', function () {
-      testCorrectSnapIndexPassedToBeforeSnap('<snapscroll snap-index="snapIndex" before-snap="beforeSnap(snapIndex)"></snapscroll>');
-    });
-    
-    it('allows preventing snapping by returning \'false\' from the beforeSnap callback', function () {
-      testAllowsPreventingSnapping('<snapscroll snap-index="snapIndex" before-snap="beforeSnap()"></snapscroll>');
-    });
-    
-    it('resets the snapIndex if snapping is prevented', function () {
-      testResetsSnapIndexIfSnappingPrevented('<snapscroll snap-index="snapIndex" before-snap="beforeSnap()"></snapscroll>');
-    });
-    
-    it('can execute an afterSnap callback', function () {
-      testAfterSnap('<snapscroll snap-index="snapIndex" after-snap="afterSnap()"></snapscroll>');
-    });
-    
-    it('executes the afterSnap callback on the initial snap', function () {
-      testExecutesAfterSnapOnInitialSnap('<snapscroll snap-index="snapIndex" after-snap="afterSnap()"></snapscroll>');
-    });
-    
-    it('passes the new snapIndex to the afterSnap callback', function () {
-      testCorrectSnapIndexPassedToAfterSnap('<snapscroll snap-index="snapIndex" after-snap="afterSnap(snapIndex)"></snapscroll>');
-    });
-  });
 });

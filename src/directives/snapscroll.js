@@ -157,32 +157,5 @@ var snapscrollAsAnAttribute = ['$timeout',
   }
 ];
 
-var snapscrollAsAnElement = [
-  function () {
-    return {
-      restrict: 'E',
-      scope: scopeObject,
-      controller: controller,
-      link: function (scope) {
-        scope.defaultSnapHeight = 0;
-        scope.snapIndexIsValid = function () {
-          // TBD: return scope.snapIndex >= 0 && something else here..;
-          return true;
-        };
-        watchSnapHeight(scope, function () {
-          // TBD: element.css('height', scope.snapHeight + 'px');
-        });
-        watchSnapIndex(scope, function (snapIndex, afterSnap) {
-          // TBD
-          if (angular.isFunction(afterSnap)) {
-            afterSnap.call();
-          }
-        });
-      }
-    };
-  }
-];
-
 angular.module('snapscroll')
-  .directive('snapscroll', snapscrollAsAnAttribute)
-  .directive('snapscroll', snapscrollAsAnElement);
+  .directive('snapscroll', snapscrollAsAnAttribute);
