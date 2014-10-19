@@ -17,6 +17,7 @@ module.exports = function(config) {
     files: [
       'bower_components/angular/angular.js',
       'bower_components/angular-mocks/angular-mocks.js',
+      'bower_components/angular-scroll/angular-scroll.js',
       '.tmp/snapscroll.css',
       '.tmp/snapscroll.js',
       'test/spec/**/*.js'
