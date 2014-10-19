@@ -115,7 +115,7 @@ var snapscrollAsAnAttribute = ['$timeout',
           if (scrollDelay === 'false') {
             scrollDelay = false;
           } else {
-            scrollDelay = parseInt(scrollDelay);
+            scrollDelay = parseInt(scrollDelay, 10);
             if (isNaN(scrollDelay)) {
               scrollDelay = 250;
             }

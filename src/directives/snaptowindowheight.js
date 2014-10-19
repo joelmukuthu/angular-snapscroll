@@ -25,7 +25,7 @@ angular.module('snapscroll')
           if (resizeDelay === 'false') {
             resizeDelay = false;
           } else {
-            resizeDelay = parseInt(resizeDelay);
+            resizeDelay = parseInt(resizeDelay, 10);
             if (isNaN(resizeDelay)) {
               resizeDelay = 400;
             }
