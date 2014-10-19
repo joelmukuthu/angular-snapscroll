@@ -13,5 +13,6 @@ angular
   .module('snapscroll', [
     'duScroll'
   ])
+  .value('snapscrollEaseInOut', easeInOutQuad)
   .value('duScrollDuration', 800)
   .value('duScrollEasing', easeInOutQuad);

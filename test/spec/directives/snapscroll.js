@@ -656,27 +656,44 @@ describe('Directive: snapscroll', function () {
     
     // test suite for animations
     describe('', function () {
-//      beforeEach(function () {
-//        
-//      });
+      var defaultSnapEasing,
+          defaultSnapDuration;
+      
+      beforeEach(inject(function (duScrollEasing, duScrollDuration) {
+        defaultSnapEasing = duScrollEasing;
+        defaultSnapDuration = duScrollDuration;
+      }));
+      
+      it('sets the duScrollEasing to ease-in-out', inject(function (snapscrollEaseInOut) {
+      // TODO: does this really perform the intended test?
+        expect(defaultSnapEasing).toEqual(snapscrollEaseInOut);
+      }));
+      
+      it('sets the duScrollDuration to 800', function () {
+        expect(defaultSnapDuration).toBe(800);
+      });
       
       it('animates the snapping by default', function () {
-        var html = [
-              '<div snapscroll="" style="height: 50px; overflow: auto">',
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
               '</div>'
             ].join('');
-        spyOn(angular.element, 'scrollTop');
-        compileELement(html, true);
-        expect(angular.element.scrollTop).toHaveBeenCalled();
+        element = compileELement(html, true);
+        spyOn(element, 'scrollTop');
+        $scope.$apply(function () {
+          $scope.index = 1;
+        });
+        expect(element.scrollTop).toHaveBeenCalledWith(50, defaultSnapDuration);
       });
 
       it('allows disabling snapAnimation on initialisation', function () {
         var element,
             html = [
-              '<div snapscroll="" snap-index="1" snap-animation="animation" style="height: 50px; overflow: auto">',
+              '<div snapscroll="" snap-index="index" snap-animation="animation" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
@@ -684,20 +701,28 @@ describe('Directive: snapscroll', function () {
             ].join('');
         $scope.animation = false;
         element = compileELement(html, true);
-        expect(element[0].scrollTop).toBe(50);
+        spyOn(element, 'scrollTop');
+        $scope.$apply(function () {
+          $scope.index = 1;
+        });
+        expect(element.scrollTop).toHaveBeenCalledWith(50);
       });
 
-      it('allows disabling snapAnimation on initialisation by passing \'false\'', function () {
+      it('allows disabling snapAnimation on initialisation by passing a falsy value (1)', function () {
         var element,
             html = [
-              '<div snapscroll="" snap-index="1" snap-animation="false" style="height: 50px; overflow: auto">',
+              '<div snapscroll="" snap-index="index" snap-animation="false" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
               '</div>'
             ].join('');
         element = compileELement(html, true);
-        expect(element[0].scrollTop).toBe(50);
+        spyOn(element, 'scrollTop');
+        $scope.$apply(function () {
+          $scope.index = 1;
+        });
+        expect(element.scrollTop).toHaveBeenCalledWith(50);
       });
 
       it('allows enabling/disabling snapAnimation after initialisation i.e. creates one-way bind to snapAnimation', function () {
@@ -709,29 +734,120 @@ describe('Directive: snapscroll', function () {
                 '<div style="height: 50px"></div>',
               '</div>'
             ].join('');
-        element = compileELement(html, true);
-        expect(element[0].scrollTop).not.toBe(50);
-        element[0].scrollTop = 50;
+        $scope.index = 0;
         $scope.animation = false;
-        $scope.index = 2;
+        element = compileELement(html, true);
+        spyOn(element, 'scrollTop');
+        expect(element.scrollTop).toHaveBeenCalledWith(0, defaultSnapDuration);
+        $scope.index = 1;
+        $scope.animation = true;
         $scope.$apply();
-        expect(element[0].scrollTop).toBe(100);
+        expect(element.scrollTop).toHaveBeenCalledWith(50, defaultSnapDuration);
+        $scope.index = 2;
+        $scope.animation = false;
+        $scope.$apply();
+        expect(element.scrollTop).toHaveBeenCalledWith(100);
       });
-
-      // TODO: how to test these?
+      
       it('allows setting the snapAnimation duration (snapDuration)', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" snap-duration="10" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        element = compileELement(html, true);
+        spyOn(element, 'scrollTop');
+        $scope.index = 1;
+        $scope.$apply();
+        expect(element.scrollTop).toHaveBeenCalledWith(50, 10);
       });
 
-      it('only accepts integer values for snapDuration', function () {
+      it('doesn\'t allow setting snapDuration using angular expressions', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" snap-duration="bad" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        $scope.bad = 10;
+        element = compileELement(html, true);
+        spyOn(element, 'scrollTop');
+        $scope.index = 1;
+        $scope.$apply();
+        expect(element.scrollTop).toHaveBeenCalledWith(50, defaultSnapDuration);
+      });
+
+      it('doesn\'t allow setting snapDuration using non-integer expressions', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" snap-duration="\'bad\'" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        element = compileELement(html, true);
+        spyOn(element, 'scrollTop');
+        $scope.index = 1;
+        $scope.$apply();
+        expect(element.scrollTop).toHaveBeenCalledWith(50, defaultSnapDuration);
       });
 
       it('defaults snapDuration to the value of duScrollDuration', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" snap-duration="\'bad\'" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        element = compileELement(html, true);
+        spyOn(element, 'scrollTop');
+        $scope.index = 1;
+        $scope.$apply();
+        expect(element.scrollTop).toHaveBeenCalledWith(50, defaultSnapDuration);
+      });
+      
+      it('allows setting the snapAnimation easing (snapEasing)', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" snap-easing="easing()" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join(''),
+            easingSpy;
+        easingSpy = jasmine.createSpy('easingSpy');
+        $scope.easing = function () {
+          return easingSpy;
+        };
+        element = compileELement(html, true);
+        $scope.index = 1;
+        $scope.$apply();
+        expect(easingSpy).toHaveBeenCalled();
       });
 
-      it('allows setting the snapAnimation easing (snapEasing) for a single instance', function () {
-      });
-
-      it('defaults setting the snapEasing (snapEasing) to the value of duScrollEasing', function () {
+      it('defaults setting the snapEasing to the value of duScrollEasing', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        spyOn(defaultSnapEasing);
+        element = compileELement(html, true);
+        $scope.index = 1;
+        $scope.$apply();
+        expect(defaultSnapEasing).toHaveBeenCalled();
       });
     });
   });
