@@ -138,4 +138,17 @@ describe('Services: requestAnimation & cancelAnimation', function () {
       expect(timeoutMockObject.timeout.cancel).toHaveBeenCalled();
     }));
   });
+
+  describe('on iOS 7', function () {
+    beforeEach(function () {
+      windowMock.navigator.userAgent = 'iPhone OS 7';
+    });
+    
+    it('return the unprefixed functions', inject(function (requestAnimation, cancelAnimation) {
+      expect(requestAnimation()).toBe('requestAnimationFrame');
+      expect(cancelAnimation()).toBe('cancelAnimationFrame');
+      expect(timeoutMockObject.timeout).not.toHaveBeenCalled();
+      expect(timeoutMockObject.timeout.cancel).not.toHaveBeenCalled();
+    }));
+  });
 });
