@@ -1,5 +1,5 @@
 // all this is adapted from https://github.com/darius/requestAnimationFrame/blob/master/requestAnimationFrame.js
-// ngAnimate does have $$animateReflow, but that was not build to be a wrapper around requestAnimationFrame, hence this.
+// ngAnimate does have $$animateReflow, but that was not built to be a wrapper around requestAnimationFrame, hence this.
 
 'use strict';
 
