@@ -4,7 +4,7 @@ describe('Services: requestAnimation & cancelAnimation', function () {
   var windowMock,
       timeoutMockObject;
 
-  beforeEach(function() {
+  beforeEach(function () {
     var timeoutCancel;
     timeoutMockObject = {};
     timeoutMockObject.timeout = {};
