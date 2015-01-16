@@ -12,4 +12,14 @@ describe('Module: snapscroll', function () {
     expect(app).toBeDefined();
   });
   
+  describe('', function () {
+    
+    beforeEach(module('snapscroll'));
+    
+    it('registers the defaultSnapscrollEasing', inject(function (defaultSnapscrollEasing) {
+      expect(angular.isFunction(defaultSnapscrollEasing)).toBe(true);
+    }));
+    
+  });
+  
 });
