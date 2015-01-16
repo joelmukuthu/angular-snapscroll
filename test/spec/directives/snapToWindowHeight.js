@@ -26,7 +26,7 @@ describe('Directive: snapToWindowHeight', function () {
     // controller that just updates a local variable
     var setSnapHeightMock = 
       jasmine.createSpy('setSnapHeight')
-        .andCallFake(function (height) {
+        .and.callFake(function (height) {
           snapHeightMock = height;
         });
     snapscrollDirective.controller = function () {
