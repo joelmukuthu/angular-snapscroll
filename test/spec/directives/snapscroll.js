@@ -713,6 +713,7 @@ describe('Directive: snapscroll', function () {
           snapDurationMock = undefined;
         }
         if (angular.isFunction(easing)) {
+          easing.call();
           snapEasingMock = 1;
         } else {
           snapEasingMock = undefined;
@@ -926,6 +927,23 @@ describe('Directive: snapscroll', function () {
       $scope.index = 1;
       $scope.$apply();
       expect(snapEasingMock).toBe(1);
+    });
+    
+    it('uses whichever snapEasing is provided', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-index="index" snap-easing="easing" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join(''),
+          easing = jasmine.createSpy('easing');
+      $scope.easing = easing;
+      element = compileElement(html, true);
+      $scope.index = 1;
+      $scope.$apply();
+      expect(easing).toHaveBeenCalled();
     });
   });
   
