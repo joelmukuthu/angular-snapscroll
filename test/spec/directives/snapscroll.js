@@ -268,7 +268,7 @@ describe('Directive: snapscroll', function () {
       expect(scrollMock.stop).toHaveBeenCalled();
     });
     
-    it('defaults the scrollDelay timeout to 250', inject(function ($timeout) {
+    it('defaults the scrollDelay timeout to the value of defaulSnapscrollScrollDelay', inject(function ($timeout, defaulSnapscrollScrollDelay) {
       var element,
           html = [
             '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
@@ -280,7 +280,7 @@ describe('Directive: snapscroll', function () {
       expect($scope.index).toBe(0);
       element[0].scrollTop = 50;
       element.triggerHandler('scroll');
-      $timeout.flush(249);
+      $timeout.flush(defaulSnapscrollScrollDelay - 1);
       expect($scope.index).toBe(0);
       $timeout.flush(1);
       expect($scope.index).toBe(1);
@@ -341,7 +341,7 @@ describe('Directive: snapscroll', function () {
       expect($scope.index).toBe(1);
     }));
     
-    it('defaults the the scrollDelay timeout to 250 if a non-number scrollDelay is provided', inject(function ($timeout) {
+    it('defaults the the scrollDelay timeout to the value of defaulSnapscrollScrollDelay if a non-number scrollDelay is provided', inject(function ($timeout, defaulSnapscrollScrollDelay) {
       var element,
           html = [
             '<div snapscroll="" snap-index="index" scroll-delay="\'bad\'" style="height: 50px; overflow: auto">',
@@ -353,7 +353,7 @@ describe('Directive: snapscroll', function () {
       expect($scope.index).toBe(0);
       element[0].scrollTop = 50;
       element.triggerHandler('scroll');
-      $timeout.flush(249);
+      $timeout.flush(defaulSnapscrollScrollDelay - 1);
       expect($scope.index).toBe(0);
       $timeout.flush(1);
       expect($scope.index).toBe(1);

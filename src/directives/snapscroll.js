@@ -62,8 +62,8 @@ var watchSnapIndex = function (scope, snapIndexChangedCallback) {
   });
 };
 
-var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaulSnapscrollSnapDuration',
-  function ($timeout, scroll, defaulSnapscrollSnapDuration) {
+var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaulSnapscrollScrollDelay', 'defaulSnapscrollSnapDuration',
+  function ($timeout, scroll, defaulSnapscrollScrollDelay, defaulSnapscrollSnapDuration) {
     return {
       restrict: 'A',
       scope: scopeObject,
@@ -138,7 +138,7 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaulSnapscrollSnapDurati
           } else {
             scrollDelay = parseInt(scrollDelay, 10);
             if (isNaN(scrollDelay)) {
-              scrollDelay = 250;
+              scrollDelay = defaulSnapscrollScrollDelay;
             }
           }
         

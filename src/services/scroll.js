@@ -4,8 +4,8 @@
 
 var snapscroll = angular.module('snapscroll');
 
-snapscroll.factory('scroll', ['$q', 'requestAnimation', 'cancelAnimation', 'defaultSnapscrollEasing',
-  function ($q, requestAnimation, cancelAnimation, defaultSnapscrollEasing) {
+snapscroll.factory('scroll', ['$q', 'requestAnimation', 'cancelAnimation', 'defaultSnapscrollScrollEasing',
+  function ($q, requestAnimation, cancelAnimation, defaultSnapscrollScrollEasing) {
     
     function cleanUp(element, animation) {
       animation = null;
@@ -55,7 +55,7 @@ snapscroll.factory('scroll', ['$q', 'requestAnimation', 'cancelAnimation', 'defa
           deferred.resolve();
         } else {
           if (typeof easing !== 'function') {
-            easing = defaultSnapscrollEasing;
+            easing = defaultSnapscrollScrollEasing;
           }
           start = element[0].scrollTop;
           change = top - start;
