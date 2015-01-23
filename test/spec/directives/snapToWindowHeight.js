@@ -2,11 +2,27 @@
 
 describe('Directive: snapToWindowHeight', function () {
 
-  beforeEach(module('snapscroll'));
-
   var $compile,
       $scope,
       snapHeightMock;
+  
+  beforeEach(module('snapscroll'));
+  
+  beforeEach(module(function ($provide) {
+    // use $provide.factory() for mocking directives, not $provide.value() since directives are factories
+    $provide.factory('snapscrollDirective', function () {
+      // very important to return an array of directive definitions!! that's how angular works
+      return [{
+        restrict: 'A',
+        name: 'snapscroll',
+        controller: function () {
+          this.setSnapHeight = function (height) {
+            snapHeightMock = height;
+          };
+        }
+      }];
+    });
+  }));
 
   beforeEach(inject(function (_$compile_, _$rootScope_) {
     $compile = _$compile_;
@@ -18,22 +34,6 @@ describe('Directive: snapToWindowHeight', function () {
     element = $compile(element)($scope);
     $scope.$digest();
     return element;
-  }
-  
-  function createSnapHeightMock(snapscrollDirective) {
-    // http://stackoverflow.com/a/23064313/1004406
-    // mock snapscroll directive, create a fake setSnapHeight method on it's 
-    // controller that just updates a local variable
-    var setSnapHeightMock = 
-      jasmine.createSpy('setSnapHeight')
-        .and.callFake(function (height) {
-          snapHeightMock = height;
-        });
-    snapscrollDirective.controller = function () {
-      this.setSnapHeight = setSnapHeightMock;
-    };
-    // remove the link function of the original snapscroll directive, not needed here
-    snapscrollDirective.link = angular.noop;
   }
   
   function testSetsSnapHeight(html, $window) {
@@ -135,19 +135,6 @@ describe('Directive: snapToWindowHeight', function () {
   });
   
   describe('when applied to snapscroll as an attribute', function () {
-    beforeEach(inject(function (snapscrollDirective) {
-      var snapscroll;
-      snapHeightMock = undefined;
-      // filter through the directive definitions and find the one
-      // that matches snapscroll as an attribute
-      for (var i = 0, l = snapscrollDirective.length; i < l; i++) {
-        snapscroll = snapscrollDirective[i];
-        if (snapscroll.restrict === 'A') {
-          createSnapHeightMock(snapscroll);
-          break;
-        }
-      }
-    }));
     
     it('sets the snapHeight to equal the window height', inject(function ($window) {
       testSetsSnapHeight('<div snapscroll="" snap-to-window-height=""></div>', $window);
