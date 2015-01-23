@@ -20,6 +20,10 @@ describe('Module: snapscroll', function () {
       expect(angular.isFunction(defaultSnapscrollEasing)).toBe(true);
     }));
     
+    it('registers the defaulSnapscrollSnapDuration', inject(function (defaulSnapscrollSnapDuration) {
+      expect(angular.isNumber(defaulSnapscrollSnapDuration)).toBe(true);
+    }));
+    
   });
   
 });
