@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('snapscroll')
-  .directive('snapToWindowHeight', ['$window', '$timeout', 'defaulSnapscrollSnapToWindowHeightResizeDelay',
+  .directive('fitWindowHeight', ['$window', '$timeout', 'defaulSnapscrollSnapToWindowHeightResizeDelay',
     function ($window, $timeout, defaulSnapscrollSnapToWindowHeightResizeDelay) {
       return {
         restrict: 'A',

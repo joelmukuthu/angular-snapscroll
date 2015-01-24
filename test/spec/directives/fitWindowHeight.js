@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Directive: snapToWindowHeight', function () {
+describe('Directive: fitWindowHeight', function () {
 
   var $compile,
       $scope,
@@ -128,7 +128,7 @@ describe('Directive: snapToWindowHeight', function () {
   }
   
   it('requires snapscroll', function () {
-    var html = '<div snap-to-window-height=""></div>';
+    var html = '<div fit-window-height=""></div>';
     expect(function () {
       compileElement(html);
     }).toThrow();
@@ -137,36 +137,36 @@ describe('Directive: snapToWindowHeight', function () {
   describe('when applied to snapscroll as an attribute', function () {
     
     it('sets the snapHeight to equal the window height', inject(function ($window) {
-      testSetsSnapHeight('<div snapscroll="" snap-to-window-height=""></div>', $window);
+      testSetsSnapHeight('<div snapscroll="" fit-window-height=""></div>', $window);
     }));
 
     it('updates the snapHeight on window resize after a timeout', inject(function ($window, $timeout) {
-      testUpdatesSnapHeightOnWindowResize('<div snapscroll="" snap-to-window-height=""></div>', $window, $timeout);
+      testUpdatesSnapHeightOnWindowResize('<div snapscroll="" fit-window-height=""></div>', $window, $timeout);
     }));
 
     it('defaults the resizeDelay to the value of defaulSnapscrollSnapToWindowHeightResizeDelay', inject(function ($window, $timeout, defaulSnapscrollSnapToWindowHeightResizeDelay) {
-      testDefaultsResizeDelayToTheValueOfDefaulSnapscrollSnapToWindowHeightResizeDelay('<div snapscroll="" snap-to-window-height=""></div>', $window, $timeout, defaulSnapscrollSnapToWindowHeightResizeDelay);
+      testDefaultsResizeDelayToTheValueOfDefaulSnapscrollSnapToWindowHeightResizeDelay('<div snapscroll="" fit-window-height=""></div>', $window, $timeout, defaulSnapscrollSnapToWindowHeightResizeDelay);
     }));
 
     it('allows setting the resizeDelay', inject(function ($window, $timeout) {
-      testAllowsSettingResizeDelay('<div snapscroll="" snap-to-window-height="" resize-delay="500"></div>', $window, $timeout);
+      testAllowsSettingResizeDelay('<div snapscroll="" fit-window-height="" resize-delay="500"></div>', $window, $timeout);
     }));
 
     it('deos not allow setting the resizeDelay using an expression', inject(function ($window, $timeout) {
-      testDoesNotAllowSettingResizeDelayWithAnExpression('<div snapscroll="" snap-to-window-height="" resize-delay="300 + 200"></div>', $window, $timeout);
+      testDoesNotAllowSettingResizeDelayWithAnExpression('<div snapscroll="" fit-window-height="" resize-delay="300 + 200"></div>', $window, $timeout);
 
     }));
 
     it('defaults the resizeDelay to the value of defaulSnapscrollSnapToWindowHeightResizeDelay if a bad timeout is provided', inject(function ($window, $timeout, defaulSnapscrollSnapToWindowHeightResizeDelay) {
-      testDefaultsResizeDelayToTheValueOfDefaulSnapscrollSnapToWindowHeightResizeDelayIfBadTimeoutIsProvided('<div snapscroll="" snap-to-window-height="" resize-delay="bad"></div>', $window, $timeout, defaulSnapscrollSnapToWindowHeightResizeDelay);
+      testDefaultsResizeDelayToTheValueOfDefaulSnapscrollSnapToWindowHeightResizeDelayIfBadTimeoutIsProvided('<div snapscroll="" fit-window-height="" resize-delay="bad"></div>', $window, $timeout, defaulSnapscrollSnapToWindowHeightResizeDelay);
     }));
 
     it('allows turning off the resizeDelay if passed \'false\'', inject(function ($window, $timeout) {
-      testAllowsTurningOffResizeDelay('<div snapscroll="" snap-to-window-height="" resize-delay="false"></div>', $window, $timeout);
+      testAllowsTurningOffResizeDelay('<div snapscroll="" fit-window-height="" resize-delay="false"></div>', $window, $timeout);
     }));
 
     it('stops listening to window resize when scope is destroyed', inject(function ($window, $timeout) {
-      testStopsListeningToResizeWhenScopeDestroyed('<div snapscroll="" snap-to-window-height=""></div>', $window, $timeout);
+      testStopsListeningToResizeWhenScopeDestroyed('<div snapscroll="" fit-window-height=""></div>', $window, $timeout);
     }));
   });
 });
