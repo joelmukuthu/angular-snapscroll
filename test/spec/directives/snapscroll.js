@@ -148,6 +148,204 @@ describe('Directive: snapscroll', function () {
     $scope.$apply();
   }
   
+  function testPreventsNormalScrollingUsingMousewheel(html) {
+    var element,
+        preventDefault = jasmine.createSpy('preventDefault');
+    element = compileElement(html, true);
+    element.triggerHandler({
+      type: 'wheel',
+      preventDefault: preventDefault
+    });
+    element.triggerHandler({
+      type: 'mousewheel',
+      preventDefault: preventDefault
+    });
+    element.triggerHandler({
+      type: 'onmousewheel',
+      preventDefault: preventDefault
+    });
+    expect(preventDefault).toHaveBeenCalled();
+    expect(preventDefault.calls.count()).toBe(3);
+  }
+
+  function testSnapsDownOnMousewheelDown(html) {
+    var element;
+    element = compileElement(html, true);
+    element.triggerHandler({
+      type: 'wheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(1);
+    expect(element[0].scrollTop).toBe(50);
+    element.triggerHandler({
+      type: 'mousewheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(2);
+    expect(element[0].scrollTop).toBe(100);
+    element.triggerHandler({
+      type: 'onmousewheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(3);
+    expect(element[0].scrollTop).toBe(150);
+  }
+
+  function testSnapsUpOnMousewheelUp(html) {
+    var element;
+    $scope.index = 3;
+    element = compileElement(html, true);
+    element.triggerHandler({
+      type: 'wheel',
+      wheelDelta: 120,
+      detail: -120,
+      deltaY: -120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(2);
+    expect(element[0].scrollTop).toBe(100);
+    element.triggerHandler({
+      type: 'mousewheel',
+      wheelDelta: 120,
+      detail: -120,
+      deltaY: -120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(1);
+    expect(element[0].scrollTop).toBe(50);
+    element.triggerHandler({
+      type: 'onmousewheel',
+      wheelDelta: 120,
+      detail: -120,
+      deltaY: -120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(0);
+    expect(element[0].scrollTop).toBe(0);
+  }
+
+  function testDoesntSnapInTheSameDirectionOnNewMousewheelIfCurrentlySnapping(html) {
+    var element;
+    element = compileElement(html, true);
+    element.triggerHandler({
+      type: 'wheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120
+    });
+    element.triggerHandler({
+      type: 'wheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(1);
+    expect(element[0].scrollTop).toBe(50);
+  }
+
+  function testAllowsSnapingInTheOppositeDirectionOnNewMousewheelIfCurrentlySnapping(html) {
+    var element;
+    element = compileElement(html, true);
+    element.triggerHandler({
+      type: 'wheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120
+    });
+    element.triggerHandler({
+      type: 'wheel',
+      wheelDelta: 120,
+      detail: -120,
+      deltaY: -120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(0);
+    expect(element[0].scrollTop).toBe(0);
+  }
+
+  function testDoesntSnapDownOnNewDownMousewheelIfAlreadyScrolledToBottom(html) {
+    var element;
+    $scope.index = 3;
+    element = compileElement(html, true);
+    element.triggerHandler({
+      type: 'wheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(3);
+    expect(element[0].scrollTop).toBe(150);
+    // try to wheel up then..
+    element.triggerHandler({
+      type: 'mousewheel',
+      wheelDelta: 120,
+      detail: -120,
+      deltaY: -120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(2);
+    expect(element[0].scrollTop).toBe(100);
+  }
+
+  function testDoesntSnapUpOnNewDownMousewheelIfAlreadyScrolltopIsZero(html) {
+    var element;
+    element = compileElement(html, true);
+    element.triggerHandler({
+      type: 'wheel',
+      wheelDelta: 120,
+      detail: -120,
+      deltaY: -120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(0);
+    expect(element[0].scrollTop).toBe(0);
+    // try to wheel down then..
+    element.triggerHandler({
+      type: 'mousewheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(1);
+    expect(element[0].scrollTop).toBe(50);
+  }
+
+  function testStopsListeningToMousewheelWhenScopeIsDestroyed(html) {
+    var element;
+    element = compileElement(html, true);
+    element.triggerHandler({
+      type: 'wheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(1);
+    expect(element[0].scrollTop).toBe(50);
+    $scope.$destroy();
+    element.triggerHandler({
+      type: 'wheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120
+    });
+    $scope.$apply();
+    expect($scope.index).toBe(1);
+    expect(element[0].scrollTop).toBe(50);
+  }
+  
   describe('as an attribute', function () {
     beforeEach(function () {
       var failureCallback;
@@ -692,6 +890,101 @@ describe('Directive: snapscroll', function () {
     
     it('passes the new snapIndex to the afterSnap callback', function () {
       testCorrectSnapIndexPassedToAfterSnap('<div snapscroll="" snap-index="snapIndex" after-snap="afterSnap(snapIndex)"></div>');
+    });
+    
+    it('prevents normal scrollling using the mousewheel', function () {
+      var html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testPreventsNormalScrollingUsingMousewheel(html);
+    });
+    
+    it('snaps down on mouseheel down', function () {
+      var html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testSnapsDownOnMousewheelDown(html);
+    });
+    
+    it('snaps up on mouseheel up', function () {
+      var html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testSnapsUpOnMousewheelUp(html);
+    });
+    
+    it('doesn\'t snap in the same direction as a new mousewheel event if currently snapping', function () {
+      var html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testDoesntSnapInTheSameDirectionOnNewMousewheelIfCurrentlySnapping(html);
+    });
+    
+    it('allows snapping in the opposite direction as a new mousewheel event if currently snapping', function () {
+      var html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testAllowsSnapingInTheOppositeDirectionOnNewMousewheelIfCurrentlySnapping(html);
+    });
+    
+    it('doens\'t snap down on a new down-mousewheel event if the element is already scrolled to the end', function () {
+      var html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testDoesntSnapDownOnNewDownMousewheelIfAlreadyScrolledToBottom(html);
+    });
+    
+    it('doens\'t snap up on a new up-mousewheel event if the element\'s scrollTop is 0', function () {
+      var html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testDoesntSnapUpOnNewDownMousewheelIfAlreadyScrolltopIsZero(html);
+    });
+    
+    it('stops listening to mousewheel events when scope is destroyed', function () {
+      var html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testStopsListeningToMousewheelWhenScopeIsDestroyed(html);
     });
   });
     

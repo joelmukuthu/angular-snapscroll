@@ -47,6 +47,7 @@ var watchSnapIndex = function (scope, snapIndexChangedCallback) {
     if (!scope.snapIndexIsValid()) {
       scope.ignoreThisSnapIndexChange = true;
       scope.snapIndex = oldSnapIndex;
+      scope.snapDirection = 0;
       return;
     }
     if (scope.beforeSnap({snapIndex: snapIndex}) === false) {
@@ -56,10 +57,50 @@ var watchSnapIndex = function (scope, snapIndexChangedCallback) {
     }
     if (angular.isFunction(snapIndexChangedCallback)) {
       snapIndexChangedCallback(snapIndex, function () {
+        scope.snapDirection = 0;
         scope.afterSnap({snapIndex: snapIndex});
       });
     }
   });
+};
+
+var initWheelEvents = function (scope, element) {
+  var onWheel,
+      bindWheel,
+      unbindWheel;
+        
+  onWheel = function (e) {
+    e.preventDefault();
+
+    var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -(e.deltaY || e.detail))));
+
+    if (isNaN(delta)) {
+      return;
+    }
+    
+    if (delta < 0) {
+      if (scope.snapDirection !== 1) {
+        scope.snapDirection = 1;
+        scope.snapIndex += 1;
+      }
+    } else {
+      if (scope.snapDirection !== -1) {
+        scope.snapDirection = -1;
+        scope.snapIndex -= 1;
+      }
+    }
+  };
+        
+  bindWheel = function () {
+    element.on('wheel mousewheel onmousewheel', onWheel);
+  };
+
+  unbindWheel = function () {
+    element.off('wheel mousewheel onmousewheel', onWheel);
+  };
+  
+  bindWheel();
+  scope.$on('$destroy', unbindWheel);
 };
 
 var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaulSnapscrollScrollDelay', 'defaulSnapscrollSnapDuration',
@@ -157,7 +198,6 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaulSnapscrollScrollDela
             }
           });
           
-          
           scope.defaultSnapHeight = element[0].offsetHeight;
 
           scope.snapIndexIsValid = function () {
@@ -184,6 +224,8 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaulSnapscrollScrollDela
           
           bindScroll();
           scope.$on('$destroy', unbindScroll);
+          
+          initWheelEvents(scope, element);
         };
         
         init();
