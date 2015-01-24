@@ -54,13 +54,13 @@ describe('Directive: fitWindowHeight', function () {
     expect(snapHeightMock).toBe(200);
   }
   
-  function testDefaultsResizeDelayToTheValueOfDefaulSnapscrollSnapToWindowHeightResizeDelay(html, $window, $timeout, defaulSnapscrollSnapToWindowHeightResizeDelay) {
+  function testDefaultsResizeDelayToTheValueOfDefaulSnapscrollSnapToWindowHeightResizeDelay(html, $window, $timeout, defaultSnapscrollSnapToWindowHeightResizeDelay) {
     var element;
     $window.innerHeight = 400;
     element = compileElement(html);
     $window.innerHeight = 200;
     angular.element($window).triggerHandler('resize');
-    $timeout.flush(defaulSnapscrollSnapToWindowHeightResizeDelay - 1);
+    $timeout.flush(defaultSnapscrollSnapToWindowHeightResizeDelay - 1);
     expect(snapHeightMock).toBe(400);
     $timeout.flush(1);
     expect(snapHeightMock).toBe(200);
@@ -90,13 +90,13 @@ describe('Directive: fitWindowHeight', function () {
     expect(snapHeightMock).toBe(200);
   }
   
-  function testDefaultsResizeDelayToTheValueOfDefaulSnapscrollSnapToWindowHeightResizeDelayIfBadTimeoutIsProvided(html, $window, $timeout, defaulSnapscrollSnapToWindowHeightResizeDelay) {
+  function testDefaultsResizeDelayToTheValueOfDefaulSnapscrollSnapToWindowHeightResizeDelayIfBadTimeoutIsProvided(html, $window, $timeout, defaultSnapscrollSnapToWindowHeightResizeDelay) {
     var element;
     $window.innerHeight = 400;
     element = compileElement(html);
     $window.innerHeight = 200;
     angular.element($window).triggerHandler('resize');
-    $timeout.flush(defaulSnapscrollSnapToWindowHeightResizeDelay - 1);
+    $timeout.flush(defaultSnapscrollSnapToWindowHeightResizeDelay - 1);
     expect(snapHeightMock).toBe(400);
     $timeout.flush(1);
     expect(snapHeightMock).toBe(200);
@@ -144,8 +144,8 @@ describe('Directive: fitWindowHeight', function () {
       testUpdatesSnapHeightOnWindowResize('<div snapscroll="" fit-window-height=""></div>', $window, $timeout);
     }));
 
-    it('defaults the resizeDelay to the value of defaulSnapscrollSnapToWindowHeightResizeDelay', inject(function ($window, $timeout, defaulSnapscrollSnapToWindowHeightResizeDelay) {
-      testDefaultsResizeDelayToTheValueOfDefaulSnapscrollSnapToWindowHeightResizeDelay('<div snapscroll="" fit-window-height=""></div>', $window, $timeout, defaulSnapscrollSnapToWindowHeightResizeDelay);
+    it('defaults the resizeDelay to the value of defaultSnapscrollSnapToWindowHeightResizeDelay', inject(function ($window, $timeout, defaultSnapscrollSnapToWindowHeightResizeDelay) {
+      testDefaultsResizeDelayToTheValueOfDefaulSnapscrollSnapToWindowHeightResizeDelay('<div snapscroll="" fit-window-height=""></div>', $window, $timeout, defaultSnapscrollSnapToWindowHeightResizeDelay);
     }));
 
     it('allows setting the resizeDelay', inject(function ($window, $timeout) {
@@ -157,8 +157,8 @@ describe('Directive: fitWindowHeight', function () {
 
     }));
 
-    it('defaults the resizeDelay to the value of defaulSnapscrollSnapToWindowHeightResizeDelay if a bad timeout is provided', inject(function ($window, $timeout, defaulSnapscrollSnapToWindowHeightResizeDelay) {
-      testDefaultsResizeDelayToTheValueOfDefaulSnapscrollSnapToWindowHeightResizeDelayIfBadTimeoutIsProvided('<div snapscroll="" fit-window-height="" resize-delay="bad"></div>', $window, $timeout, defaulSnapscrollSnapToWindowHeightResizeDelay);
+    it('defaults the resizeDelay to the value of defaultSnapscrollSnapToWindowHeightResizeDelay if a bad timeout is provided', inject(function ($window, $timeout, defaultSnapscrollSnapToWindowHeightResizeDelay) {
+      testDefaultsResizeDelayToTheValueOfDefaulSnapscrollSnapToWindowHeightResizeDelayIfBadTimeoutIsProvided('<div snapscroll="" fit-window-height="" resize-delay="bad"></div>', $window, $timeout, defaultSnapscrollSnapToWindowHeightResizeDelay);
     }));
 
     it('allows turning off the resizeDelay if passed \'false\'', inject(function ($window, $timeout) {

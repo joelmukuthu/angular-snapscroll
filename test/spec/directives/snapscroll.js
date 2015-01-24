@@ -466,7 +466,7 @@ describe('Directive: snapscroll', function () {
       expect(scrollMock.stop).toHaveBeenCalled();
     });
     
-    it('defaults the scrollDelay timeout to the value of defaulSnapscrollScrollDelay', inject(function ($timeout, defaulSnapscrollScrollDelay) {
+    it('defaults the scrollDelay timeout to the value of defaultSnapscrollScrollDelay', inject(function ($timeout, defaultSnapscrollScrollDelay) {
       var element,
           html = [
             '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
@@ -478,7 +478,7 @@ describe('Directive: snapscroll', function () {
       expect($scope.index).toBe(0);
       element[0].scrollTop = 50;
       element.triggerHandler('scroll');
-      $timeout.flush(defaulSnapscrollScrollDelay - 1);
+      $timeout.flush(defaultSnapscrollScrollDelay - 1);
       expect($scope.index).toBe(0);
       $timeout.flush(1);
       expect($scope.index).toBe(1);
@@ -539,7 +539,7 @@ describe('Directive: snapscroll', function () {
       expect($scope.index).toBe(1);
     }));
     
-    it('defaults the the scrollDelay timeout to the value of defaulSnapscrollScrollDelay if a non-number scrollDelay is provided', inject(function ($timeout, defaulSnapscrollScrollDelay) {
+    it('defaults the the scrollDelay timeout to the value of defaultSnapscrollScrollDelay if a non-number scrollDelay is provided', inject(function ($timeout, defaultSnapscrollScrollDelay) {
       var element,
           html = [
             '<div snapscroll="" snap-index="index" scroll-delay="\'bad\'" style="height: 50px; overflow: auto">',
@@ -551,7 +551,7 @@ describe('Directive: snapscroll', function () {
       expect($scope.index).toBe(0);
       element[0].scrollTop = 50;
       element.triggerHandler('scroll');
-      $timeout.flush(defaulSnapscrollScrollDelay - 1);
+      $timeout.flush(defaultSnapscrollScrollDelay - 1);
       expect($scope.index).toBe(0);
       $timeout.flush(1);
       expect($scope.index).toBe(1);
@@ -1175,7 +1175,7 @@ describe('Directive: snapscroll', function () {
       expect(snapDurationMock).not.toBe('bad');
     });
 
-    it('defaults snapDuration to the value of defaulSnapscrollSnapDuration', inject(function (defaulSnapscrollSnapDuration) {
+    it('defaults snapDuration to the value of defaultSnapscrollSnapDuration', inject(function (defaultSnapscrollSnapDuration) {
       var element,
           html = [
             '<div snapscroll="" snap-index="index" snap-duration="\'bad\'" style="height: 50px; overflow: auto">',
@@ -1187,10 +1187,10 @@ describe('Directive: snapscroll', function () {
       element = compileElement(html, true);
       $scope.index = 1;
       $scope.$apply();
-      expect(snapDurationMock).toBe(defaulSnapscrollSnapDuration);
+      expect(snapDurationMock).toBe(defaultSnapscrollSnapDuration);
     }));
 
-    it('initializes snapDuration to the value of defaulSnapscrollSnapDuration', inject(function (defaulSnapscrollSnapDuration) {
+    it('initializes snapDuration to the value of defaultSnapscrollSnapDuration', inject(function (defaultSnapscrollSnapDuration) {
       var element,
           html = [
             '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
@@ -1202,7 +1202,7 @@ describe('Directive: snapscroll', function () {
       element = compileElement(html, true);
       $scope.index = 1;
       $scope.$apply();
-      expect(snapDurationMock).toBe(defaulSnapscrollSnapDuration);
+      expect(snapDurationMock).toBe(defaultSnapscrollSnapDuration);
     }));
 
     // TODO: is this functionality really necessary??

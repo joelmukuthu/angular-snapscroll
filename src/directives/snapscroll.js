@@ -103,8 +103,8 @@ var initWheelEvents = function (scope, element) {
   scope.$on('$destroy', unbindWheel);
 };
 
-var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaulSnapscrollScrollDelay', 'defaulSnapscrollSnapDuration',
-  function ($timeout, scroll, defaulSnapscrollScrollDelay, defaulSnapscrollSnapDuration) {
+var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDelay', 'defaultSnapscrollSnapDuration',
+  function ($timeout, scroll, defaultSnapscrollScrollDelay, defaultSnapscrollSnapDuration) {
     return {
       restrict: 'A',
       scope: scopeObject,
@@ -179,7 +179,7 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaulSnapscrollScrollDela
           } else {
             scrollDelay = parseInt(scrollDelay, 10);
             if (isNaN(scrollDelay)) {
-              scrollDelay = defaulSnapscrollScrollDelay;
+              scrollDelay = defaultSnapscrollScrollDelay;
             }
           }
         
@@ -189,7 +189,7 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaulSnapscrollScrollDela
           
           snapDuration = parseInt(snapDuration, 10);
           if (isNaN(snapDuration)) {
-            snapDuration = defaulSnapscrollSnapDuration;
+            snapDuration = defaultSnapscrollSnapDuration;
           }
           
           scope.$watch('snapAnimation', function (animation) {

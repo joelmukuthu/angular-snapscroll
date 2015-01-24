@@ -20,16 +20,16 @@ describe('Module: snapscroll', function () {
       expect(angular.isFunction(defaultSnapscrollScrollEasing)).toBe(true);
     }));
     
-    it('registers the defaulSnapscrollScrollDelay', inject(function (defaulSnapscrollScrollDelay) {
-      expect(angular.isNumber(defaulSnapscrollScrollDelay)).toBe(true);
+    it('registers the defaultSnapscrollScrollDelay', inject(function (defaultSnapscrollScrollDelay) {
+      expect(angular.isNumber(defaultSnapscrollScrollDelay)).toBe(true);
     }));
     
-    it('registers the defaulSnapscrollSnapDuration', inject(function (defaulSnapscrollSnapDuration) {
-      expect(angular.isNumber(defaulSnapscrollSnapDuration)).toBe(true);
+    it('registers the defaultSnapscrollSnapDuration', inject(function (defaultSnapscrollSnapDuration) {
+      expect(angular.isNumber(defaultSnapscrollSnapDuration)).toBe(true);
     }));
     
-    it('registers the defaulSnapscrollSnapToWindowHeightResizeDelay', inject(function (defaulSnapscrollSnapToWindowHeightResizeDelay) {
-      expect(angular.isNumber(defaulSnapscrollSnapToWindowHeightResizeDelay)).toBe(true);
+    it('registers the defaultSnapscrollSnapToWindowHeightResizeDelay', inject(function (defaultSnapscrollSnapToWindowHeightResizeDelay) {
+      expect(angular.isNumber(defaultSnapscrollSnapToWindowHeightResizeDelay)).toBe(true);
     }));
     
   });

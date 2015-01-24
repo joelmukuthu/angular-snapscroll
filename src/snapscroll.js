@@ -12,6 +12,6 @@ function easeInOutQuad(t, b, c, d) {
 angular
   .module('snapscroll', [])
   .value('defaultSnapscrollScrollEasing', easeInOutQuad)
-  .value('defaulSnapscrollScrollDelay', 250)
-  .value('defaulSnapscrollSnapDuration', 800)
-  .value('defaulSnapscrollSnapToWindowHeightResizeDelay', 400);
+  .value('defaultSnapscrollScrollDelay', 250)
+  .value('defaultSnapscrollSnapDuration', 800)
+  .value('defaultSnapscrollSnapToWindowHeightResizeDelay', 400);
