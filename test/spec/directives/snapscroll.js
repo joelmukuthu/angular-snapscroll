@@ -177,7 +177,6 @@ describe('Directive: snapscroll', function () {
       detail: 120,
       deltaY: 120
     });
-    $scope.$apply();
     expect($scope.index).toBe(1);
     expect(element[0].scrollTop).toBe(50);
     element.triggerHandler({
@@ -186,7 +185,6 @@ describe('Directive: snapscroll', function () {
       detail: 120,
       deltaY: 120
     });
-    $scope.$apply();
     expect($scope.index).toBe(2);
     expect(element[0].scrollTop).toBe(100);
     element.triggerHandler({
@@ -195,7 +193,6 @@ describe('Directive: snapscroll', function () {
       detail: 120,
       deltaY: 120
     });
-    $scope.$apply();
     expect($scope.index).toBe(3);
     expect(element[0].scrollTop).toBe(150);
   }
@@ -210,7 +207,6 @@ describe('Directive: snapscroll', function () {
       detail: -120,
       deltaY: -120
     });
-    $scope.$apply();
     expect($scope.index).toBe(2);
     expect(element[0].scrollTop).toBe(100);
     element.triggerHandler({
@@ -219,7 +215,6 @@ describe('Directive: snapscroll', function () {
       detail: -120,
       deltaY: -120
     });
-    $scope.$apply();
     expect($scope.index).toBe(1);
     expect(element[0].scrollTop).toBe(50);
     element.triggerHandler({
@@ -228,11 +223,11 @@ describe('Directive: snapscroll', function () {
       detail: -120,
       deltaY: -120
     });
-    $scope.$apply();
     expect($scope.index).toBe(0);
     expect(element[0].scrollTop).toBe(0);
   }
 
+  // TODO: fix this test, this requires scroll.to() not to be synchronous
   function testDoesntSnapInTheSameDirectionOnNewMousewheelIfCurrentlySnapping(html) {
     var element;
     element = compileElement(html, true);
@@ -248,11 +243,11 @@ describe('Directive: snapscroll', function () {
       detail: 120,
       deltaY: 120
     });
-    $scope.$apply();
     expect($scope.index).toBe(1);
     expect(element[0].scrollTop).toBe(50);
   }
 
+  // TODO: fix this test, this requires scroll.to() not to be synchronous
   function testAllowsSnapingInTheOppositeDirectionOnNewMousewheelIfCurrentlySnapping(html) {
     var element;
     element = compileElement(html, true);
@@ -268,7 +263,6 @@ describe('Directive: snapscroll', function () {
       detail: -120,
       deltaY: -120
     });
-    $scope.$apply();
     expect($scope.index).toBe(0);
     expect(element[0].scrollTop).toBe(0);
   }
@@ -283,7 +277,6 @@ describe('Directive: snapscroll', function () {
       detail: 120,
       deltaY: 120
     });
-    $scope.$apply();
     expect($scope.index).toBe(3);
     expect(element[0].scrollTop).toBe(150);
     // try to wheel up then..
@@ -293,7 +286,6 @@ describe('Directive: snapscroll', function () {
       detail: -120,
       deltaY: -120
     });
-    $scope.$apply();
     expect($scope.index).toBe(2);
     expect(element[0].scrollTop).toBe(100);
   }
@@ -307,7 +299,6 @@ describe('Directive: snapscroll', function () {
       detail: -120,
       deltaY: -120
     });
-    $scope.$apply();
     expect($scope.index).toBe(0);
     expect(element[0].scrollTop).toBe(0);
     // try to wheel down then..
@@ -317,7 +308,6 @@ describe('Directive: snapscroll', function () {
       detail: 120,
       deltaY: 120
     });
-    $scope.$apply();
     expect($scope.index).toBe(1);
     expect(element[0].scrollTop).toBe(50);
   }
@@ -331,7 +321,6 @@ describe('Directive: snapscroll', function () {
       detail: 120,
       deltaY: 120
     });
-    $scope.$apply();
     expect($scope.index).toBe(1);
     expect(element[0].scrollTop).toBe(50);
     $scope.$destroy();
@@ -341,7 +330,6 @@ describe('Directive: snapscroll', function () {
       detail: 120,
       deltaY: 120
     });
-    $scope.$apply();
     expect($scope.index).toBe(1);
     expect(element[0].scrollTop).toBe(50);
   }

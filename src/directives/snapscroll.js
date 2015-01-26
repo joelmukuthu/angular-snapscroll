@@ -80,13 +80,17 @@ var initWheelEvents = function (scope, element) {
     
     if (delta < 0) {
       if (scope.snapDirection !== 1) {
-        scope.snapDirection = 1;
-        scope.snapIndex += 1;
+        scope.$apply(function () {
+          scope.snapDirection = 1;
+          scope.snapIndex += 1;
+        });
       }
     } else {
       if (scope.snapDirection !== -1) {
-        scope.snapDirection = -1;
-        scope.snapIndex -= 1;
+        scope.$apply(function () {
+          scope.snapDirection = -1;
+          scope.snapIndex -= 1;
+        });
       }
     }
   };
