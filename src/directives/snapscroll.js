@@ -40,6 +40,10 @@ var watchSnapIndex = function (scope, snapIndexChangedCallback) {
       scope.snapIndex = 0;
       return;
     }
+    if (snapIndex % 1 !== 0) {
+      scope.snapIndex = Math.round(snapIndex);
+      return;
+    }
     if (scope.ignoreThisSnapIndexChange) {
       scope.ignoreThisSnapIndexChange = undefined;
       return;

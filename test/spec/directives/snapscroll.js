@@ -429,6 +429,31 @@ describe('Directive: snapscroll', function () {
       expect(element[0].scrollTop).toBe(50);
     });
     
+    it('casts any non-integer snapIndex to its nearest integer value', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      $scope.index = 0.0000005;
+      element = compileElement(html, true);
+      expect($scope.index).toBe(0);
+      expect(element[0].scrollTop).toBe(0);
+      $scope.$apply(function () {
+        $scope.index = 1.499995;
+      });
+      expect($scope.index).toBe(1);
+      expect(element[0].scrollTop).toBe(50);
+      $scope.$apply(function () {
+        $scope.index = 1.5;
+      });
+      expect($scope.index).toBe(2);
+      expect(element[0].scrollTop).toBe(100);
+    });
+    
     it('doesn\'t fire before and afterSnap callbacks while resetting the scrollTop', inject(function ($timeout) {
       var element,
           test = 0,
