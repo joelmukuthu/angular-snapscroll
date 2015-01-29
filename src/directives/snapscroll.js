@@ -173,7 +173,7 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDel
           // ongoing), unbind it and then restart the bindScroll timeout
           if (scope.snapDirection !== 0) {
             unbindScroll();
-            bindScrollPromise = $timeout(bindScroll, 400);
+            bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
             return;
           }
           scroll.stop(element);
