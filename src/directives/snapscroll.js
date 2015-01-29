@@ -125,7 +125,8 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDel
             bindScrollPromise,
             snapEasing = attributes.snapEasing,
             scrollDelay = attributes.scrollDelay,
-            snapDuration = attributes.snapDuration;
+            snapDuration = attributes.snapDuration,
+            preventSnappingAfterManualScroll = angular.isDefined(attributes.preventSnappingAfterManualScroll);
         
         snapTo = function (index) {
           var args,
@@ -139,7 +140,7 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDel
           } else {
             args = [element, top];
           }
-          if (scrollBound) {
+          if (!preventSnappingAfterManualScroll && scrollBound) {
             unbindScroll();
           }
           scroll.to.apply(scroll, args).then(function () {
@@ -147,9 +148,11 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDel
               oneTimeAfterSnap.call();
               oneTimeAfterSnap = undefined;
             }
-            // bind scroll after a timeout
-            $timeout.cancel(bindScrollPromise);
-            bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
+            if (!preventSnappingAfterManualScroll) {
+              // bind scroll after a timeout
+              $timeout.cancel(bindScrollPromise);
+              bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
+            }
           });
         };
         
@@ -241,8 +244,10 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDel
             snapTo(snapIndex);
           });
           
-          bindScroll();
-          scope.$on('$destroy', unbindScroll);
+          if (!preventSnappingAfterManualScroll) {
+            bindScroll();
+            scope.$on('$destroy', unbindScroll);
+          }
           
           initWheelEvents(scope, element);
         };

@@ -995,6 +995,28 @@ describe('Directive: snapscroll', function () {
           $timeout.flush();
         }).toThrow();
       });
+      
+      it('allows preventing the automatic snapping which happens after a manual scroll', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto" prevent-snapping-after-manual-scroll="">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        element = compileElement(html, true); // use the regular compileElement()
+        expect(function () {
+          $timeout.flush();
+        }).toThrow(); // test that no timeout was registered after the initial snap
+        expect($scope.index).toBe(0);
+        element[0].scrollTop = 25;
+        element.triggerHandler('scroll');
+        expect(function () {
+          $timeout.flush();
+        }).toThrow(); // test that no timeout was registered after scroll was triggered
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(25);
+      });
     });
   });
     
