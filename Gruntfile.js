@@ -40,29 +40,6 @@ module.exports = function (grunt) {
       }
     },
     
-    autoprefixer: {
-      options: {
-        browsers: ['last 1 version']
-      },
-      dev: {
-        src: 'src/css/<%= pkg.name %>.css',
-        dest: '.tmp/<%= pkg.name %>.css'
-      },
-      dist: {
-        src: 'src/css/<%= pkg.name %>.css',
-        dest: 'dist/<%= pkg.name %>.css'
-      }
-    },
-    
-    cssmin: {
-      options: {
-        banner: '<%= info.banner %>'
-      },
-      files: {
-        'dist/<%= pkg.name %>.min.css': 'dist/<%= pkg.name %>.css'
-      }
-    },
-    
     jshint: {
       options: {
         jshintrc: '.jshintrc',
@@ -103,13 +80,6 @@ module.exports = function (grunt) {
           'karma:single'
         ]
       },
-      css: {
-        files: ['src/css/<%= pkg.name %>.css'],
-        tasks: [
-          'autoprefixer:dev',
-          'karma:single'
-        ]
-      },
       test: {
         files: ['test/spec/**/*.js'],
         tasks: [
@@ -123,8 +93,7 @@ module.exports = function (grunt) {
   grunt.registerTask('setup', [
     'jshint',
     'clean:dev',
-    'concat:dev',
-    'autoprefixer:dev'
+    'concat:dev'
   ]);
   
   grunt.registerTask('default', [
@@ -145,8 +114,6 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'clean:dist',
     'concat',
-    'uglify',
-    'autoprefixer:dist',
-    'cssmin'
+    'uglify'
   ]);
 };

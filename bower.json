@@ -6,8 +6,7 @@
   ],
   "description": "scroll-and-snap module for AngularJS. provides functionality similar to fullpage.js",
   "main": [
-    "dist/snapscroll.js",
-    "dist/snapscroll.css"
+    "dist/snapscroll.js"
   ],
   "keywords": [
     "snapscroll",
