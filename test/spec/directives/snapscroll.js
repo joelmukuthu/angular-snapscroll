@@ -425,167 +425,6 @@ describe('Directive: snapscroll', function () {
       expect(element[0].scrollTop).toBe(50);
     });
     
-    it('converts a scrollTop to a snapIndex after a timeout (i.e. listens to scroll on the element)', inject(function ($timeout) {
-      var element,
-          html = [
-            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-            '</div>'
-          ].join('');
-      element = compileElement(html, true);
-      expect($scope.index).toBe(0);
-      element[0].scrollTop = 50;
-      element.triggerHandler('scroll');
-      $timeout.flush();
-      expect($scope.index).toBe(1);
-    }));
-    
-    it('stops scrollTop animation if there\'s a manual scroll on the element)', function () {
-      var element,
-          html = [
-            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-            '</div>'
-          ].join('');
-      element = compileElement(html, true);
-      element.triggerHandler('scroll');
-      expect(scrollMock.stop).toHaveBeenCalled();
-    });
-    
-    it('defaults the scrollDelay timeout to the value of defaultSnapscrollScrollDelay', inject(function ($timeout, defaultSnapscrollScrollDelay) {
-      var element,
-          html = [
-            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-            '</div>'
-          ].join('');
-      element = compileElement(html, true);
-      expect($scope.index).toBe(0);
-      element[0].scrollTop = 50;
-      element.triggerHandler('scroll');
-      $timeout.flush(defaultSnapscrollScrollDelay - 1);
-      expect($scope.index).toBe(0);
-      $timeout.flush(1);
-      expect($scope.index).toBe(1);
-    }));
-    
-    it('allows setting the scrollDelay timeout', inject(function ($timeout) {
-      var element,
-          html = [
-            '<div snapscroll="" snap-index="index" scroll-delay="400" style="height: 50px; overflow: auto">',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-            '</div>'
-          ].join('');
-      element = compileElement(html, true);
-      expect($scope.index).toBe(0);
-      element[0].scrollTop = 50;
-      element.triggerHandler('scroll');
-      $timeout.flush(399);
-      expect($scope.index).toBe(0);
-      $timeout.flush(1);
-      expect($scope.index).toBe(1);
-    }));
-    
-    it('does not allow setting the scrollDelay timeout using expressions', inject(function ($timeout) {
-      var element,
-          html = [
-            '<div snapscroll="" snap-index="index" scroll-delay="200 + 200" style="height: 50px; overflow: auto">',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-            '</div>'
-          ].join('');
-      element = compileElement(html, true);
-      expect($scope.index).toBe(0);
-      element[0].scrollTop = 50;
-      element.triggerHandler('scroll');
-      // TODO: not the best test for this. scrollDelay is set to 200 in this case
-      $timeout.flush(250);
-      expect($scope.index).toBe(1);
-      $timeout.flush(150);
-      expect($scope.index).toBe(1);
-    }));
-    
-    it('allows turning off the scrollDelay timeout if passed \'false\'', inject(function ($timeout) {
-      var element,
-          html = [
-            '<div snapscroll="" snap-index="index" scroll-delay="false" style="height: 50px; overflow: auto">',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-            '</div>'
-          ].join('');
-      element = compileElement(html, true);
-      expect($scope.index).toBe(0);
-      element[0].scrollTop = 50;
-      element.triggerHandler('scroll');
-      expect(function () {
-        $timeout.flush();
-      }).toThrow();
-      expect($scope.index).toBe(1);
-    }));
-    
-    it('defaults the the scrollDelay timeout to the value of defaultSnapscrollScrollDelay if a non-number scrollDelay is provided', inject(function ($timeout, defaultSnapscrollScrollDelay) {
-      var element,
-          html = [
-            '<div snapscroll="" snap-index="index" scroll-delay="\'bad\'" style="height: 50px; overflow: auto">',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-            '</div>'
-          ].join('');
-      element = compileElement(html, true);
-      expect($scope.index).toBe(0);
-      element[0].scrollTop = 50;
-      element.triggerHandler('scroll');
-      $timeout.flush(defaultSnapscrollScrollDelay - 1);
-      expect($scope.index).toBe(0);
-      $timeout.flush(1);
-      expect($scope.index).toBe(1);
-    }));
-    
-    it('stops listening on scroll event when scope is destroyed', inject(function ($timeout) {
-      var element,
-          html = [
-            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-            '</div>'
-          ].join('');
-      element = compileElement(html, true);
-      $scope.$destroy();
-      element[0].scrollTop = 50;
-      element.triggerHandler('scroll');
-      $timeout.verifyNoPendingTasks();
-      expect(function () {
-        $timeout.flush();
-      }).toThrow();
-    }));
-    
-    it('resets (rounds up/down) the scrollTop after a scroll event so that a snap is always fully visible', inject(function ($timeout) {
-      var element,
-          html = [
-            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-            '</div>'
-          ].join('');
-      element = compileElement(html, true);
-      expect($scope.index).toBe(0);
-      element[0].scrollTop = 25;
-      element.triggerHandler('scroll');
-      $timeout.flush();
-      expect($scope.index).toBe(1);
-      expect(element[0].scrollTop).toBe(50);
-      element[0].scrollTop = 24;
-      element.triggerHandler('scroll');
-      $timeout.flush();
-      expect($scope.index).toBe(0);
-      expect(element[0].scrollTop).toBe(0);
-    }));
-    
     it('doesn\'t fire before and afterSnap callbacks while resetting the scrollTop', inject(function ($timeout) {
       var element,
           test = 0,
@@ -973,6 +812,189 @@ describe('Directive: snapscroll', function () {
             '</div>'
           ].join('');
       testStopsListeningToMousewheelWhenScopeIsDestroyed(html);
+    });
+    
+    // new test suite for tests to do with manual scrolling
+    describe('', function () {
+      var $timeout;
+      
+      beforeEach(inject(function (_$timeout_) {
+        $timeout = _$timeout_;
+      }));
+      
+      // override compileElement()
+      function compileElement2(html, appendToBody) {
+        // after the element is compiled, snapscroll does an initial snap after which bindScroll() is called (after a timeout). 
+        // to prevent that timeout, we need to call $timeout.flush()
+        var element = compileElement(html, appendToBody); // call the regular compileElement() first
+        $timeout.flush(); // then flush the timeout on bindScroll() so that scroll is bound synchronously
+        return element;
+      }
+      
+      it('converts a scrollTop to a snapIndex after a timeout (i.e. listens to scroll on the element)', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        element = compileElement2(html, true);
+        expect($scope.index).toBe(0);
+        element[0].scrollTop = 50;
+        element.triggerHandler('scroll');
+        $timeout.flush();
+        expect($scope.index).toBe(1);
+      });
+
+      it('stops scrollTop animation if there\'s a manual scroll on the element)', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        element = compileElement2(html, true);
+        element.triggerHandler('scroll');
+        expect(scrollMock.stop).toHaveBeenCalled();
+      });
+
+      it('defaults the scrollDelay timeout to the value of defaultSnapscrollScrollDelay', inject(function (defaultSnapscrollScrollDelay) {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        element = compileElement2(html, true);
+        expect($scope.index).toBe(0);
+        element[0].scrollTop = 50;
+        element.triggerHandler('scroll');
+        $timeout.flush(defaultSnapscrollScrollDelay - 1);
+        expect($scope.index).toBe(0);
+        $timeout.flush(1);
+        expect($scope.index).toBe(1);
+      }));
+
+      it('allows setting the scrollDelay timeout', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" scroll-delay="400" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        element = compileElement2(html, true);
+        expect($scope.index).toBe(0);
+        element[0].scrollTop = 50;
+        element.triggerHandler('scroll');
+        $timeout.flush(399);
+        expect($scope.index).toBe(0);
+        $timeout.flush(1);
+        expect($scope.index).toBe(1);
+      });
+
+      it('does not allow setting the scrollDelay timeout using expressions', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" scroll-delay="200 + 200" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        element = compileElement2(html, true);
+        expect($scope.index).toBe(0);
+        element[0].scrollTop = 50;
+        element.triggerHandler('scroll');
+        // TODO: not the best test for this. scrollDelay is set to 200 in this case
+        $timeout.flush(250);
+        expect($scope.index).toBe(1);
+        $timeout.flush(150);
+        expect($scope.index).toBe(1);
+      });
+
+      it('allows turning off the scrollDelay timeout if passed \'false\'', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" scroll-delay="false" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        element = compileElement2(html, true);
+        expect($scope.index).toBe(0);
+        element[0].scrollTop = 50;
+        element.triggerHandler('scroll');
+        // flush the timeout on bindScroll() first
+        $timeout.flush();
+        expect(function () {
+          $timeout.flush();
+        }).toThrow();
+        expect($scope.index).toBe(1);
+      });
+
+      it('defaults the the scrollDelay timeout to the value of defaultSnapscrollScrollDelay if a non-number scrollDelay is provided', inject(function (defaultSnapscrollScrollDelay) {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" scroll-delay="\'bad\'" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        element = compileElement2(html, true);
+        expect($scope.index).toBe(0);
+        element[0].scrollTop = 50;
+        element.triggerHandler('scroll');
+        $timeout.flush(defaultSnapscrollScrollDelay - 1);
+        expect($scope.index).toBe(0);
+        $timeout.flush(1);
+        expect($scope.index).toBe(1);
+      }));
+
+      it('resets (rounds up/down) the scrollTop after a scroll event so that a snap is always fully visible', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        element = compileElement2(html, true);
+        expect($scope.index).toBe(0);
+        element[0].scrollTop = 25;
+        element.triggerHandler('scroll');
+        $timeout.flush();
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(50);
+        // flush the timeout on bindScroll() first
+        $timeout.flush();
+        element[0].scrollTop = 24;
+        element.triggerHandler('scroll');
+        $timeout.flush();
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(0);
+      });
+
+      it('stops listening on scroll event when scope is destroyed', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        element = compileElement2(html, true);
+        $scope.$destroy();
+        element[0].scrollTop = 50;
+        element.triggerHandler('scroll');
+        $timeout.verifyNoPendingTasks();
+        expect(function () {
+          $timeout.flush();
+        }).toThrow();
+      });
     });
   });
     

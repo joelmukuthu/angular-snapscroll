@@ -107,8 +107,8 @@ var initWheelEvents = function (scope, element) {
   scope.$on('$destroy', unbindWheel);
 };
 
-var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDelay', 'defaultSnapscrollSnapDuration',
-  function ($timeout, scroll, defaultSnapscrollScrollDelay, defaultSnapscrollSnapDuration) {
+var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDelay', 'defaultSnapscrollSnapDuration', 'defaultSnapscrollBindScrollTimeout',
+  function ($timeout, scroll, defaultSnapscrollScrollDelay, defaultSnapscrollSnapDuration, defaultSnapscrollBindScrollTimeout) {
     return {
       restrict: 'A',
       scope: scopeObject,
@@ -118,9 +118,11 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDel
             snapTo,
             onScroll,
             bindScroll,
+            scrollBound,
             unbindScroll,
+            scrollPromise,
             oneTimeAfterSnap,
-            scrollPromise = 0,
+            bindScrollPromise,
             snapEasing = attributes.snapEasing,
             scrollDelay = attributes.scrollDelay,
             snapDuration = attributes.snapDuration;
@@ -137,13 +139,17 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDel
           } else {
             args = [element, top];
           }
-          unbindScroll();
+          if (scrollBound) {
+            unbindScroll();
+          }
           scroll.to.apply(scroll, args).then(function () {
-            bindScroll();
             if (angular.isDefined(oneTimeAfterSnap)) {
               oneTimeAfterSnap.call();
               oneTimeAfterSnap = undefined;
             }
+            // bind scroll after a timeout
+            $timeout.cancel(bindScrollPromise);
+            bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
           });
         };
         
@@ -160,6 +166,13 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDel
               });
             }
           };
+          // if scroll is bound while snapping (i.e. the bindScroll timeout expires while snapping is 
+          // ongoing), unbind it and then restart the bindScroll timeout
+          if (scope.snapDirection !== 0) {
+            unbindScroll();
+            bindScrollPromise = $timeout(bindScroll, 400);
+            return;
+          }
           scroll.stop(element);
           if (scrollDelay === false) {
             snap();
@@ -171,10 +184,12 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDel
         
         bindScroll = function () {
           element.on('scroll', onScroll);
+          scrollBound = true;
         };
         
         unbindScroll = function () {
           element.off('scroll', onScroll);
+          scrollBound = false;
         };
         
         init = function () {

@@ -14,4 +14,5 @@ angular
   .value('defaultSnapscrollScrollEasing', easeInOutQuad)
   .value('defaultSnapscrollScrollDelay', 250)
   .value('defaultSnapscrollSnapDuration', 800)
-  .value('defaultSnapscrollSnapToWindowHeightResizeDelay', 400);
+  .value('defaultSnapscrollSnapToWindowHeightResizeDelay', 400)
+  .value('defaultSnapscrollBindScrollTimeout', 400);

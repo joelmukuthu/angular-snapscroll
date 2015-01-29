@@ -32,6 +32,10 @@ describe('Module: snapscroll', function () {
       expect(angular.isNumber(defaultSnapscrollSnapToWindowHeightResizeDelay)).toBe(true);
     }));
     
+    it('registers the defaultSnapscrollBindScrollTimeout', inject(function (defaultSnapscrollBindScrollTimeout) {
+      expect(angular.isNumber(defaultSnapscrollBindScrollTimeout)).toBe(true);
+    }));
+    
   });
   
 });
