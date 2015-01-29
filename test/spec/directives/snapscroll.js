@@ -227,46 +227,6 @@ describe('Directive: snapscroll', function () {
     expect(element[0].scrollTop).toBe(0);
   }
 
-  // TODO: fix this test, this requires scroll.to() not to be synchronous
-  function testDoesntSnapInTheSameDirectionOnNewMousewheelIfCurrentlySnapping(html) {
-    var element;
-    element = compileElement(html, true);
-    element.triggerHandler({
-      type: 'wheel',
-      wheelDelta: -120,
-      detail: 120,
-      deltaY: 120
-    });
-    element.triggerHandler({
-      type: 'wheel',
-      wheelDelta: -120,
-      detail: 120,
-      deltaY: 120
-    });
-    expect($scope.index).toBe(1);
-    expect(element[0].scrollTop).toBe(50);
-  }
-
-  // TODO: fix this test, this requires scroll.to() not to be synchronous
-  function testAllowsSnapingInTheOppositeDirectionOnNewMousewheelIfCurrentlySnapping(html) {
-    var element;
-    element = compileElement(html, true);
-    element.triggerHandler({
-      type: 'wheel',
-      wheelDelta: -120,
-      detail: 120,
-      deltaY: 120
-    });
-    element.triggerHandler({
-      type: 'wheel',
-      wheelDelta: 120,
-      detail: -120,
-      deltaY: -120
-    });
-    expect($scope.index).toBe(0);
-    expect(element[0].scrollTop).toBe(0);
-  }
-
   function testDoesntSnapDownOnNewDownMousewheelIfAlreadyScrolledToBottom(html) {
     var element;
     $scope.index = 3;
@@ -752,30 +712,6 @@ describe('Directive: snapscroll', function () {
             '</div>'
           ].join('');
       testSnapsUpOnMousewheelUp(html);
-    });
-    
-    it('doesn\'t snap in the same direction as a new mousewheel event if currently snapping', function () {
-      var html = [
-            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-            '</div>'
-          ].join('');
-      testDoesntSnapInTheSameDirectionOnNewMousewheelIfCurrentlySnapping(html);
-    });
-    
-    it('allows snapping in the opposite direction as a new mousewheel event if currently snapping', function () {
-      var html = [
-            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-            '</div>'
-          ].join('');
-      testAllowsSnapingInTheOppositeDirectionOnNewMousewheelIfCurrentlySnapping(html);
     });
     
     it('doens\'t snap down on a new down-mousewheel event if the element is already scrolled to the end', function () {
@@ -1272,4 +1208,100 @@ describe('Directive: snapscroll', function () {
     });
   });
   
+  // different test suite for tests requiring scroll.to() to be asynchronous
+  describe('as an attribute', function () {
+    var $timeout;
+    
+    function testDoesntSnapInTheSameDirectionOnNewMousewheelIfCurrentlySnapping(html) {
+      var element;
+      element = compileElement(html, true);
+      $timeout.flush(); // flush timeout for initial snap
+      element.triggerHandler({
+        type: 'wheel',
+        wheelDelta: -120,
+        detail: 120,
+        deltaY: 120
+      });
+      expect(element[0].scrollTop).toBe(0); // because animation is in progress
+      element.triggerHandler({
+        type: 'wheel',
+        wheelDelta: -120,
+        detail: 120,
+        deltaY: 120
+      });
+      $timeout.flush(); // flush all animations
+      expect(element[0].scrollTop).toBe(50); // because second wheel event was ignored
+    }
+    
+    function testAllowsSnapingInTheOppositeDirectionOnNewMousewheelIfCurrentlySnapping(html) {
+      var element;
+      element = compileElement(html, true);
+      $timeout.flush(); // flush timeout for initial snap
+      element.triggerHandler({
+        type: 'wheel',
+        wheelDelta: -120,
+        detail: 120,
+        deltaY: 120
+      });
+      expect(element[0].scrollTop).toBe(0); // because animation is in progress
+      element.triggerHandler({
+        type: 'wheel',
+        wheelDelta: 120,
+        detail: -120,
+        deltaY: -120
+      });
+      $timeout.flush(); // flush all animations
+      expect(element[0].scrollTop).toBe(0); // because second wheel event was in the opposite direction
+    }
+    
+    beforeEach(inject(function (_$timeout_) {
+      $timeout = _$timeout_;
+    }));
+    
+    beforeEach(function () {
+      scrollMock.to = function (element, top, duration) {
+        var currentAnimation = element.data('current-animation');
+        if (currentAnimation) {
+          $timeout.cancel(currentAnimation);
+        }
+        currentAnimation = $timeout(function () {
+          element[0].scrollTop = top;
+        }, duration);
+        element.data('current-animation', currentAnimation);
+        return {
+          then: angular.noop
+        };
+      };
+      scrollMock.stop = function (element) {
+        var currentAnimation = element.data('current-animation');
+        if (currentAnimation) {
+          $timeout.cancel(currentAnimation);
+        }
+      };
+    });
+    
+    it('doesn\'t snap in the same direction as a new mousewheel event if currently snapping', function () {
+      var html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testDoesntSnapInTheSameDirectionOnNewMousewheelIfCurrentlySnapping(html);
+    });
+    
+    it('allows snapping in the opposite direction as a new mousewheel event if currently snapping', function () {
+      var html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testAllowsSnapingInTheOppositeDirectionOnNewMousewheelIfCurrentlySnapping(html);
+    });
+  });
 });
