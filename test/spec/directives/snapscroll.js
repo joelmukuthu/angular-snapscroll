@@ -783,6 +783,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(1);
       });
 
+      // TODO: this isn't really true since the scroll listeners are disabled while snapping
       it('stops scrollTop animation if there\'s a manual scroll on the element)', function () {
         var element,
             html = [
