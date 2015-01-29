@@ -60,6 +60,11 @@ var watchSnapIndex = function (scope, snapIndexChangedCallback) {
       return;
     }
     if (angular.isFunction(snapIndexChangedCallback)) {
+      if (snapIndex > oldSnapIndex) {
+        scope.snapDirection = 1;
+      } else {
+        scope.snapDirection = -1;
+      }
       snapIndexChangedCallback(snapIndex, function () {
         scope.snapDirection = 0;
         scope.afterSnap({snapIndex: snapIndex});
@@ -74,7 +79,7 @@ var initWheelEvents = function (scope, element) {
       unbindWheel;
         
   onWheel = function (e) {
-    var allowPropagation,
+    var bubbleUp,
         delta = Math.max(-1, Math.min(1, (e.wheelDelta || -(e.deltaY || e.detail))));
 
     e.preventDefault();
@@ -86,11 +91,10 @@ var initWheelEvents = function (scope, element) {
     if (delta < 0) {
       if (scope.snapDirection !== 1) {
         if (scope.snapIndex + 1 > scope.max()) {
-          allowPropagation = true;
+          bubbleUp = true;
         } else {
-          allowPropagation = false;
+          bubbleUp = false;
           scope.$apply(function () {
-            scope.snapDirection = 1;
             scope.snapIndex += 1;
           });
         }
@@ -98,18 +102,17 @@ var initWheelEvents = function (scope, element) {
     } else {
       if (scope.snapDirection !== -1) {
         if (scope.snapIndex - 1 < scope.min()) {
-          allowPropagation = true;
+          bubbleUp = true;
         } else {
-          allowPropagation = false;
+          bubbleUp = false;
           scope.$apply(function () {
-            scope.snapDirection = -1;
             scope.snapIndex -= 1;
           });
         }
       }
     }
     
-    if (!allowPropagation) {
+    if (!bubbleUp) {
       e.stopPropagation();
     }
   };
@@ -188,13 +191,6 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDel
               });
             }
           };
-          // if scroll is bound while snapping (i.e. the bindScroll timeout expires while snapping is 
-          // ongoing), unbind it and then restart the bindScroll timeout
-          if (scope.snapDirection !== 0) {
-            unbindScroll();
-            bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
-            return;
-          }
           scroll.stop(element);
           if (scrollDelay === false) {
             snap();
@@ -205,6 +201,11 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDel
         };
         
         bindScroll = function () {
+          // if the bindScroll timeout expires while snapping is ongoing, restart the timer
+          if (scope.snapDirection !== 0) {
+            bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
+            return;
+          }
           element.on('scroll', onScroll);
           scrollBound = true;
         };
