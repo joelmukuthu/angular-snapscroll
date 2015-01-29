@@ -44,7 +44,7 @@ var watchSnapIndex = function (scope, snapIndexChangedCallback) {
       scope.ignoreThisSnapIndexChange = undefined;
       return;
     }
-    if (!scope.snapIndexIsValid()) {
+    if (!scope.isValid(snapIndex)) {
       scope.ignoreThisSnapIndexChange = true;
       scope.snapIndex = oldSnapIndex;
       scope.snapDirection = 0;
@@ -70,9 +70,10 @@ var initWheelEvents = function (scope, element) {
       unbindWheel;
         
   onWheel = function (e) {
-    e.preventDefault();
+    var allowPropagation,
+        delta = Math.max(-1, Math.min(1, (e.wheelDelta || -(e.deltaY || e.detail))));
 
-    var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -(e.deltaY || e.detail))));
+    e.preventDefault();
 
     if (isNaN(delta)) {
       return;
@@ -80,18 +81,32 @@ var initWheelEvents = function (scope, element) {
     
     if (delta < 0) {
       if (scope.snapDirection !== 1) {
-        scope.$apply(function () {
-          scope.snapDirection = 1;
-          scope.snapIndex += 1;
-        });
+        if (scope.snapIndex + 1 > scope.max()) {
+          allowPropagation = true;
+        } else {
+          allowPropagation = false;
+          scope.$apply(function () {
+            scope.snapDirection = 1;
+            scope.snapIndex += 1;
+          });
+        }
       }
     } else {
       if (scope.snapDirection !== -1) {
-        scope.$apply(function () {
-          scope.snapDirection = -1;
-          scope.snapIndex -= 1;
-        });
+        if (scope.snapIndex - 1 < scope.min()) {
+          allowPropagation = true;
+        } else {
+          allowPropagation = false;
+          scope.$apply(function () {
+            scope.snapDirection = -1;
+            scope.snapIndex -= 1;
+          });
+        }
       }
+    }
+    
+    if (!allowPropagation) {
+      e.stopPropagation();
     }
   };
         
@@ -222,8 +237,18 @@ var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDel
           
           scope.defaultSnapHeight = element[0].offsetHeight;
 
-          scope.snapIndexIsValid = function () {
-            return scope.snapIndex >= 0 && scope.snapIndex < element.children().length;
+          // snapIndex min
+          scope.min = function () {
+            return 0;
+          };
+
+          // snapIndex max
+          scope.max = function () {
+            return element.children().length - 1;
+          };
+
+          scope.isValid = function (snapIndex) {
+            return snapIndex >= scope.min() && snapIndex <= scope.max();
           };
 
           element.css('overflowY', 'auto');

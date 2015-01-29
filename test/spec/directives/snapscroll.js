@@ -167,6 +167,50 @@ describe('Directive: snapscroll', function () {
     expect(preventDefault).toHaveBeenCalled();
     expect(preventDefault.calls.count()).toBe(3);
   }
+  
+  function testPreventsBubblingUpOfMousewheelEventsIfElementIsStillScrollable(html) {
+    var element,
+        stopPropagation = jasmine.createSpy('stopPropagation');
+    element = compileElement(html, true);
+    element.triggerHandler({
+      type: 'wheel',
+      wheelDelta: 120,
+      detail: -120,
+      deltaY: -120,
+      stopPropagation: stopPropagation
+    }); // try to snap up
+    expect(stopPropagation).not.toHaveBeenCalled();
+    $scope.$apply(function () {
+      $scope.index = 2;
+    });
+    element.triggerHandler({
+      type: 'mousewheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120,
+      stopPropagation: stopPropagation
+    }); // try to snap down
+    expect(stopPropagation).not.toHaveBeenCalled();
+    $scope.$apply(function () {
+      $scope.index = 1;
+    });
+    element.triggerHandler({
+      type: 'onmousewheel',
+      wheelDelta: 120,
+      detail: -120,
+      deltaY: -120,
+      stopPropagation: stopPropagation
+    }); // try to snap up
+    element.triggerHandler({
+      type: 'onmousewheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120,
+      stopPropagation: stopPropagation
+    }); // then down
+    expect(stopPropagation).toHaveBeenCalled();
+    expect(stopPropagation.calls.count()).toBe(2);
+  }
 
   function testSnapsDownOnMousewheelDown(html) {
     var element;
@@ -679,7 +723,7 @@ describe('Directive: snapscroll', function () {
       testCorrectSnapIndexPassedToAfterSnap('<div snapscroll="" snap-index="snapIndex" after-snap="afterSnap(snapIndex)"></div>');
     });
     
-    it('prevents normal scrollling using the mousewheel', function () {
+    it('prevents normal scrolling using the mousewheel', function () {
       var html = [
             '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
               '<div style="height: 50px"></div>',
@@ -688,6 +732,17 @@ describe('Directive: snapscroll', function () {
             '</div>'
           ].join('');
       testPreventsNormalScrollingUsingMousewheel(html);
+    });
+    
+    it('prevents bubbling up of the mousewheel events if the element is still scrollable (to allow nesting of snapscroll elements)', function () {
+      var html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testPreventsBubblingUpOfMousewheelEventsIfElementIsStillScrollable(html);
     });
     
     it('snaps down on mouseheel down', function () {

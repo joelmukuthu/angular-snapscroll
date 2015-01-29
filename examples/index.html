@@ -5,11 +5,23 @@
     <meta charset="utf-8">
     <script src="../bower_components/angular/angular.js"></script>
     <script src="../.tmp/snapscroll.js"></script>
+    <style>
+      * { box-sizing: border-box; }
+    </style>
    </head>
   <body style="margin:0" ng-app="snapscroll" ng-init="snapIndex=1">
     <div snapscroll="" fit-window-height snap-index="snapIndex">
       <div style="background: red"></div>
-      <div style="background: blue"></div>
+      <div style="background: blue; padding-top: 100px;">
+        <div style="height: 200px; background: white;" snapscroll="">
+          <div style="border: 5px black solid"></div>
+          <div style="border: 5px black solid"></div>
+          <div style="border: 5px black solid"></div>
+          <div style="border: 5px black solid"></div>
+          <div style="border: 5px black solid"></div>
+          <div style="border: 5px black solid"></div>
+        </div>
+      </div>
       <div style="background: green"></div>
       <div style="background: cyan"></div>
       <div style="background: magenta"></div>
