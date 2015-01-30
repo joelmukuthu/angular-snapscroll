@@ -1,10 +1,10 @@
 {
-  "name": "snapscroll",
-  "version": "0.0.1",
+  "name": "angular-snapscroll",
+  "version": "0.1.0",
   "authors": [
     "Joel Mukuthu <joelmukuthu@gmail.com>"
   ],
-  "description": "scroll-and-snap module for AngularJS. provides functionality similar to fullpage.js",
+  "description": "angular module that provides scroll-and-snap functionality similar to fullPage.js",
   "main": [
     "dist/snapscroll.js"
   ],
@@ -28,5 +28,5 @@
   "devDependencies": {
     "angular-mocks": "~1.2.24"
   },
-  "homepage": "https://github.com/joelmukuthu/snapscroll.git"
+  "homepage": "https://github.com/joelmukuthu/angular-snapscroll.git"
 }

@@ -15,15 +15,15 @@
     .value('defaultSnapscrollScrollEasing', easeInOutQuad)
     .value('defaultSnapscrollScrollDelay', 250)
     .value('defaultSnapscrollSnapDuration', 800)
-    .value('defaultSnapscrollSnapToWindowHeightResizeDelay', 400)
+    .value('defaultSnapscrollResizeDelay', 400)
     .value('defaultSnapscrollBindScrollTimeout', 400);
 })();
 (function () {
   'use strict';
 
   angular.module('snapscroll')
-    .directive('fitWindowHeight', ['$window', '$timeout', 'defaultSnapscrollSnapToWindowHeightResizeDelay',
-      function ($window, $timeout, defaultSnapscrollSnapToWindowHeightResizeDelay) {
+    .directive('fitWindowHeight', ['$window', '$timeout', 'defaultSnapscrollResizeDelay',
+      function ($window, $timeout, defaultSnapscrollResizeDelay) {
         return {
           restrict: 'A',
           require: 'snapscroll',
@@ -49,7 +49,7 @@
               } else {
                 resizeDelay = parseInt(resizeDelay, 10);
                 if (isNaN(resizeDelay)) {
-                  resizeDelay = defaultSnapscrollSnapToWindowHeightResizeDelay;
+                  resizeDelay = defaultSnapscrollResizeDelay;
                 }
               }
 

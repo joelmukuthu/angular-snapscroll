@@ -7,6 +7,8 @@ module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     
+    pkgname: 'snapscroll',
+    
     info: {
       banner: '/*! <%= pkg.name %>, version: <%= pkg.version %> - <%= grunt.template.today("dd-mm-yyyy") %> */\n'
     },
@@ -22,11 +24,11 @@ module.exports = function (grunt) {
       },
       dev: {
         src: ['src/*.js', 'src/**/*.js'],
-        dest: '.tmp/<%= pkg.name %>.js'
+        dest: '.tmp/<%= pkgname %>.js'
       },
       dist: {
         src: ['src/*.js', 'src/**/*.js'],
-        dest: 'dist/<%= pkg.name %>.js'
+        dest: 'dist/<%= pkgname %>.js'
       }
     },
     
@@ -36,7 +38,7 @@ module.exports = function (grunt) {
       },
       dist: {
         src: ['<%= concat.dist.dest %>'],
-        dest: 'dist/<%= pkg.name %>.min.js'
+        dest: 'dist/<%= pkgname %>.min.js'
       }
     },
     
