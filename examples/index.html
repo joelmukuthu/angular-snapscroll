@@ -1,30 +1,233 @@
 <!doctype html>
 <html>
    <head>
-    <title></title>
+    <title>Snapscroll</title>
     <meta charset="utf-8">
-    <script src="../bower_components/angular/angular.js"></script>
-    <script src="../.tmp/snapscroll.js"></script>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
     <style>
-      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        color: white;
+        font-family: 'Open Sans', 'Arial';
+      }
+      div {
+        box-sizing: border-box;
+      }
+      h1, h2, h3 {
+        padding: 1em 0 0.5em;
+        margin: 0;
+      }
+      p {
+        margin: 0.25em 0 0.5em;
+      }
+      .examples {
+        color: orange;
+      }
+      a {
+        color: orange;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .main > div {
+        height: 100vh;
+        padding-right: 60px;
+        padding-left: 1em;
+        box-shadow: 0 -5px 15px rgba(0,0,0,0.6) inset;
+      }
+      .main > div:nth-child(odd) {
+        background: rgb(10, 84, 92);
+      }
+      .main > div:nth-child(even) {
+        background: rgb(5, 57, 63);
+        color: aliceblue;
+      }
+      .nested {
+        background: rgb(5, 159, 179);
+      }
+      .nested > div {
+        border: 5px rgb(10, 84, 92) solid;
+      }
+      .clearfix {
+        overflow: hidden;
+        height: auto;
+      }
+      .clearfix > div {
+        width: 50%;
+        float: left;
+        height: 200px;
+        overflow: auto;
+        margin-top: 1em;
+      }
+      .indicators {
+        position: fixed;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 14px;
+        height: auto;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        z-index: 1;
+      }
+      .indicators li {
+        width: 14px;
+        height: 14px;
+        margin: 5px 0;
+        background: white;
+        border-radius: 100%;
+        cursor: pointer;
+      }
+      .indicators .active {
+        background: orange;
+      }
     </style>
    </head>
-  <body style="margin:0" ng-app="snapscroll" ng-init="snapIndex=1">
-    <div snapscroll="" fit-window-height snap-index="snapIndex">
-      <div style="background: red"></div>
-      <div style="background: blue; padding-top: 100px;">
-        <div style="height: 200px; background: white;" snapscroll="">
-          <div style="border: 5px black solid"></div>
-          <div style="border: 5px black solid"></div>
-          <div style="border: 5px black solid"></div>
-          <div style="border: 5px black solid"></div>
-          <div style="border: 5px black solid"></div>
-          <div style="border: 5px black solid"></div>
+  <body ng-app="snapscroll" ng-controller="MainController" keyboard-keys>
+    <div class="main" snapscroll fit-window-height snap-index="snapIndex">
+      <div>
+        <h1>Snapscroll</h1>
+        <p>Provides an angular directive for scroll-and-snap behaviour (i.e. vertical scrolling), similar to fullpage.js</p>
+        <ol>
+          <li>Pure JS implementation</li>
+          <li>Requires the core angular module only (no jguery or ngAnimate)</li>
+          <li>5.5kB when minified, 2.0kB when gzipped</li>
+        </ol>
+        <h2>Intro</h2>
+        <p>This page is a full-page snapscroll example that demonstrantes:</p>
+        <ul>
+          <li>full-page snapscroll (i.e. fitWindowHeight)</li>
+          <li>keyboard navigation (try pressing the up and down arrow keys)</li>
+          <li>resetting current snap position after a manual scroll (try to scroll by dragging the scrollbar)</li>
+          <li>snapIndex binding</li>
+        </ul>
+        <h3>Examples</h3>
+        <ol class="examples">
+          <li><a href="#" ng-click="snapIndex=1">Nested snapscrolls</a></li>
+          <li><a href="#" ng-click="snapIndex=2">Callbacks</a></li>
+        </ol>
+      </div>
+      <div>
+        <h3>Nested snapscrolls</h3>
+        <p>Can be nested, side by side etc and won't interfere with each other</p>
+        <div class="nested" style="height: 200px" snapscroll>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div class="clearfix">
+          <div class="nested" style="height: 200px" snapscroll>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <div class="nested" style="height: 200px" snapscroll>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
         </div>
       </div>
-      <div style="background: green"></div>
-      <div style="background: cyan"></div>
-      <div style="background: magenta"></div>
+      <div ng-controller="CallbacksController">
+        <h3>Callbacks</h3>
+        <p>Callbacks are passed a snapIndex parameter. In the beforeSnap callback, this is the index being snapped to while in the afterSnap callback, it's the index just snapped to.</p>
+        <p>Returning false in the beforeSnap callback disables snapping. In this example, it's impossible to snap to the last snap (unless by scrolling manually).</p>
+        <p>Note: callbacks are executed on the initial snap on page load and also after a manual scroll.</p>
+        <div class="nested" style="height: 200px" snapscroll before-snap="beforeCallback(snapIndex)" after-snap="afterCallback(snapIndex)">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div class="clearfix">
+          <div>
+            <p>before-snap messages:</p>
+            <ul>
+              <li ng-repeat="message in beforeSnapMessages track by $index">{{ message }}</li>
+            </ul>
+          </div>
+          <div>
+            <p>after-snap messages:</p>
+            <ul>
+              <li ng-repeat="message in afterSnapMessages track by $index">{{ message }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div></div>
+      <div></div>
     </div>
+    <ul class="indicators">
+      <li ng-click="snapIndex=0" ng-class="{active: snapIndex == 0}"></li>
+      <li ng-click="snapIndex=1" ng-class="{active: snapIndex == 1}"></li>
+      <li ng-click="snapIndex=2" ng-class="{active: snapIndex == 2}"></li>
+      <li ng-click="snapIndex=3" ng-class="{active: snapIndex == 3}"></li>
+      <li ng-click="snapIndex=4" ng-class="{active: snapIndex == 4}"></li>
+    </ul>
+    <script src="../bower_components/angular/angular.js"></script>
+    <script src="../dist/snapscroll.min.js"></script>
+    <script>
+      var app = angular.module('snapscroll');
+      
+      app.directive('keyboardKeys', ['$document', function ($document) {
+        return {
+          restrict: 'A',
+          link: function (scope) {
+            var keydown = function (e) {
+              if (e.keyCode === 38) {
+                e.preventDefault();
+                scope.$emit('arrow-up');
+              }
+              if (e.keyCode === 40) {
+                e.preventDefault();
+                scope.$emit('arrow-down');
+              }
+            };
+            $document.on('keydown', keydown);
+            scope.$on('$destroy', function () {
+              $document.off('keydown', keydown);
+            });
+          }
+        }
+      }]);
+      
+      app.controller('MainController', ['$scope', function ($scope) {
+        $scope.snapIndex = 0;
+        $scope.$on('arrow-up', function () {
+          $scope.$apply(function () {
+            $scope.snapIndex--;
+          });
+        });
+        $scope.$on('arrow-down', function () {
+          $scope.$apply(function () {
+            $scope.snapIndex++;
+          });
+        });
+      }]);
+      
+      app.controller('CallbacksController', ['$scope', function ($scope) {
+        $scope.beforeSnapMessages = [];
+        $scope.afterSnapMessages = [];
+        $scope.beforeCallback = function (snapIndex) {
+          $scope.beforeSnapMessages.push('Snapping to index ' + snapIndex);
+          if (snapIndex === 4) {
+            $scope.beforeSnapMessages.push('Snapping to index 4 disabled');
+            return false;
+          }
+        };
+        $scope.afterCallback = function (snapIndex) {
+          $scope.afterSnapMessages.push('Just snapped to index ' + snapIndex);
+        };
+      }]);
+    </script>
   </body>
 </html>
