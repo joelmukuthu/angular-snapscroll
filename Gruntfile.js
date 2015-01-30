@@ -18,7 +18,7 @@ module.exports = function (grunt) {
     
     concat: {
       options: {
-        separator: ';'
+        separator: '\n'
       },
       dev: {
         src: ['src/*.js', 'src/**/*.js'],
