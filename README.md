@@ -15,12 +15,10 @@ Snapscroll is an [AngularJS](http://angularjs.org) directive that provides scrol
 Install with bower:
 ```sh
 bower install angular-snapscroll
-# or
-bower install joelmukuthu/angular-snapscroll
 ```
 And link to the main JS file:
 ```html
-<script src="/bower_components/snapscroll/dist/snapscroll.js"></script>
+<script src="/bower_components/angular-snapscroll/dist/snapscroll.js"></script>
 ```
 Or download/clone this repo then link to the main JS file.
 
