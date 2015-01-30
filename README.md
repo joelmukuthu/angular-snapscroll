@@ -1,12 +1,14 @@
 # angular-snapscroll
 
-Snapscroll is an [AngularJS](http://angularjs.org) directive that provides scroll-and-snap functionality, similar to [fullPage.js](http://alvarotrigo.com/fullPage/). This only works for vertical scrolling though.
+Snapscroll is an [AngularJS](http://angularjs.org) directive that provides scroll-and-snap functionality for vertical scrolling, similar to [fullPage.js](http://alvarotrigo.com/fullPage/).
 
 - JS-only implementation
 - Only requires angular core
 - 5.5kB when minified, 2.0kB when gzipped
 
 ### Demo
+
+[Demo site](http://joelmukuthu.github.io/angular-snapscroll/)
 
 ### Installation
 
@@ -51,7 +53,7 @@ The module also provides a minimalistic `scroll` service that can be used to ani
 
 ### Documentation
 
-For more examples, check out the [demo site] and for all the configuration options, have a look at the [docs](DOCS.md).
+For more examples, check out the [demo site](http://joelmukuthu.github.io/angular-snapscroll/) and for all the configuration options, have a look at the [docs](DOCS.md).
 
 ### Contributing
 
