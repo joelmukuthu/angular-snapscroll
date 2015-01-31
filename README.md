@@ -69,6 +69,7 @@ Check out the Gruntfile for more grunt tasks (test, build etc).
 
 ### Todo's
 
+- Mobile
 - snapscroll as an element - would allow use of templates and ngAnimate for animations. Currently this repo has a (rather outdated) 'as-element' branch for this.
 - more browser tests
 
