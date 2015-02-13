@@ -6,8 +6,9 @@ Snapscroll is an [AngularJS](http://angularjs.org) directive that provides scrol
 - Only requires angular core
 - 5.5kB when minified, 2.0kB when gzipped
 
-**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+**Table of Contents**
 
+- [angular-snapscroll](#angular-snapscroll)
 	- [Demo](#demo)
 	- [Installation](#installation)
 	- [Usage](#usage)
