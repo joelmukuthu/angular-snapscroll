@@ -8,16 +8,15 @@ Snapscroll is an [AngularJS](http://angularjs.org) directive that provides scrol
 
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
-- [angular-snapscroll](#)
-		- [Demo](#)
-		- [Installation](#)
-		- [Usage](#)
-			- [scroll service](#)
-		- [Documentation](#)
-		- [Contributing](#)
-		- [Todo's](#)
-		- [License](#)
-		- [Version](#)
+	- [Demo](#demo)
+	- [Installation](#installation)
+	- [Usage](#usage)
+		- [scroll service](#scroll-service)
+	- [Documentation](#documentation)
+	- [Contributing](#contributing)
+	- [Todo's](#todos)
+	- [License](#license)
+	- [Version](#version)
 
 ### Demo
 
