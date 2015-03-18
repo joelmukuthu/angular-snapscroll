@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/joelmukuthu/angular-snapscroll.svg?branch=master)](https://travis-ci.org/joelmukuthu/angular-snapscroll)
+
 # angular-snapscroll
 
 Snapscroll is an [AngularJS](http://angularjs.org) directive that provides scroll-and-snap functionality for vertical scrolling, similar to [fullPage.js](http://alvarotrigo.com/fullPage/).
@@ -5,19 +7,6 @@ Snapscroll is an [AngularJS](http://angularjs.org) directive that provides scrol
 - JS-only implementation
 - Only requires angular core
 - 5.5kB when minified, 2.0kB when gzipped
-
-**Table of Contents**
-
-- [angular-snapscroll](#angular-snapscroll)
-	- [Demo](#demo)
-	- [Installation](#installation)
-	- [Usage](#usage)
-		- [scroll service](#scroll-service)
-	- [Documentation](#documentation)
-	- [Contributing](#contributing)
-	- [Todo's](#todos)
-	- [License](#license)
-	- [Version](#version)
 
 ### Demo
 
