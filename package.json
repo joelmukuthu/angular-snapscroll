@@ -5,8 +5,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start test/karma.conf.js",
-    "test-single-run": "node node_modules/karma/bin/karma start test/karma.conf.js --single-run"
+    "test": "grunt test"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
