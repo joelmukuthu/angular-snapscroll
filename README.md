@@ -15,7 +15,7 @@ bower install angular-snapscroll
 ```
 And link to the main JS file:
 ```html
-<script src="/bower_components/angular-snapscroll/dist/snapscroll.js"></script>
+<script src="/bower_components/angular-snapscroll/dist/angular-snapscroll.js"></script>
 ```
 Or download/clone this repo then link to the main JS file.
 
