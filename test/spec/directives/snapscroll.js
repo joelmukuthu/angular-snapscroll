@@ -81,7 +81,7 @@ describe('Directive: snapscroll', function () {
   }
 
   function testAllowsPreventingSnapping(html) {
-    var prevent = false,
+    var prevent,
         test = 0;
     $scope.beforeSnap = function () {
       if (prevent) {
@@ -89,14 +89,18 @@ describe('Directive: snapscroll', function () {
       }
       test += 1;
     };
+    expect(test).toBe(0);
     compileElement(html);
-    // expect(test).toBe(1);
-    $scope.snapIndex = 1;
-    $scope.$apply();
+    expect(test).toBe(1);
+    $scope.$apply(function () {
+      $scope.snapIndex = 1;
+    });
     expect(test).toBe(2);
     prevent = true;
-    $scope.snapIndex = 2;
-    $scope.$apply();
+    $scope.$apply(function () {
+      $scope.snapIndex = 0;
+    });
+    expect($scope.snapIndex).toBe(1);
     expect(test).toBe(2);
   }
 
