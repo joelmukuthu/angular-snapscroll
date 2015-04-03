@@ -1,3 +1,11 @@
+/**
+ * angular-snapscroll
+ * Version: 0.2.0
+ * (c) 2014-2015 Joel Mukuthu
+ * MIT License
+ * Built on: 03-04-2015 20:47:57 GMT+0200
+ **/
+
 (function () {
   'use strict';
 
@@ -60,7 +68,7 @@
               windowElement = angular.element($window);
               windowElement.on('resize', onWindowResize);
               scope.$on('$destroy', function () {
-                windowElement.off('resize', onWindowResize);
+                windowElement.off('resize');
               });
             }
 
@@ -68,8 +76,9 @@
           }
         };
     }]);
-  
+
 })();
+
 (function () {
   'use strict';
 
@@ -88,13 +97,17 @@
   }];
 
   var watchSnapHeight = function (scope, callback) {
-    scope.$watch('snapHeight', function (snapHeight) {
+    scope.$watch('snapHeight', function (snapHeight, previousSnapHeight) {
       if (angular.isUndefined(snapHeight)) {
         scope.snapHeight = scope.defaultSnapHeight;
         return;
       }
       if (!angular.isNumber(snapHeight)) {
-        scope.snapHeight = scope.defaultSnapHeight;
+        if (angular.isNumber(previousSnapHeight)) {
+          scope.snapHeight = previousSnapHeight;
+        } else {
+          scope.snapHeight = scope.defaultSnapHeight;
+        }
         return;
       }
       if (angular.isFunction(callback)) {
@@ -103,14 +116,18 @@
     });
   };
 
-  var watchSnapIndex = function (scope, snapIndexChangedCallback) {
-    scope.$watch('snapIndex', function (snapIndex, oldSnapIndex) {
+  var watchSnapIndex = function (scope, callback) {
+    scope.$watch('snapIndex', function (snapIndex, previousSnapIndex) {
       if (angular.isUndefined(snapIndex)) {
         scope.snapIndex = 0;
         return;
       }
       if (!angular.isNumber(snapIndex)) {
-        scope.snapIndex = 0;
+        if (angular.isNumber(previousSnapIndex)) {
+          scope.snapIndex = previousSnapIndex;
+        } else {
+          scope.snapIndex = 0;
+        }
         return;
       }
       if (snapIndex % 1 !== 0) {
@@ -123,22 +140,22 @@
       }
       if (!scope.isValid(snapIndex)) {
         scope.ignoreThisSnapIndexChange = true;
-        scope.snapIndex = oldSnapIndex;
+        scope.snapIndex = previousSnapIndex;
         scope.snapDirection = 0;
         return;
       }
       if (scope.beforeSnap({snapIndex: snapIndex}) === false) {
         scope.ignoreThisSnapIndexChange = true;
-        scope.snapIndex = oldSnapIndex;
+        scope.snapIndex = previousSnapIndex;
         return;
       }
-      if (angular.isFunction(snapIndexChangedCallback)) {
-        if (snapIndex > oldSnapIndex) {
+      if (angular.isFunction(callback)) {
+        if (snapIndex > previousSnapIndex) {
           scope.snapDirection = 1;
         } else {
           scope.snapDirection = -1;
         }
-        snapIndexChangedCallback(snapIndex, function () {
+        callback(snapIndex, function () {
           scope.snapDirection = 0;
           scope.afterSnap({snapIndex: snapIndex});
         });
@@ -163,7 +180,7 @@
 
       if (delta < 0) {
         if (scope.snapDirection !== 1) {
-          if (scope.snapIndex + 1 > scope.max()) {
+          if (scope.snapIndex + 1 > scope.scopeIndexMax()) {
             bubbleUp = true;
           } else {
             bubbleUp = false;
@@ -174,7 +191,7 @@
         }
       } else {
         if (scope.snapDirection !== -1) {
-          if (scope.snapIndex - 1 < scope.min()) {
+          if (scope.snapIndex - 1 < scope.snapIndexMin()) {
             bubbleUp = true;
           } else {
             bubbleUp = false;
@@ -216,14 +233,13 @@
               scrollBound,
               unbindScroll,
               scrollPromise,
-              oneTimeAfterSnap,
               bindScrollPromise,
               snapEasing = attributes.snapEasing,
               scrollDelay = attributes.scrollDelay,
               snapDuration = attributes.snapDuration,
               preventSnappingAfterManualScroll = angular.isDefined(attributes.preventSnappingAfterManualScroll);
 
-          snapTo = function (index) {
+          snapTo = function (index, afterSnap) {
             var args,
                 top = index * scope.snapHeight;
             if (scope.snapAnimation) {
@@ -239,9 +255,8 @@
               unbindScroll();
             }
             scroll.to.apply(scroll, args).then(function () {
-              if (angular.isDefined(oneTimeAfterSnap)) {
-                oneTimeAfterSnap.call();
-                oneTimeAfterSnap = undefined;
+              if (angular.isFunction(afterSnap)) {
+                afterSnap();
               }
               if (!preventSnappingAfterManualScroll) {
                 // bind scroll after a timeout
@@ -315,18 +330,16 @@
 
             scope.defaultSnapHeight = element[0].offsetHeight;
 
-            // snapIndex min
-            scope.min = function () {
+            scope.snapIndexMin = function () {
               return 0;
             };
 
-            // snapIndex max
-            scope.max = function () {
+            scope.scopeIndexMax = function () {
               return element.children().length - 1;
             };
 
             scope.isValid = function (snapIndex) {
-              return snapIndex >= scope.min() && snapIndex <= scope.max();
+              return snapIndex >= scope.snapIndexMin() && snapIndex <= scope.scopeIndexMax();
             };
 
             element.css('overflowY', 'auto');
@@ -342,10 +355,7 @@
               snapTo(scope.snapIndex);
             });
 
-            watchSnapIndex(scope, function (snapIndex, afterSnap) {
-              oneTimeAfterSnap = afterSnap;
-              snapTo(snapIndex);
-            });
+            watchSnapIndex(scope, snapTo);
 
             if (!preventSnappingAfterManualScroll) {
               bindScroll();
@@ -363,8 +373,8 @@
 
   angular.module('snapscroll')
     .directive('snapscroll', snapscrollAsAnAttribute);
-  
 })();
+
 (function () {
   'use strict';
   

@@ -1,5 +1,6 @@
 {
   "name": "angular-snapscroll",
+  "version": "0.2.0",
   "description": "angular module that provides scroll-and-snap functionality similar to fullPage.js",
   "directories": {
     "test": "test"

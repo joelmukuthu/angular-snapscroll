@@ -8,7 +8,10 @@ module.exports = function (grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     info: {
-      banner: '/*! <%= pkg.name %>, version: <%= pkg.version %> - <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+      banner: {
+        short: '/* <%= pkg.name %> v<%= pkg.version %>, (c) 2014-2015 Joel Mukuthu, MIT License, built: <%= grunt.template.date("dd-mm-yyyy HH:MM:ss Z") %> */\n',
+        long: '/**\n * <%= pkg.name %>\n * Version: <%= pkg.version %>\n * (c) 2014-2015 Joel Mukuthu\n * MIT License\n * Built on: <%= grunt.template.date("dd-mm-yyyy HH:MM:ss Z") %>\n **/\n\n'
+      }
     },
 
     clean: {
@@ -25,6 +28,9 @@ module.exports = function (grunt) {
         dest: '.tmp/<%= pkg.name %>.js'
       },
       dist: {
+        options: {
+          banner: '<%= info.banner.long %>'
+        },
         src: ['src/*.js', 'src/**/*.js'],
         dest: 'dist/<%= pkg.name %>.js'
       }
@@ -32,7 +38,7 @@ module.exports = function (grunt) {
 
     uglify: {
       options: {
-        banner: '<%= info.banner %>'
+        banner: '<%= info.banner.short %>'
       },
       dist: {
         src: ['<%= concat.dist.dest %>'],
