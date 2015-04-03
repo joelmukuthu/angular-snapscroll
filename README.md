@@ -56,6 +56,8 @@ See the [example code](examples/index.html) for how to keep swipe events localiz
 For more examples, check out the [demo site](http://joelmukuthu.github.io/angular-snapscroll/) and for all the configuration options, have a look at the [docs](DOCS.md).
 
 ### Contributing
+Contributions wanted! See the [contribution guidelines](CONTRIBUTING.md).
+
 [Grunt](http://gruntjs.com) is used for fast development and testing. To set up your working environment, download the repo and run:
 ```sh
 npm install && bower install
