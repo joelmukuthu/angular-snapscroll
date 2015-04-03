@@ -65,6 +65,16 @@ module.exports = function (grunt) {
       }
     },
 
+    coveralls: {
+      options: {
+        debug: true,
+        coverageDir: 'coverage/',
+        dryRun: false,
+        force: true,
+        recursive: true
+      }
+    },
+
     karma: {
       options: {
         configFile: 'test/karma.conf.js'
@@ -115,6 +125,11 @@ module.exports = function (grunt) {
   grunt.registerTask('test', [
     'setup',
     'karma:single'
+  ]);
+
+  grunt.registerTask('send-coverage', [
+    'test',
+    'coveralls'
   ]);
 
   grunt.registerTask('build', [
