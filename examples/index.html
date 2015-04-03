@@ -1,13 +1,15 @@
 <!doctype html>
 <html>
    <head>
-    <title>Snapscroll</title>
+    <title>angular-snapscroll</title>
     <meta charset="utf-8">
-    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
     <style>
       body {
         margin: 0;
         color: white;
+        font-size: 0.75em;
         font-family: 'Open Sans', sans-serif;
       }
       div {
@@ -62,10 +64,11 @@
       }
       .indicators {
         position: fixed;
-        right: 30px;
+        right: 0;
         top: 50%;
+        -webkit-transform: translateY(-50%);
         transform: translateY(-50%);
-        width: 14px;
+        width: 40px;
         height: auto;
         margin: 0;
         padding: 0;
@@ -73,35 +76,60 @@
         z-index: 1;
       }
       .indicators li {
+        line-height: 30px;
+      }
+      .indicators a {
+        display: block;
+        text-align: center;
+        text-decoration: none;
+      }
+      .indicators span {
         width: 14px;
         height: 14px;
-        margin: 5px 0;
         background: white;
         border-radius: 100%;
-        cursor: pointer;
+        display: inline-block;
+        vertical-align: middle;
       }
       .indicators .active {
         background: orange;
       }
+      @media screen and (min-width: 768px) {
+        body {
+          font-size: 1em;
+        }
+        .indicators {
+          right: 11px;
+        }
+        .indicators li {
+          line-height: 22px;
+        }
+      }
+      @media screen and (min-width: 1152px) {
+        .indicators {
+          right: 25px;
+        }
+      }
     </style>
    </head>
-  <body ng-app="snapscroll" ng-controller="MainController" keyboard-keys>
-    <div class="main" snapscroll fit-window-height snap-index="snapIndex">
+  <body ng-app="app" ng-controller="MainController" keyboard-keys>
+    <div class="main" snapscroll fit-window-height snap-index="snapIndex" ng-swipe-up="swipeUp()" ng-swipe-down="swipeDown()">
       <div>
         <h1>angular-snapscroll</h1>
-        <p>Snapscroll is an angular directive that provides scroll-and-snap functionality for vertical scrolling, similar to <a href="http://alvarotrigo.com/fullPage/" target="_blank">fullPage.js</a>.</p>
+        <p>angular-snapscroll is an angular module that provides scroll-and-snap functionality for vertical scrolling, similar to <a href="http://alvarotrigo.com/fullPage/" target="_blank">fullPage.js</a>.</p>
         <ol>
           <li>JS-only implementation</li>
           <li>Requires only angular core</li>
           <li>5.5kB when minified, 2.0kB when gzipped</li>
         </ol>
         <h2>Intro</h2>
-        <p>This page is a full-page snapscroll example that demonstrantes:</p>
+        <p>This is a suite of snapscroll examples that demonstrantes:</p>
         <ul>
           <li>full-page snapscroll (i.e. fitWindowHeight)</li>
           <li>keyboard navigation (try pressing the up and down arrow keys)</li>
           <li>resetting current snap position after a manual scroll (try to scroll by dragging the scrollbar)</li>
           <li>snapIndex binding</li>
+          <li>mobile support (using <a href="https://github.com/marmorkuchen-net/angular-swipe">angular-swipe</a> module)</li>
         </ul>
         <h3>Examples</h3>
         <ol class="examples">
@@ -111,13 +139,15 @@
       </div>
       <div>
         <h3>Nested snapscrolls</h3>
-        <p>Can be nested, side by side etc and won't interfere with each other</p>
-        <div class="nested" style="height: 200px" snapscroll>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+        <p>Can be nested, side by side etc and won't interfere with each other. The first nested snapscroll below also demostrates how to keep vertical swiping localized to a nested snapscroll instance.</p>
+        <div ng-controller="NestedSnapscrollController">
+          <div class="nested" style="height: 200px" snapscroll snap-index="nestedSnapIndex" ng-swipe-up="swipeUp($event)" ng-swipe-down="swipeDown($event)">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
         </div>
         <div class="clearfix">
           <div class="nested" style="height: 200px" snapscroll>
@@ -167,17 +197,21 @@
       <div></div>
     </div>
     <ul class="indicators">
-      <li ng-click="snapIndex=0" ng-class="{active: snapIndex == 0}"></li>
-      <li ng-click="snapIndex=1" ng-class="{active: snapIndex == 1}"></li>
-      <li ng-click="snapIndex=2" ng-class="{active: snapIndex == 2}"></li>
-      <li ng-click="snapIndex=3" ng-class="{active: snapIndex == 3}"></li>
-      <li ng-click="snapIndex=4" ng-class="{active: snapIndex == 4}"></li>
+      <li><a href="#" ng-click="snapIndex=0"><span ng-class="{active: snapIndex == 0}"></span></a></li>
+      <li><a href="#" ng-click="snapIndex=1"><span ng-class="{active: snapIndex == 1}"></span></a></li>
+      <li><a href="#" ng-click="snapIndex=2"><span ng-class="{active: snapIndex == 2}"></span></a></li>
+      <li><a href="#" ng-click="snapIndex=3"><span ng-class="{active: snapIndex == 3}"></span></a></li>
+      <li><a href="#" ng-click="snapIndex=4"><span ng-class="{active: snapIndex == 4}"></span></a></li>
     </ul>
     <script src="../bower_components/angular/angular.js"></script>
+    <script src="../bower_components/angular-swipe/dist/angular-swipe.js"></script>
     <script src="../dist/snapscroll.min.js"></script>
     <script>
-      var app = angular.module('snapscroll');
-      
+      var app = angular.module('app', [
+        'swipe',
+        'snapscroll'
+      ]);
+
       app.directive('keyboardKeys', ['$document', function ($document) {
         return {
           restrict: 'A',
@@ -199,7 +233,7 @@
           }
         }
       }]);
-      
+
       app.controller('MainController', ['$scope', function ($scope) {
         $scope.snapIndex = 0;
         $scope.$on('arrow-up', function () {
@@ -212,8 +246,14 @@
             $scope.snapIndex++;
           });
         });
+        $scope.swipeUp = function () {
+          $scope.snapIndex++;
+        };
+        $scope.swipeDown = function () {
+          $scope.snapIndex--;
+        };
       }]);
-      
+
       app.controller('CallbacksController', ['$scope', function ($scope) {
         $scope.beforeSnapMessages = [];
         $scope.afterSnapMessages = [];
@@ -226,6 +266,18 @@
         };
         $scope.afterCallback = function (snapIndex) {
           $scope.afterSnapMessages.push('Just snapped to index ' + snapIndex);
+        };
+      }]);
+
+      app.controller('NestedSnapscrollController', ['$scope', function ($scope) {
+        $scope.nestedSnapIndex = 0;
+        $scope.swipeUp = function ($event) {
+          $scope.nestedSnapIndex++;
+          $event.stopPropagation();
+        };
+        $scope.swipeDown = function ($event) {
+          $scope.nestedSnapIndex--;
+          $event.stopPropagation();
         };
       }]);
     </script>
