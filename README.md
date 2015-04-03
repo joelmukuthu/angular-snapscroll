@@ -50,7 +50,7 @@ To add support for mobile (swipe-and-snap), you only need to listen for the vert
     <div></div>
 </div>
 ```
-See the [example code](examples/index.html) for how to keep swipe events localized when you have nested snapscrolls.
+See the [demo](http://joelmukuthu.github.io/angular-snapscroll/#1) for an example of how to keep swipe events localized when you have nested snapscrolls.
 
 ### Documentation
 For more examples, check out the [demo site](http://joelmukuthu.github.io/angular-snapscroll/) and for all the configuration options, have a look at the [docs](DOCS.md).
