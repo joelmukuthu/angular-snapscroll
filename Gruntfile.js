@@ -1,47 +1,45 @@
 'use strict';
 
 module.exports = function (grunt) {
-  
+
   require('load-grunt-tasks')(grunt);
-  
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    
-    pkgname: 'snapscroll',
-    
+
     info: {
       banner: '/*! <%= pkg.name %>, version: <%= pkg.version %> - <%= grunt.template.today("dd-mm-yyyy") %> */\n'
     },
-    
+
     clean: {
       dev: '.tmp',
       dist: 'dist'
     },
-    
+
     concat: {
       options: {
         separator: '\n'
       },
       dev: {
         src: ['src/*.js', 'src/**/*.js'],
-        dest: '.tmp/<%= pkgname %>.js'
+        dest: '.tmp/<%= pkg.name %>.js'
       },
       dist: {
         src: ['src/*.js', 'src/**/*.js'],
-        dest: 'dist/<%= pkgname %>.js'
+        dest: 'dist/<%= pkg.name %>.js'
       }
     },
-    
+
     uglify: {
       options: {
         banner: '<%= info.banner %>'
       },
       dist: {
         src: ['<%= concat.dist.dest %>'],
-        dest: 'dist/<%= pkgname %>.min.js'
+        dest: 'dist/<%= pkg.name %>.min.js'
       }
     },
-    
+
     jshint: {
       options: {
         jshintrc: '.jshintrc',
@@ -60,7 +58,7 @@ module.exports = function (grunt) {
         src: ['test/spec/**/*.js']
       }
     },
-    
+
     karma: {
       options: {
         configFile: 'test/karma.conf.js'
@@ -72,12 +70,12 @@ module.exports = function (grunt) {
         singleRun: false
       }
     },
-    
+
     watch: {
       js: {
         files: ['src/**/*.js'],
         tasks: [
-          'newer:jshint:js', 
+          'newer:jshint:js',
           'concat:dev',
           'karma:single'
         ]
@@ -91,28 +89,28 @@ module.exports = function (grunt) {
       }
     }
   });
-  
+
   grunt.registerTask('setup', [
     'jshint',
     'clean:dev',
     'concat:dev'
   ]);
-  
+
   grunt.registerTask('default', [
     'setup',
     'watch',
   ]);
-  
+
   grunt.registerTask('dev-test', [
     'setup',
     'karma:continuous'
   ]);
-  
+
   grunt.registerTask('test', [
     'setup',
     'karma:single'
   ]);
-  
+
   grunt.registerTask('build', [
     'clean:dist',
     'concat',

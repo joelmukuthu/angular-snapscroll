@@ -17,7 +17,7 @@ module.exports = function(config) {
     files: [
       'bower_components/angular/angular.js',
       'bower_components/angular-mocks/angular-mocks.js',
-      '.tmp/snapscroll.js',
+      '.tmp/*.js',
       'test/spec/**/*.js'
     ],
 
@@ -54,8 +54,8 @@ module.exports = function(config) {
 
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
-    
-    
+
+
     plugins: [
       // 'karma-firefox-launcher',
       // 'karma-chrome-launcher',
