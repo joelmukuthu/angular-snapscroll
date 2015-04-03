@@ -40,7 +40,7 @@
               windowElement = angular.element($window);
               windowElement.on('resize', onWindowResize);
               scope.$on('$destroy', function () {
-                windowElement.off('resize', onWindowResize);
+                windowElement.off('resize');
               });
             }
 
@@ -48,5 +48,5 @@
           }
         };
     }]);
-  
+
 })();
