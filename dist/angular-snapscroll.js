@@ -1,9 +1,9 @@
 /**
  * angular-snapscroll
- * Version: 0.2.1
+ * Version: 0.2.2
  * (c) 2014-2015 Joel Mukuthu
  * MIT License
- * Built on: 04-04-2015 01:25:04 GMT+0200
+ * Built on: 04-04-2015 03:50:13 GMT+0200
  **/
 
 (function () {
@@ -152,7 +152,7 @@
       if (angular.isFunction(callback)) {
         if (snapIndex > previousSnapIndex) {
           scope.snapDirection = 1;
-        } else {
+        } else if (snapIndex < previousSnapIndex) {
           scope.snapDirection = -1;
         }
         callback(snapIndex, function () {
