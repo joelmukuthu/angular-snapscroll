@@ -15,14 +15,18 @@
     };
   }];
 
+  var isNumber = function(value) {
+    return angular.isNumber(value) && !isNaN(value);
+  };
+
   var watchSnapHeight = function (scope, callback) {
     scope.$watch('snapHeight', function (snapHeight, previousSnapHeight) {
       if (angular.isUndefined(snapHeight)) {
         scope.snapHeight = scope.defaultSnapHeight;
         return;
       }
-      if (!angular.isNumber(snapHeight)) {
-        if (angular.isNumber(previousSnapHeight)) {
+      if (!isNumber(snapHeight)) {
+        if (isNumber(previousSnapHeight)) {
           scope.snapHeight = previousSnapHeight;
         } else {
           scope.snapHeight = scope.defaultSnapHeight;
@@ -41,8 +45,8 @@
         scope.snapIndex = 0;
         return;
       }
-      if (!angular.isNumber(snapIndex)) {
-        if (angular.isNumber(previousSnapIndex)) {
+      if (!isNumber(snapIndex)) {
+        if (isNumber(previousSnapIndex)) {
           scope.snapIndex = previousSnapIndex;
         } else {
           scope.snapIndex = 0;
@@ -188,9 +192,8 @@
           onScroll = function () {
             var snap = function () {
               var top = element[0].scrollTop,
-                  previousSnapIndex = scope.snapIndex,
                   newSnapIndex = Math.round(top / scope.snapHeight);
-              if (previousSnapIndex === newSnapIndex) {
+              if (scope.snapIndex === newSnapIndex) {
                 snapTo(newSnapIndex);
               } else {
                 scope.$apply(function () {

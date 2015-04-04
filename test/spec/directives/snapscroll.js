@@ -533,6 +533,21 @@ describe('Directive: snapscroll', function () {
       expect($scope.snapIndex).toBe(0);
     });
 
+    it('defaults snapIndex to zero if NaN is provided as snapIndex', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      $scope.index = NaN;
+      element = compileElement(html, true);
+      expect($scope.index).toBe(0);
+      expect(element[0].scrollTop).toBe(0);
+    });
+
     it('ignores changes to snapIndex if a non-number value is provided', function () {
       var element,
           html = [
@@ -625,6 +640,20 @@ describe('Directive: snapscroll', function () {
             '</div>'
           ].join('');
       $scope.height = 'bad';
+      element = compileElement(html, true);
+      expect(element[0].offsetHeight).toBe(50);
+    });
+
+    it('defaults snapHeight to the element\'s height if NaN is provided as snapHeight', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-height="height" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      $scope.height = NaN;
       element = compileElement(html, true);
       expect(element[0].offsetHeight).toBe(50);
     });
@@ -729,6 +758,22 @@ describe('Directive: snapscroll', function () {
         $scope.height = 100;
       });
       expect($scope.index).toBe(1);
+    });
+
+    it('exposes a controller function setSnapHeight() for setting snapHeight from other directives', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-height="snapHeight" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      element = compileElement(html, true);
+      expect($scope.snapHeight).toBe(50);
+      $scope.$apply(function () {
+        element.controller('snapscroll').setSnapHeight(100);
+      });
+      expect($scope.snapHeight).toBe(100);
     });
 
     it('can execute a beforeSnap callback', function () {
@@ -1001,6 +1046,13 @@ describe('Directive: snapscroll', function () {
         $timeout.flush();
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(50);
+        // flush the timeout on bindScroll() first
+        $timeout.flush();
+        element[0].scrollTop = 24;
+        element.triggerHandler('scroll');
+        $timeout.flush();
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(0);
         // flush the timeout on bindScroll() first
         $timeout.flush();
         element[0].scrollTop = 24;
