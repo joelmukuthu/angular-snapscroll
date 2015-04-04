@@ -71,7 +71,7 @@
       if (angular.isFunction(callback)) {
         if (snapIndex > previousSnapIndex) {
           scope.snapDirection = 1;
-        } else {
+        } else if (snapIndex < previousSnapIndex) {
           scope.snapDirection = -1;
         }
         callback(snapIndex, function () {
