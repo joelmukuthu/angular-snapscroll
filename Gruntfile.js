@@ -15,22 +15,20 @@ module.exports = function (grunt) {
     },
 
     clean: {
-      dev: '.tmp',
+//      dev: '.tmp',
       dist: 'dist'
     },
 
     concat: {
       options: {
-        separator: '\n'
+        separator: '\n',
+        banner: '<%= info.banner.long %>'
       },
-      dev: {
-        src: ['src/*.js', 'src/**/*.js'],
-        dest: '.tmp/<%= pkg.name %>.js'
-      },
+//      dev: {
+//        src: ['src/*.js', 'src/**/*.js'],
+//        dest: '.tmp/<%= pkg.name %>.js'
+//      },
       dist: {
-        options: {
-          banner: '<%= info.banner.long %>'
-        },
         src: ['src/*.js', 'src/**/*.js'],
         dest: 'dist/<%= pkg.name %>.js'
       }
@@ -92,7 +90,6 @@ module.exports = function (grunt) {
         files: ['src/**/*.js'],
         tasks: [
           'newer:jshint:js',
-          'concat:dev',
           'karma:single'
         ]
       },
@@ -106,24 +103,18 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('setup', [
-    'jshint',
-    'clean:dev',
-    'concat:dev'
-  ]);
-
   grunt.registerTask('default', [
-    'setup',
+    'jshint',
     'watch',
   ]);
 
   grunt.registerTask('dev-test', [
-    'setup',
+    'jshint',
     'karma:continuous'
   ]);
 
   grunt.registerTask('test', [
-    'setup',
+    'jshint',
     'karma:single'
   ]);
 
