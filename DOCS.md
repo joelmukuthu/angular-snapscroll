@@ -1,8 +1,7 @@
 # angular-snapscroll docs
 
 ## snapscroll directive
-
-Adds scroll-and-snap behaviour to any element that has a scrollbar (fixed height and child elements):
+Adds scroll-and-snap behaviour to any element that has a vertical scrollbar (fixed height and child elements):
 ```html
 <div style="height: 200px;" snapscroll="">
     <div></div>
@@ -56,7 +55,9 @@ angular.controller('MainCtrl', function ($scope) {
 });
 ```
 ```html
-<div ng-controller="MainCtrl" snapscroll="" before-snap="log(snapIndex)"> ... </div>
+<div ng-controller="MainCtrl">
+  <div snapscroll="" before-snap="log(snapIndex)"> ... </div>
+</div>
 ```
 
 #### after-snap
@@ -69,11 +70,13 @@ angular.controller('MainCtrl', function ($scope) {
 });
 ```
 ```html
-<div ng-controller="MainCtrl" snapscroll="" after-snap="log(snapIndex)"> ... </div>
+<div ng-controller="MainCtrl">
+  <div snapscroll="" after-snap="log(snapIndex)"> ... </div>
+</div>
 ```
 
 #### snap-animation
-provides a two-way bind to a boolean value indicating whether or not snapping is animated or instantaneous (i.e. simply setting the element's `scrollTop`). therefore allows turning the animation on/off.
+allows turning the snap animation on/off. this is a two-way bind.
 ```javascript
 angular.controller('MainCtrl', function ($scope) {
     $scope.index = 1;
@@ -87,7 +90,9 @@ angular.controller('MainCtrl', function ($scope) {
 ```
 ```html
 <!-- prevent animation for the initial snap on page load -->
-<div ng-controller="MainCtrl" snapscroll="" snap-index="index" snap-animation="animation" after-snap="enableAnimation()"> ... </div>
+<div ng-controller="MainCtrl">
+  <div snapscroll="" snap-index="index" snap-animation="animation" after-snap="enableAnimation()"> ... </div>
+</div>
 ```
 
 #### snap-duration
@@ -111,13 +116,15 @@ angular.controller('MainCtrl', function ($scope) {
 });
 ```
 ```html
-<div ng-controller="MainCtrl" snapscroll="" snap-easing="linearEasing"> ... </div>
+<div ng-controller="MainCtrl">
+  <div snapscroll="" snap-easing="linearEasing"> ... </div>
+</div>
 ```
 the snap-easing can also be changed for all snapscroll instances by changing the default value:
 ```javascript
 angular.module('myapp', ['snapscroll'])
     .value('defaultSnapscrollScrollEasing', function () {
-        // ...
+        // ... easing code
     });
 ```
 
@@ -138,7 +145,7 @@ angular.module('myapp', ['snapscroll'])
 #### resize-delay
 the `resize` listener used by `fit-window-height` is throttled using a `resize-delay`. this delay can be changed by providig a value in milliseconds. it can also be turned off by providin `false`.
 ```html
-<div snapscroll="" resize-delay="400"> ... </div>
+<div snapscroll="" fit-window-height="" resize-delay="400"> ... </div>
 ```
 the scroll-delay can also be changed for all snapscroll instances by changing the default value:
 ```javascript
@@ -147,7 +154,6 @@ angular.module('myapp', ['snapscroll'])
 ```
 
 ## scroll service
-
 Snapscroll also provides a `scroll` service that can be used to animate `scrollTop`, or simply to set it. It exposes two functions, `scroll.to()` and `scroll.stop()`
 
 #### scroll.to(element, top, [duration], [easing])
@@ -165,4 +171,3 @@ angular.module('myapp', ['snapscroll'])
 
 #### scroll.stop(element)
 stops any currently-running animation on scrollTop of `element`. stopping the animation results in rejecting the promise returned by `scroll.to()`.
-
