@@ -9,8 +9,8 @@ module.exports = function (grunt) {
 
     info: {
       banner: {
-        short: '/* <%= pkg.name %> v<%= pkg.version %>, (c) 2014-2015 Joel Mukuthu, MIT License, built: <%= grunt.template.date("dd-mm-yyyy HH:MM:ss Z") %> */\n',
-        long: '/**\n * <%= pkg.name %>\n * Version: <%= pkg.version %>\n * (c) 2014-2015 Joel Mukuthu\n * MIT License\n * Built on: <%= grunt.template.date("dd-mm-yyyy HH:MM:ss Z") %>\n **/\n\n'
+        short: '/* <%= pkg.name %> v<%= pkg.version %>, (c) 2014-<%= grunt.template.today("yyyy") %> Joel Mukuthu, MIT License, built: <%= grunt.template.date("dd-mm-yyyy HH:MM:ss Z") %> */\n',
+        long: '/**\n * <%= pkg.name %>\n * Version: <%= pkg.version %>\n * (c) 2014-<%= grunt.template.today("yyyy") %> Joel Mukuthu\n * MIT License\n * Built on: <%= grunt.template.date("dd-mm-yyyy HH:MM:ss Z") %>\n **/\n\n'
       }
     },
 
@@ -106,7 +106,7 @@ module.exports = function (grunt) {
         options: {
             pkgFiles: ['package.json', 'bower.json'],
             commitMessage: 'Release %s',
-            tagName: '%s',
+            tagName: 'v%s',
             tagAnnotation: 'Release %s',
             buildCommand: 'grunt build'
         }
