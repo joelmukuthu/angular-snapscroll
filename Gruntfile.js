@@ -63,16 +63,6 @@ module.exports = function (grunt) {
       }
     },
 
-    coveralls: {
-      options: {
-        debug: true,
-        coverageDir: 'coverage/',
-        dryRun: false,
-        force: true,
-        recursive: true
-      }
-    },
-
     karma: {
       options: {
         configFile: 'test/karma.conf.js'
@@ -100,6 +90,26 @@ module.exports = function (grunt) {
           'karma:single'
         ]
       }
+    },
+
+    coveralls: {
+      options: {
+        debug: true,
+        coverageDir: 'coverage/',
+        dryRun: false,
+        force: true,
+        recursive: true
+      }
+    },
+
+    'release-it': {
+        options: {
+            pkgFiles: ['package.json', 'bower.json'],
+            commitMessage: 'Release %s',
+            tagName: '%s',
+            tagAnnotation: 'Release %s',
+            buildCommand: 'grunt build'
+        }
     }
   });
 
@@ -124,6 +134,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build', [
+    'test',
     'clean:dist',
     'concat',
     'uglify'
