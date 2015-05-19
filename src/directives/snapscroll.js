@@ -92,6 +92,10 @@
         unbindWheel;
 
     onWheel = function (e) {
+      if(e.originalEvent) {
+        e = e.originalEvent;
+      }
+
       var bubbleUp,
           delta = Math.max(-1, Math.min(1, (e.wheelDelta || -(e.deltaY || e.detail))));
 

@@ -3,7 +3,7 @@
  * Version: 0.2.3
  * (c) 2014-2015 Joel Mukuthu
  * MIT License
- * Built on: 05-04-2015 13:20:00 GMT+0200
+ * Built on: 19-05-2015 22:30:09 GMT+0200
  **/
 
 (function () {
@@ -173,6 +173,10 @@
         unbindWheel;
 
     onWheel = function (e) {
+      if(e.originalEvent) {
+        e = e.originalEvent;
+      }
+
       var bubbleUp,
           delta = Math.max(-1, Math.min(1, (e.wheelDelta || -(e.deltaY || e.detail))));
 
