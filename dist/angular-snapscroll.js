@@ -1,9 +1,9 @@
 /**
  * angular-snapscroll
- * Version: 0.2.3
+ * Version: 0.2.4
  * (c) 2014-2015 Joel Mukuthu
  * MIT License
- * Built on: 19-05-2015 22:30:09 GMT+0200
+ * Built on: 20-05-2015 00:16:02 GMT+0200
  **/
 
 (function () {
@@ -173,14 +173,16 @@
         unbindWheel;
 
     onWheel = function (e) {
-      if(e.originalEvent) {
+      var bubbleUp,
+          delta;
+
+      if (e.originalEvent) {
         e = e.originalEvent;
       }
 
-      var bubbleUp,
-          delta = Math.max(-1, Math.min(1, (e.wheelDelta || -(e.deltaY || e.detail))));
-
       e.preventDefault();
+
+      delta = Math.max(-1, Math.min(1, (e.wheelDelta || -(e.deltaY || e.detail))));
 
       if (isNaN(delta)) {
         return;
