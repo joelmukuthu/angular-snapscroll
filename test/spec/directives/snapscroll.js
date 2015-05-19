@@ -342,6 +342,48 @@ describe('Directive: snapscroll', function () {
     expect(element[0].scrollTop).toBe(50);
   }
 
+  function testUsesTheOriginalBrowserMousewheelEvents(html) {
+    var element;
+    $scope.index = 3;
+    element = compileElement(html, true);
+    element.triggerHandler({
+      type: 'wheel',
+      originalEvent: {
+        wheelDelta: 120,
+        detail: -120,
+        deltaY: -120,
+        preventDefault: angular.noop,
+        stopPropagation: angular.noop
+      }
+    });
+    expect($scope.index).toBe(2);
+    expect(element[0].scrollTop).toBe(100);
+    element.triggerHandler({
+      type: 'mousewheel',
+      originalEvent: {
+        wheelDelta: 120,
+        detail: -120,
+        deltaY: -120,
+        preventDefault: angular.noop,
+        stopPropagation: angular.noop
+      }
+    });
+    expect($scope.index).toBe(1);
+    expect(element[0].scrollTop).toBe(50);
+    element.triggerHandler({
+      type: 'onmousewheel',
+      originalEvent: {
+        wheelDelta: 120,
+        detail: -120,
+        deltaY: -120,
+        preventDefault: angular.noop,
+        stopPropagation: angular.noop
+      }
+    });
+    expect($scope.index).toBe(0);
+    expect(element[0].scrollTop).toBe(0);
+  }
+
   describe('as an attribute', function () {
     beforeEach(function () {
       var failureCallback;
@@ -888,6 +930,18 @@ describe('Directive: snapscroll', function () {
             '</div>'
           ].join('');
       testStopsListeningToMousewheelWhenScopeIsDestroyed(html);
+    });
+
+    it('uses the browser mousewheel events in case the events are overwritten by some external library (i.e. jquery)', function () {
+      var html = [
+            '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testUsesTheOriginalBrowserMousewheelEvents(html);
     });
 
     // new test suite for tests to do with manual scrolling
