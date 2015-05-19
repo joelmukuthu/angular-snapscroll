@@ -92,14 +92,16 @@
         unbindWheel;
 
     onWheel = function (e) {
-      if(e.originalEvent) {
+      var bubbleUp,
+          delta;
+
+      if (e.originalEvent) {
         e = e.originalEvent;
       }
 
-      var bubbleUp,
-          delta = Math.max(-1, Math.min(1, (e.wheelDelta || -(e.deltaY || e.detail))));
-
       e.preventDefault();
+
+      delta = Math.max(-1, Math.min(1, (e.wheelDelta || -(e.deltaY || e.detail))));
 
       if (isNaN(delta)) {
         return;
