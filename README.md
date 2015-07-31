@@ -67,7 +67,7 @@ Contributions are welcomed! Here are the [contribution guidelines](CONTRIBUTING.
 
 This project uses [Grunt](http://gruntjs.com) for automation. Once you've forked the repo and cloned it to your machine, run this to install all the dependencies:
 ```sh
-npm install && bower install
+npm install
 ```
 Then to continuously watch files and run tests as you write code, run:
 ```sh
