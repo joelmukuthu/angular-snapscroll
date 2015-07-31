@@ -10,15 +10,16 @@ Install with bower:
 ```sh
 bower install angular-snapscroll
 ```
+Or with npm:
+```sh
+npm install angular-snapscroll
+```
 Or simply download the [latest release](https://github.com/joelmukuthu/angular-snapscroll/releases/latest).
 
 ### Usage
-Include the main JS file in your HTML. For example:
+The pre-built files can be found in the `dist/` directory. `dist/angular-snapscroll.min.js` is minified and production-ready. Example usage:
 ```html
-<!-- if you installed it with bower: -->
-<script src="/bower_components/angular-snapscroll/dist/angular-snapscroll.min.js"></script>
-<!-- or if you downloaded a release archive: -->
-<script src="/dist/angular-snapscroll.min.js"></script>
+<script src="dist/angular-snapscroll.min.js"></script>
 ```
 Add `snapscroll` to your app's module dependencies:
 ```javascript
