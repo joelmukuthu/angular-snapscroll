@@ -13,6 +13,7 @@ describe('Directive: fitWindowHeight', function () {
     $provide.factory('snapscrollDirective', function () {
       // very important to return an array of directive definitions!! that's how angular works
       return [{
+        scope: {},
         restrict: 'A',
         name: 'snapscroll',
         controller: function () {
