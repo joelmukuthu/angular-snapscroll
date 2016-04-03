@@ -86,39 +86,16 @@
     });
   };
 
-  var initWheelEvents = function (scope, element) {
-    var onWheel,
-        bindWheel,
-        unbindWheel;
-
-    onWheel = function (e) {
-      var bubbleUp,
-          delta;
-
-      if (e.originalEvent) {
-        e = e.originalEvent;
+  var initWheelEvents = function (wheel, scope, element) {
+    function maybePreventBubbling(e, bubbleUp) {
+      if (!bubbleUp) {
+        e.stopPropagation();
       }
+    }
 
-      e.preventDefault();
-
-      delta = Math.max(-1, Math.min(1, (e.wheelDelta || -(e.deltaY || e.detail))));
-
-      if (isNaN(delta) || delta === 0) {
-        return;
-      }
-
-      if (delta < 0) {
-        if (scope.snapDirection !== 1) {
-          if (scope.snapIndex + 1 > scope.scopeIndexMax()) {
-            bubbleUp = true;
-          } else {
-            bubbleUp = false;
-            scope.$apply(function () {
-              scope.snapIndex += 1;
-            });
-          }
-        }
-      } else {
+    wheel.bind(element, {
+      up: function (e) {
+        var bubbleUp;
         if (scope.snapDirection !== -1) {
           if (scope.snapIndex - 1 < scope.snapIndexMin()) {
             bubbleUp = true;
@@ -129,27 +106,31 @@
             });
           }
         }
+        maybePreventBubbling(e, bubbleUp);
+      },
+      down: function (e) {
+        var bubbleUp;
+        if (scope.snapDirection !== 1) {
+          if (scope.snapIndex + 1 > scope.scopeIndexMax()) {
+            bubbleUp = true;
+          } else {
+            bubbleUp = false;
+            scope.$apply(function () {
+              scope.snapIndex += 1;
+            });
+          }
+        }
+        maybePreventBubbling(e, bubbleUp);
       }
+    });
 
-      if (!bubbleUp) {
-        e.stopPropagation();
-      }
-    };
-
-    bindWheel = function () {
-      element.on('wheel mousewheel onmousewheel', onWheel);
-    };
-
-    unbindWheel = function () {
-      element.off('wheel mousewheel onmousewheel', onWheel);
-    };
-
-    bindWheel();
-    scope.$on('$destroy', unbindWheel);
+    scope.$on('$destroy', function () {
+      wheel.unbind(element);
+    });
   };
 
-  var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'defaultSnapscrollScrollDelay', 'defaultSnapscrollSnapDuration', 'defaultSnapscrollBindScrollTimeout',
-    function ($timeout, scroll, defaultSnapscrollScrollDelay, defaultSnapscrollSnapDuration, defaultSnapscrollBindScrollTimeout) {
+  var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'wheel', 'defaultSnapscrollScrollDelay', 'defaultSnapscrollSnapDuration', 'defaultSnapscrollBindScrollTimeout',
+    function ($timeout, scroll, wheel, defaultSnapscrollScrollDelay, defaultSnapscrollSnapDuration, defaultSnapscrollBindScrollTimeout) {
       return {
         restrict: 'A',
         scope: scopeObject,
@@ -290,7 +271,7 @@
               scope.$on('$destroy', unbindScroll);
             }
 
-            initWheelEvents(scope, element);
+            initWheelEvents(wheel, scope, element);
           };
 
           init();
