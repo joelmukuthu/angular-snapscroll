@@ -103,7 +103,7 @@
 
       delta = Math.max(-1, Math.min(1, (e.wheelDelta || -(e.deltaY || e.detail))));
 
-      if (isNaN(delta)) {
+      if (isNaN(delta) || delta === 0) {
         return;
       }
 
