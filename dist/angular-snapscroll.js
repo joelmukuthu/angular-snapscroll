@@ -1,9 +1,9 @@
 /**
  * angular-snapscroll
- * Version: 0.2.5
- * (c) 2014-2015 Joel Mukuthu
+ * Version: 0.2.6
+ * (c) 2014-2016 Joel Mukuthu
  * MIT License
- * Built on: 31-07-2015 17:23:24 GMT+0200
+ * Built on: 03-04-2016 19:47:50 GMT+0200
  **/
 
 (function () {
@@ -184,7 +184,7 @@
 
       delta = Math.max(-1, Math.min(1, (e.wheelDelta || -(e.deltaY || e.detail))));
 
-      if (isNaN(delta)) {
+      if (isNaN(delta) || delta === 0) {
         return;
       }
 
