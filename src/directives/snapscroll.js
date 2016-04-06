@@ -64,7 +64,7 @@
       if (!scope.isValid(snapIndex)) {
         scope.ignoreThisSnapIndexChange = true;
         scope.snapIndex = previousSnapIndex;
-        scope.snapDirection = 0;
+        scope.snapDirection = 'none';
         return;
       }
       if (scope.beforeSnap({snapIndex: snapIndex}) === false) {
@@ -74,12 +74,12 @@
       }
       if (angular.isFunction(callback)) {
         if (snapIndex > previousSnapIndex) {
-          scope.snapDirection = 1;
+          scope.snapDirection = 'up';
         } else if (snapIndex < previousSnapIndex) {
-          scope.snapDirection = -1;
+          scope.snapDirection = 'down';
         }
         callback(snapIndex, function () {
-          scope.snapDirection = 0;
+          scope.snapDirection = 'none';
           scope.afterSnap({snapIndex: snapIndex});
         });
       }
@@ -96,7 +96,7 @@
     wheel.bind(element, {
       up: function (e) {
         var bubbleUp;
-        if (scope.snapDirection !== -1) {
+        if (scope.snapDirection !== 'down') {
           if (scope.snapIndex - 1 < scope.snapIndexMin()) {
             bubbleUp = true;
           } else {
@@ -110,7 +110,7 @@
       },
       down: function (e) {
         var bubbleUp;
-        if (scope.snapDirection !== 1) {
+        if (scope.snapDirection !== 'up') {
           if (scope.snapIndex + 1 > scope.scopeIndexMax()) {
             bubbleUp = true;
           } else {
@@ -199,7 +199,7 @@
 
           bindScroll = function () {
             // if the bindScroll timeout expires while snapping is ongoing, restart the timer
-            if (scope.snapDirection !== 0) {
+            if (scope.snapDirection !== 'none') {
               bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
               return;
             }
