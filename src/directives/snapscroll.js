@@ -86,15 +86,17 @@
     });
   };
 
-  var initWheelEvents = function (wheel, scope, element) {
+  var initWheelEvents = function (mousewheel, scope, element) {
     function maybePreventBubbling(e, bubbleUp) {
       if (!bubbleUp) {
         e.stopPropagation();
       }
     }
 
-    wheel.bind(element, {
+    mousewheel.bind(element, {
       up: function (e) {
+        e.preventDefault();
+
         var bubbleUp;
         if (scope.snapDirection !== 'down') {
           if (scope.snapIndex - 1 < scope.snapIndexMin()) {
@@ -106,9 +108,12 @@
             });
           }
         }
+
         maybePreventBubbling(e, bubbleUp);
       },
       down: function (e) {
+        e.preventDefault();
+
         var bubbleUp;
         if (scope.snapDirection !== 'up') {
           if (scope.snapIndex + 1 > scope.scopeIndexMax()) {
@@ -120,17 +125,18 @@
             });
           }
         }
+
         maybePreventBubbling(e, bubbleUp);
       }
     });
 
     scope.$on('$destroy', function () {
-      wheel.unbind(element);
+      mousewheel.unbind(element);
     });
   };
 
-  var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'wheel', 'defaultSnapscrollScrollDelay', 'defaultSnapscrollSnapDuration', 'defaultSnapscrollBindScrollTimeout',
-    function ($timeout, scroll, wheel, defaultSnapscrollScrollDelay, defaultSnapscrollSnapDuration, defaultSnapscrollBindScrollTimeout) {
+  var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'mousewheel', 'defaultSnapscrollScrollDelay', 'defaultSnapscrollSnapDuration', 'defaultSnapscrollBindScrollTimeout',
+    function ($timeout, scroll, mousewheel, defaultSnapscrollScrollDelay, defaultSnapscrollSnapDuration, defaultSnapscrollBindScrollTimeout) {
       return {
         restrict: 'A',
         scope: scopeObject,
@@ -271,7 +277,7 @@
               scope.$on('$destroy', unbindScroll);
             }
 
-            initWheelEvents(wheel, scope, element);
+            initWheelEvents(mousewheel, scope, element);
           };
 
           init();

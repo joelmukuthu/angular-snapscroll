@@ -158,16 +158,25 @@ describe('Directive: snapscroll', function () {
     element = compileElement(html, true);
     element.triggerHandler({
       type: 'wheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120,
       preventDefault: preventDefault
-    });
+    }); // mousewheel down
     element.triggerHandler({
       type: 'mousewheel',
+      wheelDelta: 120,
+      detail: -120,
+      deltaY: -120,
       preventDefault: preventDefault
-    });
+    }); // mousewheel up
     element.triggerHandler({
       type: 'onmousewheel',
+      wheelDelta: -120,
+      detail: 120,
+      deltaY: 120,
       preventDefault: preventDefault
-    });
+    }); // mousewheel down
     expect(preventDefault).toHaveBeenCalled();
     expect(preventDefault.calls.count()).toBe(3);
   }
