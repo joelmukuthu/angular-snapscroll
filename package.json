@@ -29,8 +29,9 @@
     "karma-coverage": "^0.2.7",
     "karma-firefox-launcher": "^0.1.4",
     "karma-jasmine": "^0.2.3",
-    "karma-phantomjs-launcher": "^0.1.4",
-    "load-grunt-tasks": "^0.6.0"
+    "karma-phantomjs-launcher": "^1.0.0",
+    "load-grunt-tasks": "^0.6.0",
+    "phantomjs-prebuilt": "^2.1.7"
   },
   "peerDependencies": {
     "angular": "^1.5.5"
