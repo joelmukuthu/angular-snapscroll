@@ -86,14 +86,14 @@
     });
   };
 
-  var initWheelEvents = function (mousewheel, scope, element) {
+  var initWheelEvents = function (wheelie, scope, element) {
     function maybePreventBubbling(e, bubbleUp) {
       if (!bubbleUp) {
         e.stopPropagation();
       }
     }
 
-    mousewheel.bind(element, {
+    wheelie.bind(element, {
       up: function (e) {
         e.preventDefault();
 
@@ -131,12 +131,12 @@
     });
 
     scope.$on('$destroy', function () {
-      mousewheel.unbind(element);
+      wheelie.unbind(element);
     });
   };
 
-  var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'mousewheel', 'defaultSnapscrollScrollDelay', 'defaultSnapscrollSnapDuration', 'defaultSnapscrollBindScrollTimeout',
-    function ($timeout, scroll, mousewheel, defaultSnapscrollScrollDelay, defaultSnapscrollSnapDuration, defaultSnapscrollBindScrollTimeout) {
+  var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'wheelie', 'defaultSnapscrollScrollDelay', 'defaultSnapscrollSnapDuration', 'defaultSnapscrollBindScrollTimeout',
+    function ($timeout, scroll, wheelie, defaultSnapscrollScrollDelay, defaultSnapscrollSnapDuration, defaultSnapscrollBindScrollTimeout) {
       return {
         restrict: 'A',
         scope: scopeObject,
@@ -277,7 +277,7 @@
               scope.$on('$destroy', unbindScroll);
             }
 
-            initWheelEvents(mousewheel, scope, element);
+            initWheelEvents(wheelie, scope, element);
           };
 
           init();
