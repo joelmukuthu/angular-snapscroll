@@ -944,11 +944,11 @@ describe('Directive: snapscroll', function () {
         expect(element[0].scrollTop).toBe(50);
         // flush the timeout on bindScroll() first
         $timeout.flush();
-        element[0].scrollTop = 124;
+        element[0].scrollTop = 126;
         element.triggerHandler('scroll');
         $timeout.flush();
-        expect($scope.index).toBe(1);
-        expect(element[0].scrollTop).toBe(0);
+        expect($scope.index).toBe(2);
+        expect(element[0].scrollTop).toBe(200);
         // flush the timeout on bindScroll() first
         $timeout.flush();
         element[0].scrollTop = 24;
