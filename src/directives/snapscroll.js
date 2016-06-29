@@ -19,26 +19,6 @@
     return angular.isNumber(value) && !isNaN(value);
   };
 
-  var watchSnapHeight = function (scope, callback) {
-    scope.$watch('snapHeight', function (snapHeight, previousSnapHeight) {
-      if (angular.isUndefined(snapHeight)) {
-        scope.snapHeight = scope.defaultSnapHeight;
-        return;
-      }
-      if (!isNumber(snapHeight)) {
-        if (isNumber(previousSnapHeight)) {
-          scope.snapHeight = previousSnapHeight;
-        } else {
-          scope.snapHeight = scope.defaultSnapHeight;
-        }
-        return;
-      }
-      if (angular.isFunction(callback)) {
-        callback(snapHeight);
-      }
-    });
-  };
-
   var watchSnapIndex = function (scope, callback) {
     scope.$watch('snapIndex', function (snapIndex, previousSnapIndex) {
       if (angular.isUndefined(snapIndex)) {
@@ -264,8 +244,6 @@
               }
             });
 
-            scope.defaultSnapHeight = element[0].offsetHeight;
-
             scope.snapIndexMin = function () {
               return 0;
             };
@@ -279,17 +257,6 @@
             };
 
             element.css('overflowY', 'auto');
-
-            watchSnapHeight(scope, function () {
-              var snaps = element.children();
-              element.css('height', scope.snapHeight + 'px');
-              if (snaps.length) {
-                angular.forEach(snaps, function (snap) {
-                  angular.element(snap).css('height', scope.snapHeight + 'px');
-                });
-              }
-              snapTo(scope.snapIndex);
-            });
 
             watchSnapIndex(scope, snapTo);
 
