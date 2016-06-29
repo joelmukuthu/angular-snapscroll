@@ -660,22 +660,6 @@ describe('Directive: snapscroll', function () {
       expect(element[0].scrollTop).toBe(250);
     });
 
-    it('exposes a controller function setSnapHeight() for setting snapHeight from other directives', function () {
-      var element,
-          html = [
-            '<div snapscroll="" snap-height="snapHeight" style="height: 50px; overflow: auto">',
-              '<div style="height: 50px"></div>',
-              '<div style="height: 50px"></div>',
-            '</div>'
-          ].join('');
-      element = compileElement(html, true);
-      expect($scope.snapHeight).toBe(50);
-      $scope.$apply(function () {
-        element.controller('snapscroll').setSnapHeight(100);
-      });
-      expect($scope.snapHeight).toBe(100);
-    });
-
     it('can execute a beforeSnap callback', function () {
       testBeforeSnap('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div></div>');
     });

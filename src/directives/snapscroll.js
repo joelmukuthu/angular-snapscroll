@@ -9,12 +9,6 @@
     snapAnimation: '=?'
   };
 
-  var controller = ['$scope', function ($scope) {
-    this.setSnapHeight = function (height) {
-      $scope.snapHeight = height;
-    };
-  }];
-
   var isNumber = function(value) {
     return angular.isNumber(value) && !isNaN(value);
   };
@@ -120,7 +114,6 @@
       return {
         restrict: 'A',
         scope: scopeObject,
-        controller: controller,
         link: function (scope, element, attributes) {
           var init,
               snapTo,
