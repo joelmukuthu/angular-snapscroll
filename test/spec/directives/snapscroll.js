@@ -632,6 +632,20 @@ describe('Directive: snapscroll', function () {
       expect(element[0].scrollTop).toBe(50);
     });
 
+    it('calculates the scrollTop from the combined heights of the snaps', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-index="2" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      element = compileElement(html, true);
+      expect(element[0].scrollTop).toBe(100);
+    });
+
     it('defaults the snapHeight to the height of the element', function () {
       var element,
           html = [
