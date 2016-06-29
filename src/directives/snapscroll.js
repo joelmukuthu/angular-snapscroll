@@ -3,7 +3,6 @@
 
   var scopeObject = {
     snapIndex: '=?',
-    snapHeight: '=?',
     beforeSnap: '&',
     afterSnap: '&',
     snapAnimation: '=?'

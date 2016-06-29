@@ -961,7 +961,7 @@ describe('Directive: snapscroll', function () {
       it('stays snapped to the current snapIndex when the element\'s height is changed', function () {
         var element,
             html = [
-              '<div snapscroll="" snap-index="index" snap-height="height" style="height: 50px; overflow: auto">',
+              '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
@@ -984,7 +984,7 @@ describe('Directive: snapscroll', function () {
       it('stays snapped to the current snapIndex when a child element\'s height is changed', function () {
         var element,
             html = [
-              '<div snapscroll="" snap-index="index" snap-height="height" style="height: 50px; overflow: auto">',
+              '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
