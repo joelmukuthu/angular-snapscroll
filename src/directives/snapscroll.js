@@ -155,9 +155,18 @@
               snapDuration = attributes.snapDuration,
               preventSnappingAfterManualScroll = angular.isDefined(attributes.preventSnappingAfterManualScroll);
 
+          function getScrollTop(index) {
+              var snaps = element.children();
+              var combinedHeight = 0;
+              for (var i = 0; i < index; i++) {
+                  combinedHeight += parseInt(snaps[i].offsetHeight, 10);
+              }
+              return combinedHeight;
+          }
+
           snapTo = function (index, afterSnap) {
             var args,
-                top = index * scope.snapHeight;
+                top = getScrollTop(index);
             if (scope.snapAnimation) {
               if (angular.isDefined(snapEasing)) {
                 args = [element, top, snapDuration, snapEasing];
