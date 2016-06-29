@@ -125,17 +125,6 @@ angular.module('myapp', ['snapscroll'])
     .value('defaultSnapscrollScrollDelay', 400);
 ```
 
-#### resize-delay
-the `resize` listener used by `fit-window-height` is throttled using a `resize-delay`. this delay can be changed by providig a value in milliseconds. it can also be turned off by providin `false`.
-```html
-<div snapscroll="" fit-window-height="" resize-delay="400"> ... </div>
-```
-the scroll-delay can also be changed for all snapscroll instances by changing the default value:
-```javascript
-angular.module('myapp', ['snapscroll'])
-    .value('defaultSnapscrollResizeDelay', 400);
-```
-
 ## scroll service
 Snapscroll also provides a `scroll` service that can be used to animate `scrollTop`, or simply to set it. It exposes two functions, `scroll.to()` and `scroll.stop()`
 
