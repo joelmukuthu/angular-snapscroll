@@ -191,10 +191,22 @@
             });
           };
 
+          function getSnapIndex(scrollTop) {
+            var snapIndex = -1,
+                snaps = element.children(),
+                lastSnapHeight;
+            while (scrollTop > 0) {
+              scrollTop -= lastSnapHeight = snaps[++snapIndex].offsetHeight;
+            }
+            if ((lastSnapHeight / 2) >= -scrollTop) {
+              snapIndex += 1;
+            }
+            return snapIndex;
+          }
+
           onScroll = function () {
             var snap = function () {
-              var top = element[0].scrollTop,
-                  newSnapIndex = Math.round(top / scope.snapHeight);
+              var newSnapIndex = getSnapIndex(element[0].scrollTop);
               if (scope.snapIndex === newSnapIndex) {
                 snapTo(newSnapIndex);
               } else {
