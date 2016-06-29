@@ -35,6 +35,8 @@ And now you can add a `snapscroll` attribute to any element to make it snap-scro
     <div style="height: 200px;"></div>
 </div>
 ```
+`snapscroll` does not alter the CSS of the snapscroll element or its children.
+This allows you full control, for instance allowing you to have children of unequal heights.
 
 ### Touch support
 I recommend using [angular-swipe](https://github.com/marmorkuchen-net/angular-swipe) to add touch support but you can use any other library or module that recognizes vertical swipe gestures (e.g. hammer.js). Here's how to do it using angular-swipe:
