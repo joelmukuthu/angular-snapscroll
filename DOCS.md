@@ -25,17 +25,6 @@ provides a two-way bind to the current index of the visible child element. indec
 </div>
 ```
 
-##### snap-height
-allows you to provide the height of the element (and children elements) instead of doing it in CSS. this is a two-way bind.
-```html
-<div snapscroll="" snap-height="200"> ... </div>
-```
-```html
-<div ng-init="snapHeight=200">
-    <div snapscroll="" snap-height="snapHeight"> ... </div>
-</div>
-```
-
 #### fit-window-height
 instead of `snap-height`, you can use this attribute (it's actually a directive) to make the snapHeight equal the window height. snapHeight will be resized automatically if the window is resized.
 ```html
