@@ -420,11 +420,6 @@ describe('Directive: snapscroll', function () {
       expect($scope.snapIndex).toBeDefined();
     });
 
-    it('sets overflow-y on the element to auto so that it\'s always scrollable', function () {
-      var element = compileElement('<div snapscroll=""></div>');
-      expect(element.css('overflowY')).toBe('auto');
-    });
-
     it('defaults snapIndex to zero', function () {
       compileElement('<div snapscroll="" snap-index="snapIndex"></div>');
       expect($scope.snapIndex).toBe(0);
