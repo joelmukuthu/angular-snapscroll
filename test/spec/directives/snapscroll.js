@@ -1153,6 +1153,53 @@ describe('Directive: snapscroll', function () {
         expect(element[0].scrollTop).toBe(0);
       });
 
+      it('stays snapped to the current snapIndex when the element\'s height is changed', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" snap-height="height" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        $scope.index = 1;
+        element = compileElement2(html, true);
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(50);
+        $scope.$apply(function () {
+          element.css('height', '100px');
+        });
+        // on the browser, an element resize triggers a scroll
+        element.triggerHandler('scroll');
+        $timeout.flush();
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(50);
+      });
+
+      it('stays snapped to the current snapIndex when a child element\'s height is changed', function () {
+        var element,
+            html = [
+              '<div snapscroll="" snap-index="index" snap-height="height" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        $scope.index = 1;
+        element = compileElement2(html, true);
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(50);
+        $scope.$apply(function () {
+          var children = element.children();
+          angular.element(children[0]).css('height', '100px');
+        });
+        // on the browser, an element resize triggers a scroll
+        element.triggerHandler('scroll');
+        $timeout.flush();
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(100);
+      });
+
       it('stops listening on scroll event when scope is destroyed', function () {
         var element,
             html = [
