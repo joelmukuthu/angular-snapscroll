@@ -41,7 +41,7 @@ module.exports = function(config) {
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     // coverage reporter generates tests' coverage
-    reporters: ['progress', 'coverage'],
+    reporters: ['progress', 'coverage','coveralls'],
 
 
     // configure coverage reporter
@@ -71,6 +71,7 @@ module.exports = function(config) {
     plugins: [
       'karma-jasmine',
       'karma-coverage',
+      'karma-coveralls',
       // 'karma-chrome-launcher',
       // 'karma-firefox-launcher',
       'karma-phantomjs-launcher'
