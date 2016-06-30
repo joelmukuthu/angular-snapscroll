@@ -92,16 +92,6 @@ module.exports = function (grunt) {
       }
     },
 
-    coveralls: {
-      options: {
-        debug: true,
-        coverageDir: 'coverage/',
-        dryRun: false,
-        force: true,
-        recursive: true
-      }
-    },
-
     'release-it': {
         options: {
             pkgFiles: ['package.json', 'bower.json'],
@@ -126,11 +116,6 @@ module.exports = function (grunt) {
   grunt.registerTask('test', [
     'jshint',
     'karma:single'
-  ]);
-
-  grunt.registerTask('send-coverage', [
-    'test',
-    'coveralls'
   ]);
 
   grunt.registerTask('build', [
