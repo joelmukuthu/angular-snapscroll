@@ -49,7 +49,10 @@ To have the element fill the browser viewport height:
 ### Touch support
 I recommend using [angular-swipe](https://github.com/marmorkuchen-net/angular-swipe) to add touch support but you can use any other library or module that recognizes vertical swipe gestures (e.g. hammer.js). Here's how to do it using angular-swipe:
 ```html
-<div style="height: 200px;" ng-init="snapIndex=0" snapscroll="" snap-index="snapIndex" ng-swipe-up="snapIndex=snapIndex+1" ng-swipe-down="snapIndex=snapIndex-1">
+<div ng-init="snapIndex=0" snapscroll="" snap-height="200"
+  snap-index="snapIndex"
+  ng-swipe-up="snapIndex=snapIndex+1"
+  ng-swipe-down="snapIndex=snapIndex-1">
     <div></div>
     <div></div>
     <div></div>
