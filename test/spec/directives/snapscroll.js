@@ -420,9 +420,29 @@ describe('Directive: snapscroll', function () {
       expect($scope.snapIndex).toBeDefined();
     });
 
-    it('sets overflow-y on the element to auto so that it\'s always scrollable', function () {
+    it('sets overflow-y on the element to auto if it\'s not set', function () {
       var element = compileElement('<div snapscroll=""></div>');
       expect(element.css('overflowY')).toBe('auto');
+    });
+
+    it('changes overflow-y to auto if it\'s set to visible', function () {
+      var element = compileElement('<div snapscroll="" style="overflow-y: visible;"></div>');
+      expect(element.css('overflowY')).toBe('auto');
+    });
+
+    it('changes overflow-y to auto if it\'s set to hidden', function () {
+      var element = compileElement('<div snapscroll="" style="overflow-y: hidden;"></div>');
+      expect(element.css('overflowY')).toBe('auto');
+    });
+
+    it('does not change overflow-y if it\'s set to scroll', function () {
+      var element = compileElement('<div snapscroll="" style="overflow-y: scroll;"></div>');
+      expect(element.css('overflowY')).toBe('scroll');
+    });
+
+    it('does not set overflow-y to auto if overflow is set to scroll', function () {
+      var element = compileElement('<div snapscroll="" style="overflow: scroll;"></div>');
+      expect(element.css('overflowY')).toBe('scroll');
     });
 
     it('defaults snapIndex to zero', function () {

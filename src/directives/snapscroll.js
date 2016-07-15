@@ -248,7 +248,9 @@
               return snapIndex >= scope.snapIndexMin() && snapIndex <= scope.scopeIndexMax();
             };
 
-            element.css('overflowY', 'auto');
+            if (element.css('overflowY') !== 'scroll') {
+              element.css('overflowY', 'auto');
+            }
 
             watchSnapIndex(scope, snapTo);
 
