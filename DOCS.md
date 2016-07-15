@@ -25,6 +25,12 @@ provides a two-way bind to the current index of the visible child element. indec
 </div>
 ```
 
+#### fit-window-height
+instead of `snap-height`, you can use this attribute (it's actually a directive) to make the snapHeight equal the window height. snapHeight will be resized automatically if the window is resized.
+```html
+<div snapscroll="" fit-window-height=""> ... </div>
+```
+
 #### before-snap
 is a callback executed before snapping occurs. the callback is passed a `snapIndex` parameter, which is the index being snapped to. returning `false` from this callback will prevent snapping.
 ```javascript
