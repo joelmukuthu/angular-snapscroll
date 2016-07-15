@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "angular": "^1.2.24",
-    "angular-wheelie": "^1.0.1"
+    "angular-wheelie": "^1.1.0"
   },
   "repository": {
     "type": "git",
