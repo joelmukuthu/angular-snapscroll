@@ -12,7 +12,7 @@ angular-snapscroll adds vertical scroll-and-snap functionality to angular.
 ### Installation
 Install with bower:
 ```sh
-bower install angular-snapscroll
+bower install angular-snapscroll angular-wheelie
 ```
 Or with npm:
 ```sh
@@ -20,7 +20,7 @@ npm install angular-snapscroll
 ```
 Or simply download the [latest release](https://github.com/joelmukuthu/angular-snapscroll/releases/latest).
 Note that in this case you also need to download the
-[latest release angular-wheelie](https://github.com/joelmukuthu/angular-wheelie/releases/latest).
+[latest angular-wheelie release](https://github.com/joelmukuthu/angular-wheelie/releases/latest).
 
 ### Usage
 The pre-built files can be found in the `dist/` directory.
