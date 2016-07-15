@@ -1,9 +1,9 @@
 /**
  * angular-snapscroll
- * Version: 0.3.0
+ * Version: 0.3.1
  * (c) 2014-2016 Joel Mukuthu
  * MIT License
- * Built on: 16-07-2016 00:35:52 GMT+0200
+ * Built on: 16-07-2016 00:59:03 GMT+0200
  **/
 
 (function () {
