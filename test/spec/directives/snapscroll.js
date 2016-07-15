@@ -861,6 +861,21 @@ describe('Directive: snapscroll', function () {
       expect(snaps[1].offsetHeight).toBe(25);
     });
 
+    it('allows setting the snapHeight to zero', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-height="0" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      element = compileElement(html, true);
+      expect(element[0].offsetHeight).toBe(0);
+      var snaps = element.children();
+      expect(snaps[0].offsetHeight).toBe(0);
+      expect(snaps[1].offsetHeight).toBe(0);
+    });
+
     it('exposes a controller function setSnapHeight() for setting snapHeight from other directives', function () {
       var element,
           html = [
