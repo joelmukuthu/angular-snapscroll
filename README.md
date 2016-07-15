@@ -29,7 +29,7 @@ angular.module('myapp', ['snapscroll']);
 ```
 And now you can add a `snapscroll` attribute to any element to make it snap-scrollable! The element would have a scrollbar to begin with, the idea being that with the `snapscroll` attribute you're adding scroll-and-snap behaviour to an element that is otherwise already scrollable:
 ```html
-<div style="height: 200px; overflow-y: auto;" snapscroll="">
+<div style="height: 200px;" snapscroll="">
     <div style="height: 200px;"></div>
     <div style="height: 200px;"></div>
     <div style="height: 200px;"></div>
