@@ -10,7 +10,7 @@
     "test": "grunt test"
   },
   "devDependencies": {
-    "angular-mocks": "^1.5.5",
+    "angular-mocks": "^1.2.24",
     "grunt": "^0.4.5",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-clean": "^0.6.0",
@@ -35,10 +35,10 @@
     "phantomjs-prebuilt": "^2.1.7"
   },
   "peerDependencies": {
-    "angular": "^1.5.5"
+    "angular": "^1.2.24"
   },
   "dependencies": {
-    "angular": "^1.5.5",
+    "angular": "^1.2.24",
     "angular-wheelie": "^1.0.1"
   },
   "repository": {

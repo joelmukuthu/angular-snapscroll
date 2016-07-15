@@ -11,3 +11,4 @@ or equal to the snapscroll element
 - [`snap-height`](DOCS.md#snap-height) is now an opt-in feature
 - If `overflow-y` on the snapscroll element is set to `scroll`, then it is not
 changed to `auto`
+- Change angular dep version to the lowest supported version (`1.2.24`)
