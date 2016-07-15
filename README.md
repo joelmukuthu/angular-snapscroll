@@ -34,6 +34,15 @@ And now you can add a `snapscroll` attribute to any element to make it snap-scro
     <div style="height: 200px;"></div>
     <div style="height: 200px;"></div>
 </div>
+```
+All you need to set is the height of the element and the directive will take care of the rest. Or to have the element fill the browser viewport height:
+```html
+<div snapscroll="" fit-window-height="">
+    <div></div>
+    <div></div>
+    <div></div>
+</div>
+```
 
 ### Touch support
 I recommend using [angular-swipe](https://github.com/marmorkuchen-net/angular-swipe) to add touch support but you can use any other library or module that recognizes vertical swipe gestures (e.g. hammer.js). Here's how to do it using angular-swipe:
