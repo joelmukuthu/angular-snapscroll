@@ -680,6 +680,185 @@ describe('Directive: snapscroll', function () {
       expect(element[0].scrollTop).toBe(250);
     });
 
+    it('defaults the snapHeight to the height of the element', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-height="height" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      expect($scope.height).toBeUndefined();
+      element = compileElement(html, true);
+      expect($scope.height).toBe(50);
+    });
+
+    it('allows setting an initial snapHeight', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-height="50" style="overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      element = compileElement(html, true);
+      expect(element[0].offsetHeight).toBe(50);
+    });
+
+    it('allows setting an initial snapHeight using an expression', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-height="20 + 30" style="overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      element = compileElement(html, true);
+      expect(element[0].offsetHeight).toBe(50);
+    });
+
+    it('allows setting an initial snapHeight using an angular expression', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-height="h + 30" style="overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      $scope.h = 20;
+      element = compileElement(html, true);
+      expect(element[0].offsetHeight).toBe(50);
+    });
+
+    it('defaults snapHeight to the element\'s height if a non-number snapHeight is provided', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-height="height" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      $scope.height = 'bad';
+      element = compileElement(html, true);
+      expect(element[0].offsetHeight).toBe(50);
+    });
+
+    it('defaults snapHeight to the element\'s height if NaN is provided as snapHeight', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-height="height" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      $scope.height = NaN;
+      element = compileElement(html, true);
+      expect(element[0].offsetHeight).toBe(50);
+    });
+
+    it('ignores changes to snapHeight if a non-number snapHeight is provided', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-height="height" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      element = compileElement(html, true);
+      expect(element[0].offsetHeight).toBe(50);
+      $scope.$apply(function () {
+        $scope.height = 100;
+      });
+      expect(element[0].offsetHeight).toBe(100);
+      $scope.$apply(function () {
+        $scope.height = 'bad';
+      });
+      expect(element[0].offsetHeight).toBe(100);
+    });
+
+    it('updates the element\'s height when snapHeight is changed externally', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-index="index" snap-height="height" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      element = compileElement(html, true);
+      expect(element[0].offsetHeight).toBe(50);
+      $scope.$apply(function () {
+        $scope.height = 70;
+      });
+      expect(element[0].offsetHeight).toBe(70);
+    });
+
+    it('updates the heights of the element\'s children when snapHeight is changed externally', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-index="index" snap-height="height" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      element = compileElement(html, true);
+      expect(element.children()[0].offsetHeight).toBe(50);
+      $scope.$apply(function () {
+        $scope.height = 70;
+      });
+      expect(element.children()[0].offsetHeight).toBe(70);
+    });
+
+    it('can (therefore) function without heights set on the element or it\'s children, as long as snapHeight is provided', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-index="1" snap-height="height" style="overflow: auto">',
+              '<div></div>',
+              '<div></div>',
+            '</div>'
+          ].join('');
+      $scope.height = 50;
+      element = compileElement(html, true);
+      expect(element[0].scrollTop).toBe(50);
+      expect(element[0].offsetHeight).toBe(50);
+      expect(element.children()[0].offsetHeight).toBe(50);
+    });
+
+    it('updates the scrollTop when snapHeight is changed so that the current snap is fully visible', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-index="1" snap-height="height" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      element = compileElement(html, true);
+      expect(element[0].scrollTop).toBe(50);
+      $scope.$apply(function () {
+        $scope.height = 70;
+      });
+      expect(element[0].scrollTop).toBe(70);
+    });
+
+    it('stays snapped to the current snapIndex when snapHeight is changed', function () {
+      var element,
+          html = [
+            '<div snapscroll="" snap-index="index" snap-height="height" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      $scope.index = 1;
+      element = compileElement(html, true);
+      expect($scope.index).toBe(1);
+      $scope.$apply(function () {
+        $scope.height = 100;
+      });
+      expect($scope.index).toBe(1);
+    });
+
     it('exposes a controller function setSnapHeight() for setting snapHeight from other directives', function () {
       var element,
           html = [
