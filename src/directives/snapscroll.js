@@ -22,14 +22,11 @@
   var watchSnapHeight = function (scope, callback) {
     scope.$watch('snapHeight', function (snapHeight, previousSnapHeight) {
       if (angular.isUndefined(snapHeight)) {
-        scope.snapHeight = scope.defaultSnapHeight;
         return;
       }
       if (!isNumber(snapHeight)) {
         if (isNumber(previousSnapHeight)) {
           scope.snapHeight = previousSnapHeight;
-        } else {
-          scope.snapHeight = scope.defaultSnapHeight;
         }
         return;
       }
@@ -155,9 +152,18 @@
               snapDuration = attributes.snapDuration,
               preventSnappingAfterManualScroll = angular.isDefined(attributes.preventSnappingAfterManualScroll);
 
+          function getScrollTop(index) {
+              var snaps = element.children();
+              var combinedHeight = 0;
+              for (var i = 0; i < index; i++) {
+                  combinedHeight += parseInt(snaps[i].offsetHeight, 10);
+              }
+              return combinedHeight;
+          }
+
           snapTo = function (index, afterSnap) {
             var args,
-                top = index * scope.snapHeight;
+                top = getScrollTop(index);
             if (scope.snapAnimation) {
               if (angular.isDefined(snapEasing)) {
                 args = [element, top, snapDuration, snapEasing];
@@ -182,10 +188,22 @@
             });
           };
 
+          function getSnapIndex(scrollTop) {
+            var snapIndex = -1,
+                snaps = element.children(),
+                lastSnapHeight;
+            while (scrollTop > 0) {
+              scrollTop -= lastSnapHeight = snaps[++snapIndex].offsetHeight;
+            }
+            if ((lastSnapHeight / 2) >= -scrollTop) {
+              snapIndex += 1;
+            }
+            return snapIndex;
+          }
+
           onScroll = function () {
             var snap = function () {
-              var top = element[0].scrollTop,
-                  newSnapIndex = Math.round(top / scope.snapHeight);
+              var newSnapIndex = getSnapIndex(element[0].scrollTop);
               if (scope.snapIndex === newSnapIndex) {
                 snapTo(newSnapIndex);
               } else {
@@ -243,8 +261,6 @@
               }
             });
 
-            scope.defaultSnapHeight = element[0].offsetHeight;
-
             scope.snapIndexMin = function () {
               return 0;
             };
@@ -257,14 +273,16 @@
               return snapIndex >= scope.snapIndexMin() && snapIndex <= scope.scopeIndexMax();
             };
 
-            element.css('overflowY', 'auto');
+            if (element.css('overflowY') !== 'scroll') {
+              element.css('overflowY', 'auto');
+            }
 
-            watchSnapHeight(scope, function () {
+            watchSnapHeight(scope, function (snapHeight) {
+              element.css('height', snapHeight + 'px');
               var snaps = element.children();
-              element.css('height', scope.snapHeight + 'px');
               if (snaps.length) {
                 angular.forEach(snaps, function (snap) {
-                  angular.element(snap).css('height', scope.snapHeight + 'px');
+                  angular.element(snap).css('height', snapHeight + 'px');
                 });
               }
               snapTo(scope.snapIndex);
