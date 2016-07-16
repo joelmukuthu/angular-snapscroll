@@ -204,10 +204,7 @@ describe('Directive: snapscroll', function () {
     $scope.$apply();
   }
 
-  function testPreventsNormalScrollingUsingMousewheel(html) {
-    var element,
-        preventDefault = jasmine.createSpy('preventDefault');
-    element = compileElement(html, true);
+  function triggerThreeMousewheelEvents(element, preventDefault) {
     element.triggerHandler({
       type: 'wheel',
       wheelDelta: -120,
@@ -229,6 +226,36 @@ describe('Directive: snapscroll', function () {
       deltaY: 120,
       preventDefault: preventDefault
     }); // mousewheel down
+  }
+
+  function testPreventsNormalScrollingUsingMousewheel(html) {
+    var element,
+        preventDefault = jasmine.createSpy('preventDefault');
+    element = compileElement(html, true);
+    triggerThreeMousewheelEvents(element, preventDefault);
+    expect(preventDefault).toHaveBeenCalled();
+    expect(preventDefault.calls.count()).toBe(3);
+  }
+
+  function testAllowsNormalScrollingUsingMousewheelWhenDisabled(html) {
+      var element,
+          preventDefault = jasmine.createSpy('preventDefault');
+      element = compileElement(html, true);
+      triggerThreeMousewheelEvents(element, preventDefault);
+      expect(preventDefault).not.toHaveBeenCalled();
+  }
+
+  function testPreventsNormalScrollingUsingMousewheelWhenReEnabled(html) {
+    var element,
+        preventDefault = jasmine.createSpy('preventDefault');
+    $scope.enabled = false;
+    element = compileElement(html, true);
+    triggerThreeMousewheelEvents(element, preventDefault);
+    expect(preventDefault).not.toHaveBeenCalled();
+    $scope.$apply(function () {
+      $scope.enabled = true;
+    });
+    triggerThreeMousewheelEvents(element, preventDefault);
     expect(preventDefault).toHaveBeenCalled();
     expect(preventDefault.calls.count()).toBe(3);
   }
@@ -643,6 +670,19 @@ describe('Directive: snapscroll', function () {
       expect(element[0].scrollTop).toBe(100);
     });
 
+    it('does not snap to the initial index when it is disabled', function () {
+      var element,
+          html = [
+            '<div snapscroll="false" snap-index="1" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      element = compileElement(html, true);
+      expect(element[0].scrollTop).toBe(0);
+    });
+
     it('defaults snapIndex to zero if a non-number value is provided', function () {
       var element,
           html = [
@@ -700,6 +740,80 @@ describe('Directive: snapscroll', function () {
       expect(element[0].scrollTop).toBe(0);
       $scope.$apply(function () {
         $scope.index = 1;
+      });
+      expect(element[0].scrollTop).toBe(50);
+    });
+
+    it('allows disabling snapscroll by passing a binding as the snapscroll attribute value', function () {
+      var element,
+          html = [
+            '<div snapscroll="enabled" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      $scope.enabled = false;
+      $scope.index = 1;
+      element = compileElement(html, true);
+      expect(element[0].scrollTop).toBe(0);
+    });
+
+    it('allows disabling snapscroll by passing false as the snapscroll attribute value', function () {
+      var element,
+          html = [
+            '<div snapscroll="false" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      $scope.index = 1;
+      element = compileElement(html, true);
+      expect(element[0].scrollTop).toBe(0);
+    });
+
+    it('does not disable snapscroll by passing 0 as the snapscroll attribute value', function () {
+      var element,
+          html = [
+            '<div snapscroll="0" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      $scope.index = 1;
+      element = compileElement(html, true);
+      expect(element[0].scrollTop).toBe(50);
+    });
+
+    it('allows re-enabling snapscroll using a binding passed as the snapscroll attribute value', function () {
+      var element,
+          html = [
+            '<div snapscroll="enabled" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      $scope.enabled = false;
+      element = compileElement(html, true);
+      $scope.enabled = true;
+      $scope.$apply(function () {
+        $scope.index = 1;
+      });
+      expect(element[0].scrollTop).toBe(50);
+    });
+
+    it('automatically snaps to the current snapIndex when snapscroll is re-enabled', function () {
+      var element,
+          html = [
+            '<div snapscroll="enabled" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      $scope.enabled = false;
+      element = compileElement(html, true);
+      $scope.index = 1;
+      $scope.$apply(function () {
+        $scope.enabled = true;
       });
       expect(element[0].scrollTop).toBe(50);
     });
@@ -880,6 +994,23 @@ describe('Directive: snapscroll', function () {
       expect(element[0].scrollTop).toBe(70);
     });
 
+    it('does not update the scrollTop when snapHeight is changed and snapscroll is disabled', function () {
+      var element,
+          html = [
+            '<div snapscroll="false" snap-index="1" snap-height="height" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      element = compileElement(html, true);
+      expect(element[0].scrollTop).toBe(0);
+      $scope.$apply(function () {
+        $scope.height = 70;
+      });
+      expect(element[0].scrollTop).toBe(0);
+    });
+
     it('stays snapped to the current snapIndex when snapHeight is changed', function () {
       var element,
           html = [
@@ -911,6 +1042,66 @@ describe('Directive: snapscroll', function () {
       var snaps = element.children();
       expect(snaps[0].offsetHeight).toBe(150);
       expect(snaps[1].offsetHeight).toBe(25);
+    });
+
+    it('does not change the element\'s or the snaps\' heights if snapscroll is disabled', function () {
+      var element,
+          html = [
+            '<div snapscroll="false" style="height: 50px; overflow: auto" snap-height="50">',
+              '<div style="height: 150px"></div>',
+              '<div style="height: 25px"></div>',
+            '</div>'
+          ].join('');
+      element = compileElement(html, true);
+      expect(element[0].offsetHeight).toBe(50);
+      var snaps = element.children();
+      expect(snaps[0].offsetHeight).toBe(150);
+      expect(snaps[1].offsetHeight).toBe(25);
+    });
+
+    it('changes the element\'s and the snaps\' heights if snapscroll is re-enabled', function () {
+      var element,
+          html = [
+            '<div snapscroll="enabled" style="height: 50px; overflow: auto" snap-height="height">',
+              '<div style="height: 150px"></div>',
+              '<div style="height: 25px"></div>',
+            '</div>'
+          ].join('');
+      $scope.enabled = false;
+      element = compileElement(html, true);
+      expect(element[0].offsetHeight).toBe(50);
+      var snaps = element.children();
+      expect(snaps[0].offsetHeight).toBe(150);
+      expect(snaps[1].offsetHeight).toBe(25);
+      $scope.enabled = true;
+      $scope.$apply(function () {
+        $scope.height = 70;
+      });
+      expect(element[0].offsetHeight).toBe(70);
+      expect(snaps[0].offsetHeight).toBe(70);
+      expect(snaps[1].offsetHeight).toBe(70);
+    });
+
+    it('updates the element\'s and the snaps\' heights automatically when snapscroll is re-enabled', function () {
+      var element,
+          html = [
+            '<div snapscroll="enabled" style="height: 50px; overflow: auto" snap-height="70">',
+              '<div style="height: 150px"></div>',
+              '<div style="height: 25px"></div>',
+            '</div>'
+          ].join('');
+      $scope.enabled = false;
+      element = compileElement(html, true);
+      expect(element[0].offsetHeight).toBe(50);
+      var snaps = element.children();
+      expect(snaps[0].offsetHeight).toBe(150);
+      expect(snaps[1].offsetHeight).toBe(25);
+      $scope.$apply(function () {
+        $scope.enabled = true;
+      });
+      expect(element[0].offsetHeight).toBe(70);
+      expect(snaps[0].offsetHeight).toBe(70);
+      expect(snaps[1].offsetHeight).toBe(70);
     });
 
     it('allows setting the snapHeight to zero', function () {
@@ -997,6 +1188,28 @@ describe('Directive: snapscroll', function () {
             '</div>'
           ].join('');
       testPreventsNormalScrollingUsingMousewheel(html);
+    });
+
+    it('allows normal scrolling using the mousewheel when snapscroll is disabled', function () {
+      var html = [
+            '<div snapscroll="false" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testAllowsNormalScrollingUsingMousewheelWhenDisabled(html);
+    });
+
+    it('prevents normal scrolling using the mousewheel when snapscroll is re-enabled', function () {
+      var html = [
+            '<div snapscroll="enabled" snap-index="index" style="height: 50px; overflow: auto">',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+              '<div style="height: 50px"></div>',
+            '</div>'
+          ].join('');
+      testPreventsNormalScrollingUsingMousewheelWhenReEnabled(html);
     });
 
     it('prevents bubbling up of the mousewheel events if the element is still scrollable (to allow nesting of snapscroll elements)', function () {
@@ -1339,6 +1552,92 @@ describe('Directive: snapscroll', function () {
         }).toThrow(); // test that no timeout was registered after scroll was triggered
         expect($scope.index).toBe(0);
         expect(element[0].scrollTop).toBe(25);
+      });
+
+      it('does not snap reset scrollTop after a manual scroll when snapscroll has been disabled', function () {
+        var element,
+            html = [
+              '<div snapscroll="enabled" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 150px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        $scope.enabled = false;
+        element = compileElement(html, true); // use the regular compileElement()
+        expect(function () {
+          $timeout.flush();
+        }).toThrow(); // test that no timeout was registered after the initial snap
+        expect($scope.index).toBe(0);
+        element[0].scrollTop = 25;
+        element.triggerHandler('scroll');
+        expect(function () {
+          $timeout.flush();
+        }).toThrow(); // test that no timeout was registered after scroll was triggered
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(25);
+      });
+
+      it('resets scrollTop after a manual scroll when snapscroll is re-enabled', function () {
+        var element,
+            html = [
+              '<div snapscroll="enabled" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 150px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        $scope.enabled = false;
+        element = compileElement(html, true); // use the regular compileElement()
+        expect(function () {
+          $timeout.flush();
+        }).toThrow(); // test that no timeout was registered after the initial snap
+        expect($scope.index).toBe(0);
+        element[0].scrollTop = 25;
+        element.triggerHandler('scroll');
+        expect(function () {
+          $timeout.flush();
+        }).toThrow(); // test that no timeout was registered after scroll was triggered
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(25);
+        $scope.$apply(function () {
+          $scope.enabled = true;
+        });
+        element[0].scrollTop = 26;
+        element.triggerHandler('scroll');
+        $timeout.flush();
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(50);
+      });
+
+      it('snaps automatically to the current snap-index when snapscroll is re-enabled', function () {
+        var element,
+            html = [
+              '<div snapscroll="enabled" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 150px"></div>',
+                '<div style="height: 50px"></div>',
+              '</div>'
+            ].join('');
+        $scope.enabled = false;
+        element = compileElement(html, true); // use the regular compileElement()
+        expect(function () {
+          $timeout.flush();
+        }).toThrow(); // test that no timeout was registered after the initial snap
+        expect($scope.index).toBe(0);
+        element[0].scrollTop = 25;
+        element.triggerHandler('scroll');
+        expect(function () {
+          $timeout.flush();
+        }).toThrow(); // test that no timeout was registered after scroll was triggered
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(25);
+        $scope.$apply(function () {
+          $scope.enabled = true;
+        });
+        $timeout.flush();
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(50);
       });
     });
   });
