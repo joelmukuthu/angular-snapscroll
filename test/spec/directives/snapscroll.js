@@ -467,9 +467,9 @@ describe('Directive: snapscroll', function () {
     });
 
     it('can be declared as an attribute', function () {
-      // TODO: better way to test this?
-      compileElement('<div snapscroll="" snap-index="snapIndex"></div>');
-      expect($scope.snapIndex).toBeDefined();
+      expect(function () {
+        compileElement('<div snapscroll=""></div>');
+      }).not.toThrow();
     });
 
     it('sets overflow-y on the element to auto if it\'s not set', function () {
