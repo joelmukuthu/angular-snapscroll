@@ -43,20 +43,23 @@ instead of `snap-height`, you can use this attribute (it's actually a directive)
 ```
 
 #### before-snap
-is a callback executed before snapping occurs. the callback is passed a `snapIndex` parameter, which is the index being snapped to. returning `false` from this callback will prevent snapping.
+is a callback executed before snapping occurs. the callback is passed a `snapIndex` parameter, which is the index being snapped to. returning `false` from this callback will prevent snapping. you can also override the next `snapIndex` by returning a number.
 ```javascript
 angular.controller('MainCtrl', function ($scope) {
-    $scope.log = function (snapIndex) {
+    $scope.beforeSnap = function (snapIndex) {
         console.log('snapping to', snapIndex);
-        if (snapIndex > 1) {
+        if (snapIndex > 4) {
             return false; // prevent snapping
+        }
+        if (snapIndex === 2) {
+          return 3; // snap to a different snapIndex instead
         }
     };
 });
 ```
 ```html
 <div ng-controller="MainCtrl">
-  <div snapscroll="" before-snap="log(snapIndex)"> ... </div>
+  <div snapscroll="" before-snap="beforeSnap(snapIndex)"> ... </div>
 </div>
 ```
 

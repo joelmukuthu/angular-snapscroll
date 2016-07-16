@@ -1,3 +1,9 @@
+## next release
+
+### Features
+- Support overriding the next snapIndex by returning a number from
+[`before-snap`](DOCS.md#before-snap)
+
 ## 0.3.0
 
 ### Breaking changes
