@@ -64,9 +64,14 @@
         scope.snapDirection = 'none';
         return;
       }
-      if (scope.beforeSnap({snapIndex: snapIndex}) === false) {
+      var beforeSnapReturnValue = scope.beforeSnap({snapIndex: snapIndex});
+      if (beforeSnapReturnValue === false) {
         scope.ignoreThisSnapIndexChange = true;
         scope.snapIndex = previousSnapIndex;
+        return;
+      }
+      if (isNumber(beforeSnapReturnValue) && scope.isValid(beforeSnapReturnValue)) {
+        scope.snapIndex = beforeSnapReturnValue;
         return;
       }
       if (angular.isFunction(callback)) {

@@ -104,6 +104,58 @@ describe('Directive: snapscroll', function () {
     expect(test).toBe(2);
   }
 
+  function testAllowsSnappingToADifferentSnapIndex(html) {
+      var snapIndexOverride;
+      $scope.beforeSnap = function () {
+        if (snapIndexOverride) {
+          return snapIndexOverride;
+        }
+      };
+      compileElement(html);
+      expect($scope.snapIndex).toBe(0);
+      snapIndexOverride = 2;
+      $scope.$apply(function () {
+        $scope.snapIndex = 1;
+      });
+      expect($scope.snapIndex).toBe(2);
+  }
+
+  function testIgnoresSnapIndexOverrideIfNotANumber(html) {
+      var snapIndexOverride;
+      $scope.beforeSnap = function () {
+        if (snapIndexOverride !== undefined) {
+          return snapIndexOverride;
+        }
+      };
+      compileElement(html);
+      expect($scope.snapIndex).toBe(0);
+      snapIndexOverride = 'meh';
+      $scope.$apply(function () {
+        $scope.snapIndex = 1;
+      });
+      snapIndexOverride = NaN;
+      $scope.$apply(function () {
+        $scope.snapIndex = 0;
+      });
+      expect($scope.snapIndex).toBe(0);
+  }
+
+  function testIgnoresInvalidSnapIndexOverride(html) {
+      var snapIndexOverride;
+      $scope.beforeSnap = function () {
+        if (snapIndexOverride) {
+          return snapIndexOverride;
+        }
+      };
+      compileElement(html);
+      expect($scope.snapIndex).toBe(0);
+      snapIndexOverride = 10;
+      $scope.$apply(function () {
+        $scope.snapIndex = 1;
+      });
+      expect($scope.snapIndex).toBe(1);
+  }
+
   function testResetsSnapIndexIfSnappingPrevented(html) {
     var prevent = false;
     $scope.beforeSnap = function () {
@@ -906,6 +958,18 @@ describe('Directive: snapscroll', function () {
 
     it('allows preventing snapping by returning \'false\' from the beforeSnap callback', function () {
       testAllowsPreventingSnapping('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div><div></div></div>');
+    });
+
+    it('allows snapping to a different index by returning a number from the beforeSnap callback', function () {
+      testAllowsSnappingToADifferentSnapIndex('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div><div></div><div></div></div>');
+    });
+
+    it('does not snap to a different snapIndex if the beforeSnap return value is not a number', function () {
+      testIgnoresSnapIndexOverrideIfNotANumber('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div><div></div><div></div></div>');
+    });
+
+    it('does not snap to a different snapIndex if the beforeSnap return value is not a valid snapIndex', function () {
+      testIgnoresInvalidSnapIndexOverride('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div><div></div><div></div></div>');
     });
 
     it('resets the snapIndex if snapping is prevented', function () {
