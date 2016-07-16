@@ -3,6 +3,8 @@
 ### Features
 - Support overriding the next snapIndex by returning a number from
 [`before-snap`](DOCS.md#before-snap)
+- Support [disabling/enabling](DOCS.md#snapscroll-directive) snapscroll
+programmatically
 
 ## 0.3.0
 

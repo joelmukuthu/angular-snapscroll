@@ -9,6 +9,21 @@ Adds scroll-and-snap behaviour to any element that has a vertical scrollbar:
     <div style="height: 200px;"></div>
 </div>
 ```
+You can disable snapscroll programmatically by passing `false` or a binding that
+evaluates to `false`:
+```javascript
+angular.controller('MainCtrl', function ($scope, $window) {
+    $scope.snapscrollEnabled = $window.innerWidth > 320;
+});
+```
+```html
+ <!-- always disabled -->
+<div style="height: 200px;" snapscroll="false"> ... </div>
+<!-- disabled programmatically -->
+<div ng-controller="MainCtrl">
+  <div snapscroll="" snapscroll="snapscrollEnabled"> ... </div>
+</div>
+```
 
 Other attributes that can be added are:
 
