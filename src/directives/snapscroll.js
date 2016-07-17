@@ -28,20 +28,22 @@
   }
 
   function watchSnapHeight(scope, callback) {
-    _unwatchSnapHeight = scope.$watch('snapHeight', function (snapHeight, previousSnapHeight) {
-      if (angular.isUndefined(snapHeight)) {
-        return;
-      }
-      if (!isNumber(snapHeight)) {
-        if (isNumber(previousSnapHeight)) {
-          scope.snapHeight = previousSnapHeight;
+    _unwatchSnapHeight = scope.$watch('snapHeight',
+      function (snapHeight, previousSnapHeight) {
+        if (angular.isUndefined(snapHeight)) {
+          return;
         }
-        return;
+        if (!isNumber(snapHeight)) {
+          if (isNumber(previousSnapHeight)) {
+            scope.snapHeight = previousSnapHeight;
+          }
+          return;
+        }
+        if (angular.isFunction(callback)) {
+          callback(snapHeight);
+        }
       }
-      if (angular.isFunction(callback)) {
-        callback(snapHeight);
-      }
-    });
+    );
   }
 
   var _unwatchSnapIndex;
@@ -52,59 +54,75 @@
   }
 
   function watchSnapIndex(scope, callback) {
-    _unwatchSnapIndex = scope.$watch('snapIndex', function (snapIndex, previousSnapIndex) {
-      if (angular.isUndefined(snapIndex)) {
-        scope.snapIndex = 0;
-        return;
-      }
-      if (!isNumber(snapIndex)) {
-        if (isNumber(previousSnapIndex)) {
-          scope.snapIndex = previousSnapIndex;
-        } else {
+    _unwatchSnapIndex = scope.$watch('snapIndex',
+      function (snapIndex, previousSnapIndex) {
+        if (angular.isUndefined(snapIndex)) {
           scope.snapIndex = 0;
+          return;
         }
-        return;
-      }
-      if (snapIndex % 1 !== 0) {
-        scope.snapIndex = Math.round(snapIndex);
-        return;
-      }
-      if (scope.ignoreThisSnapIndexChange) {
-        scope.ignoreThisSnapIndexChange = undefined;
-        return;
-      }
-      if (!scope.isValid(snapIndex)) {
-        scope.ignoreThisSnapIndexChange = true;
-        scope.snapIndex = previousSnapIndex;
-        scope.snapDirection = 'none';
-        return;
-      }
-      var beforeSnapReturnValue = scope.beforeSnap({snapIndex: snapIndex});
-      if (beforeSnapReturnValue === false) {
-        scope.ignoreThisSnapIndexChange = true;
-        scope.snapIndex = previousSnapIndex;
-        return;
-      }
-      if (isNumber(beforeSnapReturnValue) && scope.isValid(beforeSnapReturnValue)) {
-        scope.snapIndex = beforeSnapReturnValue;
-        return;
-      }
-      if (angular.isFunction(callback)) {
-        if (snapIndex > previousSnapIndex) {
-          scope.snapDirection = 'up';
-        } else if (snapIndex < previousSnapIndex) {
-          scope.snapDirection = 'down';
+        if (!isNumber(snapIndex)) {
+          if (isNumber(previousSnapIndex)) {
+            scope.snapIndex = previousSnapIndex;
+          } else {
+            scope.snapIndex = 0;
+          }
+          return;
         }
-        callback(snapIndex, function () {
+        if (snapIndex % 1 !== 0) {
+          scope.snapIndex = Math.round(snapIndex);
+          return;
+        }
+        if (scope.ignoreThisSnapIndexChange) {
+          scope.ignoreThisSnapIndexChange = undefined;
+          return;
+        }
+        if (!scope.isValid(snapIndex)) {
+          scope.ignoreThisSnapIndexChange = true;
+          scope.snapIndex = previousSnapIndex;
           scope.snapDirection = 'none';
-          scope.afterSnap({snapIndex: snapIndex});
-        });
+          return;
+        }
+        var beforeSnapReturnValue = scope.beforeSnap({snapIndex: snapIndex});
+        if (beforeSnapReturnValue === false) {
+          scope.ignoreThisSnapIndexChange = true;
+          scope.snapIndex = previousSnapIndex;
+          return;
+        }
+        if (isNumber(beforeSnapReturnValue) &&
+          scope.isValid(beforeSnapReturnValue)) {
+            scope.snapIndex = beforeSnapReturnValue;
+            return;
+        }
+        if (angular.isFunction(callback)) {
+          if (snapIndex > previousSnapIndex) {
+            scope.snapDirection = 'up';
+          } else if (snapIndex < previousSnapIndex) {
+            scope.snapDirection = 'down';
+          }
+          callback(snapIndex, function () {
+            scope.snapDirection = 'none';
+            scope.afterSnap({snapIndex: snapIndex});
+          });
+        }
       }
-    });
+    );
   }
 
-  var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'wheelie', 'defaultSnapscrollScrollDelay', 'defaultSnapscrollSnapDuration', 'defaultSnapscrollBindScrollTimeout',
-    function ($timeout, scroll, wheelie, defaultSnapscrollScrollDelay, defaultSnapscrollSnapDuration, defaultSnapscrollBindScrollTimeout) {
+  var snapscrollAsAnAttribute = [
+    '$timeout',
+    'scroll',
+    'wheelie',
+    'defaultSnapscrollScrollDelay',
+    'defaultSnapscrollSnapDuration',
+    'defaultSnapscrollBindScrollTimeout',
+    function (
+      $timeout,
+      scroll,
+      wheelie,
+      defaultSnapscrollScrollDelay,
+      defaultSnapscrollSnapDuration,
+      defaultSnapscrollBindScrollTimeout
+    ) {
       return {
         restrict: 'A',
         scope: scopeObject,
@@ -157,9 +175,13 @@
             if (preventSnappingAfterManualScroll || scrollBound) {
               return;
             }
-            // if the bindScroll timeout expires while snapping is ongoing, restart the timer
+            // if the bindScroll timeout expires while snapping is ongoing,
+            // restart the timer
             if (scope.snapDirection !== 'none') {
-              bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
+              bindScrollPromise = $timeout(
+                bindScroll,
+                defaultSnapscrollBindScrollTimeout
+              );
               return;
             }
             element.on('scroll', onScroll);
@@ -177,7 +199,10 @@
             if (!preventSnappingAfterManualScroll) {
               // bind scroll after a timeout
               $timeout.cancel(bindScrollPromise);
-              bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
+              bindScrollPromise = $timeout(
+                bindScroll,
+                defaultSnapscrollBindScrollTimeout
+              );
             }
           }
 
@@ -322,7 +347,8 @@
             };
 
             scope.isValid = function (snapIndex) {
-              return snapIndex >= scope.snapIndexMin() && snapIndex <= scope.scopeIndexMax();
+              return snapIndex >= scope.snapIndexMin() &&
+                     snapIndex <= scope.scopeIndexMax();
             };
 
             if (element.css('overflowY') !== 'scroll') {
