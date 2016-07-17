@@ -110,14 +110,6 @@
         scope: scopeObject,
         controller: controller,
         link: function (scope, element, attributes) {
-          var scrollBound,
-              scrollPromise,
-              bindScrollPromise,
-              snapEasing = attributes.snapEasing,
-              scrollDelay = attributes.scrollDelay,
-              snapDuration = attributes.snapDuration,
-              preventSnappingAfterManualScroll = angular.isDefined(attributes.preventSnappingAfterManualScroll);
-
           function getSnapIndex(scrollTop) {
             var snapIndex = -1,
                 snaps = element.children(),
@@ -143,6 +135,8 @@
             }
           }
 
+          var scrollPromise,
+              scrollDelay = attributes.scrollDelay;
           function onScroll() {
             scroll.stop(element);
             if (scrollDelay === false) {
@@ -153,6 +147,12 @@
             }
           }
 
+
+          var scrollBound,
+              bindScrollPromise,
+              preventSnappingAfterManualScroll = angular.isDefined(
+                attributes.preventSnappingAfterManualScroll
+              );
           function bindScroll() {
             if (preventSnappingAfterManualScroll || scrollBound) {
               return;
@@ -173,6 +173,14 @@
             }
           }
 
+          function bindScrollAfterTimeout() {
+            if (!preventSnappingAfterManualScroll) {
+              // bind scroll after a timeout
+              $timeout.cancel(bindScrollPromise);
+              bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
+            }
+          }
+
           function getScrollTop(snapIndex) {
               var snaps = element.children();
               var combinedHeight = 0;
@@ -182,14 +190,8 @@
               return combinedHeight;
           }
 
-          function bindScrollAfterTimeout() {
-            if (!preventSnappingAfterManualScroll) {
-              // bind scroll after a timeout
-              $timeout.cancel(bindScrollPromise);
-              bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
-            }
-          }
-
+          var snapEasing = attributes.snapEasing,
+              snapDuration = attributes.snapDuration;
           snapTo = function(snapIndex, afterSnap) {
             var args,
                 top = getScrollTop(snapIndex);
@@ -276,6 +278,16 @@
             snapTo(scope.snapIndex);
           }
 
+          function updateSnapIndexFromScrollTop() {
+            if (preventSnappingAfterManualScroll) {
+              return;
+            }
+            var currentScrollTop = element[0].scrollTop;
+            if (currentScrollTop !== 0) {
+              scope.snapIndex = getSnapIndex(currentScrollTop);
+            }
+          }
+
           function init() {
             if (scrollDelay === 'false') {
               scrollDelay = false;
@@ -315,16 +327,6 @@
 
             if (element.css('overflowY') !== 'scroll') {
               element.css('overflowY', 'auto');
-            }
-
-            function updateSnapIndexFromScrollTop() {
-              if (preventSnappingAfterManualScroll) {
-                return;
-              }
-              var currentScrollTop = element[0].scrollTop;
-              if (currentScrollTop !== 0) {
-                scope.snapIndex = getSnapIndex(currentScrollTop);
-              }
             }
 
             scope.$watch('enabled', function (enabled) {
