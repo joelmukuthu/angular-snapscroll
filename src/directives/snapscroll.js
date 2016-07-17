@@ -16,12 +16,19 @@
     };
   }];
 
-  var isNumber = function(value) {
+  function isNumber(value) {
     return angular.isNumber(value) && !isNaN(value);
-  };
+  }
 
-  var watchSnapHeight = function (scope, callback) {
-    scope.$watch('snapHeight', function (snapHeight, previousSnapHeight) {
+  var _unwatchSnapHeight;
+  function unwatchSnapHeight() {
+    if (_unwatchSnapHeight) {
+      _unwatchSnapHeight();
+    }
+  }
+
+  function watchSnapHeight(scope, callback) {
+    _unwatchSnapHeight = scope.$watch('snapHeight', function (snapHeight, previousSnapHeight) {
       if (angular.isUndefined(snapHeight)) {
         return;
       }
@@ -35,10 +42,17 @@
         callback(snapHeight);
       }
     });
-  };
+  }
 
-  var watchSnapIndex = function (scope, callback) {
-    scope.$watch('snapIndex', function (snapIndex, previousSnapIndex) {
+  var _unwatchSnapIndex;
+  function unwatchSnapIndex() {
+    if (_unwatchSnapIndex) {
+      _unwatchSnapIndex();
+    }
+  }
+
+  function watchSnapIndex(scope, callback) {
+    _unwatchSnapIndex = scope.$watch('snapIndex', function (snapIndex, previousSnapIndex) {
       if (angular.isUndefined(snapIndex)) {
         scope.snapIndex = 0;
         return;
@@ -87,7 +101,7 @@
         });
       }
     });
-  };
+  }
 
   var snapscrollAsAnAttribute = ['$timeout', 'scroll', 'wheelie', 'defaultSnapscrollScrollDelay', 'defaultSnapscrollSnapDuration', 'defaultSnapscrollBindScrollTimeout',
     function ($timeout, scroll, wheelie, defaultSnapscrollScrollDelay, defaultSnapscrollSnapDuration, defaultSnapscrollBindScrollTimeout) {
@@ -96,54 +110,13 @@
         scope: scopeObject,
         controller: controller,
         link: function (scope, element, attributes) {
-          var init,
-              snapTo,
-              onScroll,
-              bindScroll,
-              scrollBound,
-              unbindScroll,
+          var scrollBound,
               scrollPromise,
               bindScrollPromise,
               snapEasing = attributes.snapEasing,
               scrollDelay = attributes.scrollDelay,
               snapDuration = attributes.snapDuration,
               preventSnappingAfterManualScroll = angular.isDefined(attributes.preventSnappingAfterManualScroll);
-
-          function getScrollTop(index) {
-              var snaps = element.children();
-              var combinedHeight = 0;
-              for (var i = 0; i < index; i++) {
-                  combinedHeight += parseInt(snaps[i].offsetHeight, 10);
-              }
-              return combinedHeight;
-          }
-
-          snapTo = function (index, afterSnap) {
-            var args,
-                top = getScrollTop(index);
-            if (scope.snapAnimation) {
-              if (angular.isDefined(snapEasing)) {
-                args = [element, top, snapDuration, snapEasing];
-              } else {
-                args = [element, top, snapDuration];
-              }
-            } else {
-              args = [element, top];
-            }
-            if (!preventSnappingAfterManualScroll && scrollBound) {
-              unbindScroll();
-            }
-            scroll.to.apply(scroll, args).then(function () {
-              if (angular.isFunction(afterSnap)) {
-                afterSnap();
-              }
-              if (!preventSnappingAfterManualScroll) {
-                // bind scroll after a timeout
-                $timeout.cancel(bindScrollPromise);
-                bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
-              }
-            });
-          };
 
           function getSnapIndex(scrollTop) {
             var snapIndex = -1,
@@ -158,27 +131,32 @@
             return snapIndex;
           }
 
-          onScroll = function () {
-            var snap = function () {
-              var newSnapIndex = getSnapIndex(element[0].scrollTop);
-              if (scope.snapIndex === newSnapIndex) {
-                snapTo(newSnapIndex);
-              } else {
-                scope.$apply(function () {
-                  scope.snapIndex = newSnapIndex;
-                });
-              }
-            };
+          var snapTo; // damn it jshint
+          function snapFromCurrentSrollTop() {
+            var newSnapIndex = getSnapIndex(element[0].scrollTop);
+            if (scope.snapIndex === newSnapIndex) {
+              snapTo(newSnapIndex);
+            } else {
+              scope.$apply(function () {
+                scope.snapIndex = newSnapIndex;
+              });
+            }
+          }
+
+          function onScroll() {
             scroll.stop(element);
             if (scrollDelay === false) {
-              snap();
+              snapFromCurrentSrollTop();
             } else {
               $timeout.cancel(scrollPromise);
-              scrollPromise = $timeout(snap, scrollDelay);
+              scrollPromise = $timeout(snapFromCurrentSrollTop, scrollDelay);
             }
-          };
+          }
 
-          bindScroll = function () {
+          function bindScroll() {
+            if (preventSnappingAfterManualScroll || scrollBound) {
+              return;
+            }
             // if the bindScroll timeout expires while snapping is ongoing, restart the timer
             if (scope.snapDirection !== 'none') {
               bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
@@ -186,13 +164,51 @@
             }
             element.on('scroll', onScroll);
             scrollBound = true;
-          };
+          }
 
-          unbindScroll = function () {
+          function unbindScroll() {
             if (scrollBound) {
               element.off('scroll', onScroll);
               scrollBound = false;
             }
+          }
+
+          function getScrollTop(snapIndex) {
+              var snaps = element.children();
+              var combinedHeight = 0;
+              for (var i = 0; i < snapIndex; i++) {
+                  combinedHeight += snaps[i].offsetHeight;
+              }
+              return combinedHeight;
+          }
+
+          function bindScrollAfterTimeout() {
+            if (!preventSnappingAfterManualScroll) {
+              // bind scroll after a timeout
+              $timeout.cancel(bindScrollPromise);
+              bindScrollPromise = $timeout(bindScroll, defaultSnapscrollBindScrollTimeout);
+            }
+          }
+
+          snapTo = function(snapIndex, afterSnap) {
+            var args,
+                top = getScrollTop(snapIndex);
+            if (scope.snapAnimation) {
+              if (angular.isDefined(snapEasing)) {
+                args = [element, top, snapDuration, snapEasing];
+              } else {
+                args = [element, top, snapDuration];
+              }
+            } else {
+              args = [element, top];
+            }
+            unbindScroll();
+            scroll.to.apply(scroll, args).then(function () {
+              if (angular.isFunction(afterSnap)) {
+                afterSnap();
+              }
+              bindScrollAfterTimeout();
+            });
           };
 
           var wheelBound;
@@ -260,7 +276,7 @@
             snapTo(scope.snapIndex);
           }
 
-          init = function () {
+          function init() {
             if (scrollDelay === 'false') {
               scrollDelay = false;
             } else {
@@ -301,34 +317,34 @@
               element.css('overflowY', 'auto');
             }
 
-            var unwatchSnapHeight, unwatchSnapIndex;
+            function updateSnapIndexFromScrollTop() {
+              if (preventSnappingAfterManualScroll) {
+                return;
+              }
+              var currentScrollTop = element[0].scrollTop;
+              if (currentScrollTop !== 0) {
+                scope.snapIndex = getSnapIndex(currentScrollTop);
+              }
+            }
+
             scope.$watch('enabled', function (enabled) {
               if (enabled === false) {
-                if (unwatchSnapHeight) {
-                  unwatchSnapHeight();
-                }
-                if (unwatchSnapIndex) {
-                  unwatchSnapIndex();
-                }
+                unwatchSnapHeight();
+                unwatchSnapIndex();
                 unbindScroll();
                 unbindWheel();
               } else {
-                var currentScrollTop = element[0].scrollTop;
-                if (currentScrollTop !== 0 && !preventSnappingAfterManualScroll) {
-                  scope.snapIndex = getSnapIndex(currentScrollTop);
-                }
-                unwatchSnapHeight = watchSnapHeight(scope, updateSnapHeight);
-                unwatchSnapIndex = watchSnapIndex(scope, snapTo);
-                if (!preventSnappingAfterManualScroll) {
-                  bindScroll();
-                }
+                updateSnapIndexFromScrollTop();
+                watchSnapHeight(scope, updateSnapHeight);
+                watchSnapIndex(scope, snapTo);
+                bindScroll();
                 bindWheel();
               }
             });
 
             scope.$on('$destroy', unbindScroll);
             scope.$on('$destroy', unbindWheel);
-          };
+          }
 
           init();
         }
