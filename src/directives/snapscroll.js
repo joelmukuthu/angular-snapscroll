@@ -31,9 +31,6 @@
         }
         return;
       }
-      if (scope.isDisabled()) {
-        return;
-      }
       if (angular.isFunction(callback)) {
         callback(snapHeight);
       }
@@ -76,9 +73,6 @@
       }
       if (isNumber(beforeSnapReturnValue) && scope.isValid(beforeSnapReturnValue)) {
         scope.snapIndex = beforeSnapReturnValue;
-        return;
-      }
-      if (scope.isDisabled()) {
         return;
       }
       if (angular.isFunction(callback)) {
@@ -303,34 +297,32 @@
               return snapIndex >= scope.snapIndexMin() && snapIndex <= scope.scopeIndexMax();
             };
 
-            scope.isDisabled = function () {
-              return scope.enabled === false;
-            };
-
             if (element.css('overflowY') !== 'scroll') {
               element.css('overflowY', 'auto');
             }
 
-            // TODO: unwatch snapIndex and snapHeight when snapscroll is disabled
-            watchSnapHeight(scope, updateSnapHeight);
-            watchSnapIndex(scope, snapTo);
-
-            scope.$watch('enabled', function (enabled, previousValue) {
+            var unwatchSnapHeight, unwatchSnapIndex;
+            scope.$watch('enabled', function (enabled) {
               if (enabled === false) {
+                if (unwatchSnapHeight) {
+                  unwatchSnapHeight();
+                }
+                if (unwatchSnapIndex) {
+                  unwatchSnapIndex();
+                }
                 unbindScroll();
                 unbindWheel();
               } else {
+                var currentScrollTop = element[0].scrollTop;
+                if (currentScrollTop !== 0 && !preventSnappingAfterManualScroll) {
+                  scope.snapIndex = getSnapIndex(currentScrollTop);
+                }
+                unwatchSnapHeight = watchSnapHeight(scope, updateSnapHeight);
+                unwatchSnapIndex = watchSnapIndex(scope, snapTo);
                 if (!preventSnappingAfterManualScroll) {
                   bindScroll();
                 }
                 bindWheel();
-                if (previousValue === false) {
-                  if (scope.snapHeight) {
-                    updateSnapHeight(scope.snapHeight);
-                  } else {
-                    onScroll();
-                  }
-                }
               }
             });
 
