@@ -128,9 +128,17 @@
         scope: scopeObject,
         controller: controller,
         link: function (scope, element, attributes) {
+          function getCurrentScrollTop() {
+            return element[0].scrollTop;
+          }
+
+          function getCurrentSnaps() {
+            return element.children();
+          }
+
           function getSnapIndex(scrollTop) {
             var snapIndex = -1,
-                snaps = element.children(),
+                snaps = getCurrentSnaps(),
                 lastSnapHeight;
             while (scrollTop > 0) {
               scrollTop -= lastSnapHeight = snaps[++snapIndex].offsetHeight;
@@ -141,9 +149,18 @@
             return snapIndex;
           }
 
+          function getScrollTop(snapIndex) {
+            var snaps = getCurrentSnaps(),
+                combinedHeight = 0;
+            for (var i = 0; i < snapIndex; i++) {
+              combinedHeight += snaps[i].offsetHeight;
+            }
+            return combinedHeight;
+          }
+
           var snapTo; // damn it jshint
           function snapFromCurrentSrollTop() {
-            var newSnapIndex = getSnapIndex(element[0].scrollTop);
+            var newSnapIndex = getSnapIndex(getCurrentScrollTop());
             if (scope.snapIndex === newSnapIndex) {
               snapTo(newSnapIndex);
             } else {
@@ -164,7 +181,6 @@
               scrollPromise = $timeout(snapFromCurrentSrollTop, scrollDelay);
             }
           }
-
 
           var scrollBound,
               bindScrollPromise,
@@ -206,15 +222,6 @@
             }
           }
 
-          function getScrollTop(snapIndex) {
-              var snaps = element.children();
-              var combinedHeight = 0;
-              for (var i = 0; i < snapIndex; i++) {
-                  combinedHeight += snaps[i].offsetHeight;
-              }
-              return combinedHeight;
-          }
-
           var snapEasing = attributes.snapEasing,
               snapDuration = attributes.snapDuration;
           snapTo = function(snapIndex, afterSnap) {
@@ -240,46 +247,33 @@
 
           var wheelBound;
           function bindWheel() {
-            function maybePreventBubbling(e, bubbleUp) {
-              if (!bubbleUp) {
-                e.stopPropagation();
-              }
+            if (wheelBound) {
+              return;
             }
-
             wheelie.bind(element, {
               up: function (e) {
                 e.preventDefault();
-
-                var bubbleUp;
                 if (scope.snapDirection !== 'down') {
-                  if (scope.snapIndex - 1 < scope.snapIndexMin()) {
-                    bubbleUp = true;
-                  } else {
-                    bubbleUp = false;
+                  var nextSnapIndex = scope.snapIndex - 1;
+                  if (nextSnapIndex >= scope.snapIndexMin()) {
                     scope.$apply(function () {
-                      scope.snapIndex -= 1;
+                      scope.snapIndex = nextSnapIndex;
                     });
+                    e.stopPropagation();
                   }
                 }
-
-                maybePreventBubbling(e, bubbleUp);
               },
               down: function (e) {
                 e.preventDefault();
-
-                var bubbleUp;
                 if (scope.snapDirection !== 'up') {
-                  if (scope.snapIndex + 1 > scope.scopeIndexMax()) {
-                    bubbleUp = true;
-                  } else {
-                    bubbleUp = false;
+                  var nextSnapIndex = scope.snapIndex + 1;
+                  if (nextSnapIndex <= scope.scopeIndexMax()) {
                     scope.$apply(function () {
-                      scope.snapIndex += 1;
+                      scope.snapIndex = nextSnapIndex;
                     });
+                    e.stopPropagation();
                   }
                 }
-
-                maybePreventBubbling(e, bubbleUp);
               }
             });
             wheelBound = true;
@@ -294,7 +288,7 @@
 
           function updateSnapHeight(snapHeight) {
             element.css('height', snapHeight + 'px');
-            var snaps = element.children();
+            var snaps = getCurrentSnaps();
             if (snaps.length) {
               angular.forEach(snaps, function (snap) {
                 angular.element(snap).css('height', snapHeight + 'px');
@@ -307,7 +301,7 @@
             if (preventSnappingAfterManualScroll) {
               return;
             }
-            var currentScrollTop = element[0].scrollTop;
+            var currentScrollTop = getCurrentScrollTop();
             if (currentScrollTop !== 0) {
               scope.snapIndex = getSnapIndex(currentScrollTop);
             }
@@ -343,7 +337,7 @@
             };
 
             scope.scopeIndexMax = function () {
-              return element.children().length - 1;
+              return getCurrentSnaps().length - 1;
             };
 
             scope.isValid = function (snapIndex) {
