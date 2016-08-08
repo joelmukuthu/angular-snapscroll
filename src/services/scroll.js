@@ -1,10 +1,6 @@
 (function () {
-    'use strict';
-
-  // this is built upon http://stackoverflow.com/a/16136789/1004406
-
+    // this is built upon http://stackoverflow.com/a/16136789/1004406
     var snapscroll = angular.module('snapscroll');
-
     snapscroll.factory('scroll', [
         '$q',
         'requestAnimation',
@@ -55,8 +51,8 @@
 
                     if (animation) {
                         cancelAnimation(animation);
-                // TODO: should the promise be rejected at this point since this is just cleaning up?
-                // element.data('snapscroll-animation-deferred').reject();
+                        // TODO: should the promise be rejected at this point since this is just cleaning up?
+                        // element.data('snapscroll-animation-deferred').reject();
                         cleanUp(element, animation);
                     }
 

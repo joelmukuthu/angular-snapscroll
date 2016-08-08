@@ -1,9 +1,7 @@
 (function () {
-    'use strict';
-
-  // all this is adapted from https://github.com/darius/requestAnimationFrame/blob/master/requestAnimationFrame.js
-  // ngAnimate does have $$animateReflow, but that was not built to be a wrapper
-  // around requestAnimationFrame, hence this.
+    // all this is adapted from https://github.com/darius/requestAnimationFrame/blob/master/requestAnimationFrame.js
+    // ngAnimate does have $$animateReflow, but that was not built to be a wrapper
+    // around requestAnimationFrame, hence this.
 
     var getWithVendorPrefix = function (funcName, $window) {
         var vendors = ['webkit', 'moz'],

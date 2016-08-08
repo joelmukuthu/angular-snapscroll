@@ -1,5 +1,3 @@
-'use strict';
-
 describe('Directive: fitWindowHeight', function () {
 
     var $compile,

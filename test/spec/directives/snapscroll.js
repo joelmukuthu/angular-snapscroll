@@ -1,5 +1,3 @@
-'use strict';
-
 describe('Directive: snapscroll', function () {
 
     var $compile,

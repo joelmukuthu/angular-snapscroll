@@ -1,5 +1,3 @@
-'use strict';
-
 describe('Module: snapscroll', function () {
 
     it('is created', function () {

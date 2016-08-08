@@ -1,6 +1,4 @@
 (function () {
-    'use strict';
-
     function easeInOutQuad(t, b, c, d) {
         t /= d / 2;
         if (t < 1) {

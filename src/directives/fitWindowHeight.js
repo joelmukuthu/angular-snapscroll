@@ -1,16 +1,14 @@
 (function () {
-    'use strict';
-
     angular.module('snapscroll')
     .directive('fitWindowHeight', [
         '$window',
         '$timeout',
         'defaultSnapscrollResizeDelay',
         function (
-        $window,
-        $timeout,
-        defaultSnapscrollResizeDelay
-      ) {
+            $window,
+            $timeout,
+            defaultSnapscrollResizeDelay
+        ) {
             return {
                 restrict: 'A',
                 require: 'snapscroll',

@@ -1,6 +1,4 @@
 (function () {
-    'use strict';
-
     var scopeObject = {
         enabled: '=snapscroll',
         snapIndex: '=?',

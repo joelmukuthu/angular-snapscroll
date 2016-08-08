@@ -1,5 +1,3 @@
-'use strict';
-
 describe('Services: requestAnimation & cancelAnimation', function () {
     var windowMock,
         timeoutMockObject;

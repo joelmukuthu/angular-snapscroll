@@ -1,5 +1,3 @@
-'use strict';
-
 describe('Service: scroll', function () {
     var element,
         requestAnimationMock,
