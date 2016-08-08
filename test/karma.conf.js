@@ -1,94 +1,94 @@
 // Karma configuration
 // Generated on Sat Sep 13 2014 18:48:29 GMT+0300 (EEST)
 
-module.exports = function(config) {
-  config.set({
+module.exports = function (config) {
+    config.set({
 
-    // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '../',
-
-
-    // frameworks to use
-    // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine'],
+        // base path that will be used to resolve all patterns (eg. files, exclude)
+        basePath: '../',
 
 
-    // list of files / patterns to load in the browser
-    files: [
-      'node_modules/angular/angular.js',
-      'node_modules/angular-mocks/angular-mocks.js',
-      'node_modules/angular-wheelie/dist/angular-wheelie.js',
-      'src/*.js',
-      'src/**/*.js',
-      'test/spec/**/*.js'
-    ],
+        // frameworks to use
+        // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+        frameworks: ['jasmine'],
 
 
-    // list of files to exclude
-    exclude: [
-    ],
+        // list of files / patterns to load in the browser
+        files: [
+            'node_modules/angular/angular.js',
+            'node_modules/angular-mocks/angular-mocks.js',
+            'node_modules/angular-wheelie/dist/angular-wheelie.js',
+            'src/*.js',
+            'src/**/*.js',
+            'test/spec/**/*.js'
+        ],
 
 
-    // preprocess matching files before serving them to the browser
-    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-      // generage coverage for these files
-      'src/**/*.js': ['coverage']
-    },
+        // list of files to exclude
+        exclude: [
+        ],
 
 
-    // test results reporter to use
-    // possible values: 'dots', 'progress'
-    // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    // coverage reporter generates tests' coverage
-    reporters: ['progress', 'coverage','coveralls'],
+        // preprocess matching files before serving them to the browser
+        // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+        preprocessors: {
+            // generage coverage for these files
+            'src/**/*.js': ['coverage']
+        },
 
 
-    // configure coverage reporter
-    coverageReporter: {
-      type : 'lcov',
-      dir : 'coverage/'
-    },
+        // test results reporter to use
+        // possible values: 'dots', 'progress'
+        // available reporters: https://npmjs.org/browse/keyword/karma-reporter
+        // coverage reporter generates tests' coverage
+        reporters: ['progress', 'coverage', 'coveralls'],
 
 
-    // web server port
-    port: 9876,
+        // configure coverage reporter
+        coverageReporter: {
+            type : 'lcov',
+            dir : 'coverage/'
+        },
 
 
-    // enable / disable colors in the output (reporters and logs)
-    colors: true,
+        // web server port
+        port: 9876,
 
 
-    // level of logging
-    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_INFO,
+        // enable / disable colors in the output (reporters and logs)
+        colors: true,
 
 
-    // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+        // level of logging
+        // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+        logLevel: config.LOG_INFO,
 
 
-    plugins: [
-      'karma-jasmine',
-      'karma-coverage',
-      'karma-coveralls',
-      // 'karma-chrome-launcher',
-      // 'karma-firefox-launcher',
-      'karma-phantomjs-launcher'
-    ],
+        // enable / disable watching file and executing tests whenever any file changes
+        autoWatch: true,
 
 
-    // start these browsers
-    // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: [
-      // 'Chrome',
-      // 'Firefox',
-      'PhantomJS'
-    ],
+        plugins: [
+            'karma-jasmine',
+            'karma-coverage',
+            'karma-coveralls',
+            // 'karma-chrome-launcher',
+            // 'karma-firefox-launcher',
+            'karma-phantomjs-launcher'
+        ],
 
 
-    // Continuous Integration mode
-    // if true, Karma captures browsers, runs the tests and exits
-    singleRun: true
-  });
+        // start these browsers
+        // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+        browsers: [
+            // 'Chrome',
+            // 'Firefox',
+            'PhantomJS'
+        ],
+
+
+        // Continuous Integration mode
+        // if true, Karma captures browsers, runs the tests and exits
+        singleRun: true
+    });
 };
