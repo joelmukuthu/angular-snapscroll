@@ -44,6 +44,13 @@ module.exports = function (grunt) {
       }
     },
 
+    eslint: {
+      target: [
+        'src/**/*.js',
+        'test/spec/**/*.js'
+      ]
+    },
+
     jshint: {
       options: {
         jshintrc: '.jshintrc',
