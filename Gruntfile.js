@@ -111,17 +111,17 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('default', [
-        'jshint',
+        'eslint',
         'watch'
     ]);
 
     grunt.registerTask('dev-test', [
-        'jshint',
+        'eslint',
         'karma:continuous'
     ]);
 
     grunt.registerTask('test', [
-        'jshint',
+        'eslint',
         'karma:single'
     ]);
 
