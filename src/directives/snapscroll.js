@@ -18,15 +18,14 @@
         return angular.isNumber(value) && !isNaN(value);
     }
 
-    var _unwatchSnapHeight;
-    function unwatchSnapHeight() {
-        if (_unwatchSnapHeight) {
-            _unwatchSnapHeight();
+    function unwatchSnapHeight(scope) {
+        if (scope.unwatchSnapHeight) {
+            scope.unwatchSnapHeight();
         }
     }
 
     function watchSnapHeight(scope, callback) {
-        _unwatchSnapHeight = scope.$watch('snapHeight',
+        scope.unwatchSnapHeight = scope.$watch('snapHeight',
             function (snapHeight, previousSnapHeight) {
                 if (angular.isUndefined(snapHeight)) {
                     return;
@@ -44,15 +43,14 @@
         );
     }
 
-    var _unwatchSnapIndex;
-    function unwatchSnapIndex() {
-        if (_unwatchSnapIndex) {
-            _unwatchSnapIndex();
+    function unwatchSnapIndex(scope) {
+        if (scope.unwatchSnapIndex) {
+            scope.unwatchSnapIndex();
         }
     }
 
     function watchSnapIndex(scope, snapTo) {
-        _unwatchSnapIndex = scope.$watch('snapIndex',
+        scope.unwatchSnapIndex = scope.$watch('snapIndex',
             function (snapIndex, previousSnapIndex) {
                 if (angular.isUndefined(snapIndex)) {
                     scope.snapIndex = 0;
@@ -141,12 +139,12 @@
                     function getSnapIndex(scrollTop) {
                         var snapIndex = -1,
                             snaps = getCurrentSnaps(),
-                            lastSnapHeight;
+                            snapHeight;
                         while (scrollTop > 0) {
-                            lastSnapHeight = snaps[++snapIndex].offsetHeight;
-                            scrollTop -= lastSnapHeight;
+                            snapHeight = snaps[++snapIndex].offsetHeight;
+                            scrollTop -= snapHeight;
                         }
-                        if ((lastSnapHeight / 2) >= -scrollTop) {
+                        if ((snapHeight / 2) >= -scrollTop) {
                             snapIndex += 1;
                         }
                         return snapIndex;
@@ -172,55 +170,52 @@
                         }
                     }
 
-                    var scrollPromise,
-                        scrollDelay = attributes.scrollDelay;
+                    var scrollDelay = attributes.scrollDelay;
                     function onScroll() {
                         scroll.stop(element);
                         if (scrollDelay === false) {
                             snapFromCurrentSrollTop();
                         } else {
-                            $timeout.cancel(scrollPromise);
-                            scrollPromise = $timeout(
+                            $timeout.cancel(scope.scrollPromise);
+                            scope.scrollPromise = $timeout(
                                 snapFromCurrentSrollTop,
                                 scrollDelay
                             );
                         }
                     }
 
-                    var scrollBound,
-                        bindScrollPromise,
-                        preventSnappingAfterManualScroll = angular.isDefined(
+                    var preventSnappingAfterManualScroll = angular.isDefined(
                           attributes.preventSnappingAfterManualScroll
                         );
                     function bindScroll() {
-                        if (preventSnappingAfterManualScroll || scrollBound) {
+                        if (preventSnappingAfterManualScroll || scope.scrollBound) {
                             return;
                         }
                         // if the bindScroll timeout expires while snapping is
                         // ongoing, restart the timer
                         if (scope.snapDirection !== 'none') {
-                            bindScrollPromise = $timeout(
+                            scope.bindScrollPromise = $timeout(
                                 bindScroll,
                                 defaultSnapscrollBindScrollTimeout
                             );
                             return;
                         }
                         element.on('scroll', onScroll);
-                        scrollBound = true;
+                        scope.scrollBound = true;
                     }
 
                     function unbindScroll() {
-                        if (scrollBound) {
+                        if (scope.scrollBound) {
                             element.off('scroll', onScroll);
-                            scrollBound = false;
+                            scope.scrollBound = false;
                         }
                     }
 
                     function bindScrollAfterTimeout() {
                         if (!preventSnappingAfterManualScroll) {
                             // bind scroll after a timeout
-                            $timeout.cancel(bindScrollPromise);
-                            bindScrollPromise = $timeout(
+                            $timeout.cancel(scope.bindScrollPromise);
+                            scope.bindScrollPromise = $timeout(
                                 bindScroll,
                                 defaultSnapscrollBindScrollTimeout
                             );
@@ -265,9 +260,8 @@
                         return scrollTo(getScrollTop(snapIndex), afterSnap);
                     }
 
-                    var wheelBound;
                     function bindWheel() {
-                        if (wheelBound) {
+                        if (scope.wheelBound) {
                             return;
                         }
                         wheelie.bind(element, {
@@ -296,13 +290,13 @@
                                 }
                             }
                         });
-                        wheelBound = true;
+                        scope.wheelBound = true;
                     }
 
                     function unbindWheel() {
-                        if (wheelBound) {
+                        if (scope.wheelBound) {
                             wheelie.unbind(element);
-                            wheelBound = false;
+                            scope.wheelBound = false;
                         }
                     }
 
@@ -374,8 +368,8 @@
 
                         scope.$watch('enabled', function (enabled) {
                             if (enabled === false) {
-                                unwatchSnapHeight();
-                                unwatchSnapIndex();
+                                unwatchSnapHeight(scope);
+                                unwatchSnapIndex(scope);
                                 unbindScroll();
                                 unbindWheel();
                             } else {
