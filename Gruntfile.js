@@ -15,7 +15,6 @@ module.exports = function (grunt) {
         },
 
         clean: {
-            // dev: '.tmp',
             dist: 'dist'
         },
 
@@ -24,10 +23,6 @@ module.exports = function (grunt) {
                 separator: '\n',
                 banner: '<%= info.banner.long %>'
             },
-            // dev: {
-            //     src: ['src/*.js', 'src/**/*.js'],
-            //     dest: '.tmp/<%= pkg.name %>.js'
-            // },
             dist: {
                 src: ['src/*.js', 'src/**/*.js'],
                 dest: 'dist/<%= pkg.name %>.js'
@@ -57,27 +52,18 @@ module.exports = function (grunt) {
             },
             single: {
                 singleRun: true
-            },
-            continuous: {
-                singleRun: false
             }
         },
 
         watch: {
-            js: {
-                files: ['src/**/*.js'],
-                tasks: [
-                    'newer:jshint:js',
-                    'karma:single'
-                ]
-            },
-            test: {
-                files: ['test/spec/**/*.js'],
-                tasks: [
-                    'newer:jshint:test',
-                    'karma:single'
-                ]
-            }
+            files: [
+                'src/**/*.js',
+                'test/spec/**/*.js'
+            ],
+            tasks: [
+                'newer:eslint',
+                'karma:single'
+            ]
         },
 
         'release-it': {
@@ -94,11 +80,6 @@ module.exports = function (grunt) {
     grunt.registerTask('default', [
         'eslint',
         'watch'
-    ]);
-
-    grunt.registerTask('dev-test', [
-        'eslint',
-        'karma:continuous'
     ]);
 
     grunt.registerTask('test', [
