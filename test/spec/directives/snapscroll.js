@@ -684,15 +684,14 @@ describe('Directive: snapscroll', function () {
         });
 
         it('defaults snapIndex to zero if a non-number value is provided', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="snapIndex" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
             $scope.snapIndex = 'bad';
-            element = compileElement(html, true);
+            compileElement(html, true);
             expect($scope.snapIndex).toBe(0);
         });
 
@@ -712,15 +711,14 @@ describe('Directive: snapscroll', function () {
         });
 
         it('ignores changes to snapIndex if a non-number value is provided', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="snapIndex" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
             $scope.snapIndex = 1;
-            element = compileElement(html, true);
+            compileElement(html, true);
             expect($scope.snapIndex).toBe(1);
             $scope.$apply(function () {
                 $scope.snapIndex = 'bad';
@@ -1076,16 +1074,15 @@ describe('Directive: snapscroll', function () {
         });
 
         it('stays snapped to the current snapIndex when snapHeight is changed', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" snap-height="height" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
+            var html = [
+                '<div snapscroll="" snap-index="index" snap-height="height" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
             $scope.index = 1;
-            element = compileElement(html, true);
+            compileElement(html, true);
             expect($scope.index).toBe(1);
             $scope.$apply(function () {
                 $scope.height = 100;
@@ -1737,15 +1734,14 @@ describe('Directive: snapscroll', function () {
         }));
 
         it('animates the snapping by default', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
-            element = compileElement(html, true);
+            var html = [
+                '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
             $scope.$apply(function () {
                 $scope.index = 1;
             });
@@ -1755,16 +1751,15 @@ describe('Directive: snapscroll', function () {
         });
 
         it('allows disabling snapAnimation on initialisation', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" snap-animation="animation" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
+            var html = [
+                '<div snapscroll="" snap-index="index" snap-animation="animation" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
             $scope.animation = false;
-            element = compileElement(html, true);
+            compileElement(html, true);
             $scope.$apply(function () {
                 $scope.index = 1;
             });
@@ -1772,15 +1767,14 @@ describe('Directive: snapscroll', function () {
         });
 
         it('allows enabling snapAnimation on initialisation (useless though as it\'s enabled by default)', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" snap-animation="true" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
-            element = compileElement(html, true);
+            var html = [
+                '<div snapscroll="" snap-index="index" snap-animation="true" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
             $scope.$apply(function () {
                 $scope.index = 1;
             });
@@ -1788,15 +1782,14 @@ describe('Directive: snapscroll', function () {
         });
 
         it('allows disabling snapAnimation on initialisation by passing a falsy value', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" snap-animation="false" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
-            element = compileElement(html, true);
+            var html = [
+                '<div snapscroll="" snap-index="index" snap-animation="false" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
             $scope.$apply(function () {
                 $scope.index = 1;
             });
@@ -1804,17 +1797,16 @@ describe('Directive: snapscroll', function () {
         });
 
         it('allows enabling/disabling snapAnimation after initialisation i.e. creates a two-way bind to snapAnimation', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" snap-animation="animation" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
+            var html = [
+                '<div snapscroll="" snap-index="index" snap-animation="animation" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
             $scope.index = 0;
             $scope.animation = false;
-            element = compileElement(html, true);
+            compileElement(html, true);
             $scope.index = 1;
             $scope.animation = true;
             $scope.$apply();
@@ -1827,30 +1819,28 @@ describe('Directive: snapscroll', function () {
         });
 
         it('allows setting the snapAnimation duration (snapDuration)', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" snap-duration="10" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
-            element = compileElement(html, true);
+            var html = [
+                '<div snapscroll="" snap-index="index" snap-duration="10" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
             $scope.index = 1;
             $scope.$apply();
             expect(snapDurationMock).toBe(10);
         });
 
         it('allows setting the snapDuration to zero', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" snap-duration="0" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
-            element = compileElement(html, true);
+            var html = [
+                '<div snapscroll="" snap-index="index" snap-duration="0" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
             $scope.index = 1;
             $scope.$apply();
             expect(snapDurationMock).toBeDefined();
@@ -1858,16 +1848,15 @@ describe('Directive: snapscroll', function () {
         });
 
         it('doesn\'t allow setting snapDuration using angular expressions', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" snap-duration="bad" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
+            var html = [
+                '<div snapscroll="" snap-index="index" snap-duration="bad" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
             $scope.bad = 10;
-            element = compileElement(html, true);
+            compileElement(html, true);
             $scope.index = 1;
             $scope.$apply();
             expect(snapDurationMock).toBeDefined();
@@ -1875,15 +1864,14 @@ describe('Directive: snapscroll', function () {
         });
 
         it('doesn\'t allow setting snapDuration using non-integer expressions', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" snap-duration="\'bad\'" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
-            element = compileElement(html, true);
+            var html = [
+                '<div snapscroll="" snap-index="index" snap-duration="\'bad\'" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
             $scope.index = 1;
             $scope.$apply();
             expect(snapDurationMock).toBeDefined();
@@ -1891,30 +1879,28 @@ describe('Directive: snapscroll', function () {
         });
 
         it('defaults snapDuration to the value of defaultSnapscrollSnapDuration', inject(function (defaultSnapscrollSnapDuration) {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" snap-duration="\'bad\'" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
-            element = compileElement(html, true);
+            var html = [
+                '<div snapscroll="" snap-index="index" snap-duration="\'bad\'" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
             $scope.index = 1;
             $scope.$apply();
             expect(snapDurationMock).toBe(defaultSnapscrollSnapDuration);
         }));
 
         it('initializes snapDuration to the value of defaultSnapscrollSnapDuration', inject(function (defaultSnapscrollSnapDuration) {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
-            element = compileElement(html, true);
+            var html = [
+                '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
             $scope.index = 1;
             $scope.$apply();
             expect(snapDurationMock).toBe(defaultSnapscrollSnapDuration);
@@ -1922,33 +1908,31 @@ describe('Directive: snapscroll', function () {
 
         // TODO: is this functionality really necessary??
         it('allows setting the snapAnimation easing (snapEasing)', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" snap-easing="easing" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
+            var html = [
+                '<div snapscroll="" snap-index="index" snap-easing="easing" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
             $scope.easing = function () {};
-            element = compileElement(html, true);
+            compileElement(html, true);
             $scope.index = 1;
             $scope.$apply();
             expect(snapEasingMock).toBe(1);
         });
 
         it('uses whichever snapEasing is provided', function () {
-            var element,
-                html = [
-                    '<div snapscroll="" snap-index="index" snap-easing="easing" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join(''),
-                easing = jasmine.createSpy('easing');
+            var easing = jasmine.createSpy('easing');
+            var html = [
+                '<div snapscroll="" snap-index="index" snap-easing="easing" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
             $scope.easing = easing;
-            element = compileElement(html, true);
+            compileElement(html, true);
             $scope.index = 1;
             $scope.$apply();
             expect(easing).toHaveBeenCalled();
