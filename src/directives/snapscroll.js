@@ -75,7 +75,6 @@
                 if (!scope.isValid(snapIndex)) {
                     scope.ignoreThisSnapIndexChange = true;
                     scope.snapIndex = previousSnapIndex;
-                    scope.snapDirection = 'none'; // TODO: why?
                     return;
                 }
                 var beforeSnapReturnValue = scope.beforeSnap({
