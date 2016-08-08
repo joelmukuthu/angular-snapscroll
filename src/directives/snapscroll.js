@@ -161,7 +161,6 @@
                         return combinedHeight;
                     }
 
-                    var snapTo; // damn it jshint
                     function snapFromCurrentSrollTop() {
                         var newSnapIndex = getSnapIndex(getCurrentScrollTop());
                         if (scope.snapIndex === newSnapIndex) {
@@ -262,9 +261,9 @@
                         });
                     }
 
-                    snapTo = function (snapIndex, afterSnap) {
+                    function snapTo(snapIndex, afterSnap) {
                         return scrollTo(getScrollTop(snapIndex), afterSnap);
-                    };
+                    }
 
                     var wheelBound;
                     function bindWheel() {
