@@ -51,25 +51,6 @@ module.exports = function (grunt) {
             ]
         },
 
-        jshint: {
-            options: {
-                jshintrc: '.jshintrc',
-                reporter: require('jshint-stylish')
-            },
-            js: {
-                src: [
-                    'Gruntfile.js',
-                    'src/**/*.js'
-                ]
-            },
-            test: {
-                options: {
-                    jshintrc: 'test/.jshintrc'
-                },
-                src: ['test/spec/**/*.js']
-            }
-        },
-
         karma: {
             options: {
                 configFile: 'test/karma.conf.js'
