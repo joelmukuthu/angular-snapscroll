@@ -333,6 +333,51 @@ describe('Directive: snapscroll', function () {
         expect(element[0].scrollTop).toBe(150);
     }
 
+    function testShowsRestOfBigSnapOnMousewheelDown(html) {
+        var element;
+        element = compileElement(html, true);
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(50);
+        element.triggerHandler({
+            type: 'mousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(100);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(125);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(2);
+        expect(element[0].scrollTop).toBe(175);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(3);
+        expect(element[0].scrollTop).toBe(225);
+    }
+
     function testSnapsUpOnMousewheelUp(html) {
         var element;
         $scope.index = 3;
@@ -347,6 +392,52 @@ describe('Directive: snapscroll', function () {
         expect(element[0].scrollTop).toBe(100);
         element.triggerHandler({
             type: 'mousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(50);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(0);
+    }
+
+    function testShowsRestOfBigSnapOnMousewheelUp(html) {
+        var element;
+        $scope.index = 3;
+        element = compileElement(html, true);
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(2);
+        expect(element[0].scrollTop).toBe(175);
+        element.triggerHandler({
+            type: 'mousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(125);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(75);
+        element.triggerHandler({
+            type: 'onmousewheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -1306,6 +1397,30 @@ describe('Directive: snapscroll', function () {
                 '</div>'
             ].join('');
             testSnapsUpOnMousewheelUp(html);
+        });
+
+        it('shows the rest of a snap instead of snapping down if it\'s greater than the snapHeight on mouseheel down', function () {
+            var html = [
+                '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 125px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testShowsRestOfBigSnapOnMousewheelDown(html);
+        });
+
+        it('shows the rest of a snap instead of snapping up if it\'s greater than the snapHeight on mouseheel up', function () {
+            var html = [
+                '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 125px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testShowsRestOfBigSnapOnMousewheelUp(html);
         });
 
         it('doens\'t snap down on a new down-mousewheel event if the element is already scrolled to the end', function () {
