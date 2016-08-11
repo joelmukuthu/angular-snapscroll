@@ -23,7 +23,7 @@
     "grunt-newer": "^1.2.0",
     "grunt-release-it": "^1.0.1",
     "jasmine-core": "^2.4.1",
-    "karma": "^1.1.1",
+    "karma": "^1.2.0",
     "karma-coverage": "^1.1.0",
     "karma-coveralls": "^1.1.2",
     "karma-jasmine": "^1.0.2",
