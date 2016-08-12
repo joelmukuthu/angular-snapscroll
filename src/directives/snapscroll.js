@@ -92,9 +92,9 @@
                 }
                 if (angular.isFunction(snapTo)) {
                     if (snapIndex > previousSnapIndex) {
-                        scope.snapDirection = 'up';
-                    } else if (snapIndex < previousSnapIndex) {
                         scope.snapDirection = 'down';
+                    } else if (snapIndex < previousSnapIndex) {
+                        scope.snapDirection = 'up';
                     }
                     snapTo(snapIndex, function () {
                         scope.snapDirection = 'none';
@@ -261,6 +261,105 @@
                         return scrollTo(getScrollTop(snapIndex), afterSnap);
                     }
 
+                    function getCurrentSnapHeight() {
+                        var snaps = getCurrentSnaps();
+                        return snaps[scope.snapIndex].offsetHeight;
+                    }
+
+                    function getSnapscrollHeight() {
+                        return element[0].offsetHeight;
+                    }
+
+                    function snapUp() {
+                        if (scope.snapDirection === 'up') {
+                            return;
+                        }
+
+                        var currentScrollTop = getCurrentScrollTop();
+                        if (currentScrollTop <= 0) {
+                            return;
+                        }
+
+                        var snapscrollHeight = getSnapscrollHeight();
+                        var currentSnapHeight = getCurrentSnapHeight();
+                        var newScrollTop;
+                        var newSnapIndex;
+                        if (currentSnapHeight > snapscrollHeight) {
+                            var startingScrollTop = getScrollTop(scope.snapIndex);
+                            var remaining = currentScrollTop - startingScrollTop;
+                            if (remaining > 0) {
+                                newScrollTop = currentScrollTop - Math.min(remaining, snapscrollHeight);
+                            }
+                        }
+
+                        if (angular.isUndefined(newScrollTop)) {
+                            newSnapIndex = scope.snapIndex - 1;
+                            newScrollTop = currentScrollTop - snapscrollHeight;
+                        }
+
+                        if (newScrollTop < 0) {
+                            return;
+                        }
+
+                        if (angular.isDefined(newSnapIndex)) {
+                            scope.$apply(function () {
+                                scope.ignoreThisSnapIndexChange = true;
+                                scope.snapIndex = newSnapIndex;
+                            });
+                        }
+
+                        scope.snapDirection = 'up';
+                        return scrollTo(newScrollTop, function () {
+                            scope.snapDirection = 'none';
+                        });
+                    }
+
+                    function snapDown() {
+                        if (scope.snapDirection === 'down') {
+                            return;
+                        }
+
+                        var currentScrollTop = getCurrentScrollTop();
+                        var snapscrollHeight = getSnapscrollHeight();
+                        var scrollHeight = element[0].scrollHeight;
+
+                        if (currentScrollTop >= scrollHeight - snapscrollHeight) {
+                            return;
+                        }
+
+                        var currentSnapHeight = getCurrentSnapHeight();
+                        var newScrollTop;
+                        var newSnapIndex;
+                        if (currentSnapHeight > snapscrollHeight) {
+                            var startingScrollTop = getScrollTop(scope.snapIndex);
+                            var remaining = startingScrollTop + currentSnapHeight - currentScrollTop - snapscrollHeight;
+                            if (remaining > 0) {
+                                newScrollTop = currentScrollTop + Math.min(remaining, snapscrollHeight);
+                            }
+                        }
+
+                        if (angular.isUndefined(newScrollTop)) {
+                            newSnapIndex = scope.snapIndex + 1;
+                            newScrollTop = currentScrollTop + snapscrollHeight;
+                        }
+
+                        if (newScrollTop >= scrollHeight) {
+                            return;
+                        }
+
+                        if (angular.isDefined(newSnapIndex)) {
+                            scope.$apply(function () {
+                                scope.ignoreThisSnapIndexChange = true;
+                                scope.snapIndex = newSnapIndex;
+                            });
+                        }
+
+                        scope.snapDirection = 'down';
+                        return scrollTo(newScrollTop, function () {
+                            scope.snapDirection = 'none';
+                        });
+                    }
+
                     function bindWheel() {
                         if (scope.wheelBound) {
                             return;
@@ -268,26 +367,14 @@
                         wheelie.bind(element, {
                             up: function (e) {
                                 e.preventDefault();
-                                if (scope.snapDirection !== 'down') {
-                                    var nextSnapIndex = scope.snapIndex - 1;
-                                    if (nextSnapIndex >= scope.snapIndexMin()) {
-                                        scope.$apply(function () {
-                                            scope.snapIndex = nextSnapIndex;
-                                        });
-                                        e.stopPropagation();
-                                    }
+                                if (snapUp()) {
+                                    e.stopPropagation();
                                 }
                             },
                             down: function (e) {
                                 e.preventDefault();
-                                if (scope.snapDirection !== 'up') {
-                                    var nextSnapIndex = scope.snapIndex + 1;
-                                    if (nextSnapIndex <= scope.scopeIndexMax()) {
-                                        scope.$apply(function () {
-                                            scope.snapIndex = nextSnapIndex;
-                                        });
-                                        e.stopPropagation();
-                                    }
+                                if (snapDown()) {
+                                    e.stopPropagation();
                                 }
                             }
                         });

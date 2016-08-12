@@ -336,6 +336,8 @@ describe('Directive: snapscroll', function () {
     function testShowsRestOfBigSnapOnMousewheelDown(html) {
         var element;
         element = compileElement(html, true);
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(0);
         element.triggerHandler({
             type: 'wheel',
             wheelDelta: -120,
@@ -412,6 +414,8 @@ describe('Directive: snapscroll', function () {
         var element;
         $scope.index = 3;
         element = compileElement(html, true);
+        expect($scope.index).toBe(3);
+        expect(element[0].scrollTop).toBe(225);
         element.triggerHandler({
             type: 'wheel',
             wheelDelta: 120,
