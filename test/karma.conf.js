@@ -1,6 +1,18 @@
 // Karma configuration
 // Generated on Sat Sep 13 2014 18:48:29 GMT+0300 (EEST)
 
+var reporters = [
+    'progress',
+    'coverage'
+];
+
+var coverageType = 'html';
+
+if (process.env.TRAVIS) {
+    coverageType = 'lcov';
+    reporters.push('coveralls');
+}
+
 module.exports = function (config) {
     config.set({
 
@@ -41,13 +53,13 @@ module.exports = function (config) {
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
         // coverage reporter generates tests' coverage
-        reporters: ['progress', 'coverage', 'coveralls'],
+        reporters: reporters,
 
 
         // configure coverage reporter
         coverageReporter: {
-            type : 'lcov',
-            dir : 'coverage/'
+            dir: 'coverage/',
+            type: coverageType
         },
 
 
