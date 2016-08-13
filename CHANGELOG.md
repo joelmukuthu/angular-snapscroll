@@ -1,5 +1,8 @@
 ## next release
 
+### Breaking changes
+- Dependency on [angular-scrollie](https://github.com/joelmukuthu/angular-scrollie)
+
 ### Features
 - Support overriding the next snapIndex by returning a number from
 [`before-snap`](DOCS.md#before-snap)
