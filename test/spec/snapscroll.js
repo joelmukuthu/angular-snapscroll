@@ -14,8 +14,8 @@ describe('Module: snapscroll', function () {
 
         beforeEach(module('snapscroll'));
 
-        it('defaultSnapscrollScrollEasing', inject(function (defaultSnapscrollScrollEasing) {
-            expect(angular.isFunction(defaultSnapscrollScrollEasing)).toBe(true);
+        it('defaultSnapscrollScrollEasing as undefined', inject(function (defaultSnapscrollScrollEasing) {
+            expect(angular.isUndefined(defaultSnapscrollScrollEasing)).toBe(true);
         }));
 
         it('defaultSnapscrollScrollDelay', inject(function (defaultSnapscrollScrollDelay) {

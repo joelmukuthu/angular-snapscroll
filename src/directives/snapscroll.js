@@ -111,6 +111,7 @@
         '$timeout',
         'scroll',
         'wheelie',
+        'defaultSnapscrollScrollEasing',
         'defaultSnapscrollScrollDelay',
         'defaultSnapscrollSnapDuration',
         'defaultSnapscrollBindScrollTimeout',
@@ -118,6 +119,7 @@
             $timeout,
             scroll,
             wheelie,
+            defaultSnapscrollScrollEasing,
             defaultSnapscrollScrollDelay,
             defaultSnapscrollSnapDuration,
             defaultSnapscrollBindScrollTimeout
@@ -335,6 +337,8 @@
 
                         if (angular.isDefined(snapEasing)) {
                             snapEasing = scope.$parent.$eval(snapEasing);
+                        } else if (angular.isFunction(defaultSnapscrollScrollEasing)) {
+                            snapEasing = defaultSnapscrollScrollEasing;
                         }
 
                         snapDuration = parseInt(snapDuration, 10);
