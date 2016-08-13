@@ -8,7 +8,7 @@ describe('Directive: snapscroll', function () {
     beforeEach(module('snapscroll'));
 
     beforeEach(module(function ($provide) {
-        $provide.value('scroll', scrollMock);
+        $provide.value('scrollie', scrollMock);
         $provide.value('defaultSnapscrollScrollEasing', defaultSnapscrollScrollEasingMock);
     }));
 

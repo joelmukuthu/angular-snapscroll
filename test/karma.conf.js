@@ -30,6 +30,7 @@ module.exports = function (config) {
             'node_modules/angular/angular.js',
             'node_modules/angular-mocks/angular-mocks.js',
             'node_modules/angular-wheelie/dist/angular-wheelie.js',
+            'node_modules/angular-scrollie/dist/angular-scrollie.js',
             'src/*.js',
             'src/**/*.js',
             'test/spec/**/*.js'
