@@ -196,29 +196,3 @@ the default value:
 angular.module('myapp', ['snapscroll'])
     .value('defaultSnapscrollResizeDelay', 400);
 ```
-
-## scroll service
-Snapscroll also provides a `scroll` service that can be used to animate
-`scrollTop`, or simply to set it. It exposes two functions, `scroll.to()` and
-`scroll.stop()`
-
-#### scroll.to(element, top, [duration], [easing])
-animates the scrollTop of `element` from it's current scrollTop to the value of
-`top` in a time-frame of `duration` and using the provided `easing` function.
-if duration is not provided or is not valid, then it sets the scrollTop without
-animating.
-
-it returns a `$q` promise object which is resolved when the animation is
-complete and is rejected if the animation is stopped.
-
-the default easing can be changed during module instantiation:
-```javascript
-angular.module('myapp', ['snapscroll'])
-    .value('defaultSnapscrollScrollEasing', function () {
-        // easing function
-    });
-```
-
-#### scroll.stop(element)
-stops any currently-running animation on scrollTop of `element`. stopping the
-animation results in rejecting the promise returned by `scroll.to()`.
