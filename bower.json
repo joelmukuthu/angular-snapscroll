@@ -25,7 +25,8 @@
     "test"
   ],
   "dependencies": {
-    "angular": "^1.2.24"
+    "angular": "^1.2.24",
+    "angular-scrollie": "^1.0.0"
   },
   "homepage": "https://github.com/joelmukuthu/angular-snapscroll.git"
 }
