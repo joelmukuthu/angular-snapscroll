@@ -109,16 +109,16 @@
 
     var snapscrollAsAnAttribute = [
         '$timeout',
-        'scroll',
         'wheelie',
+        'scrollie',
         'defaultSnapscrollScrollEasing',
         'defaultSnapscrollScrollDelay',
         'defaultSnapscrollSnapDuration',
         'defaultSnapscrollBindScrollTimeout',
         function (
             $timeout,
-            scroll,
             wheelie,
+            scrollie,
             defaultSnapscrollScrollEasing,
             defaultSnapscrollScrollDelay,
             defaultSnapscrollSnapDuration,
@@ -173,7 +173,7 @@
 
                     var scrollDelay = attributes.scrollDelay;
                     function onScroll() {
-                        scroll.stop(element);
+                        scrollie.stop(element);
                         if (scrollDelay === false) {
                             snapFromCurrentSrollTop();
                         } else {
@@ -249,7 +249,7 @@
                             ];
                         }
                         unbindScroll();
-                        return scroll.to.apply(scroll, args).then(function () {
+                        return scrollie.to.apply(scrollie, args).then(function () {
                             if (angular.isFunction(afterScroll)) {
                                 afterScroll();
                             }

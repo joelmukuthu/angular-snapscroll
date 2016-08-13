@@ -1,6 +1,6 @@
 (function () {
     angular
-        .module('snapscroll', ['wheelie'])
+        .module('snapscroll', ['wheelie', 'scrollie'])
         .value('defaultSnapscrollScrollEasing', undefined)
         .value('defaultSnapscrollScrollDelay', 250)
         .value('defaultSnapscrollSnapDuration', 800)
