@@ -2106,16 +2106,26 @@ describe('Directive: snapscroll', function () {
                 wheelDelta: -120,
                 detail: 120,
                 deltaY: 120
-            });
+            }); // snap down to 50
             expect(element[0].scrollTop).toBe(0); // because animation is in progress
+            $timeout.flush(); // flush all animations
+            expect(element[0].scrollTop).toBe(50);
+            element.triggerHandler({
+                type: 'wheel',
+                wheelDelta: -120,
+                detail: 120,
+                deltaY: 120
+            }); // snap down to 100
+            expect(element[0].scrollTop).toBe(50); // because animation is in progress
+            $timeout.flush(); // flush all animations
             element.triggerHandler({
                 type: 'wheel',
                 wheelDelta: 120,
                 detail: -120,
                 deltaY: -120
-            });
+            });  // snap up to 50
             $timeout.flush(); // flush all animations
-            expect(element[0].scrollTop).toBe(0); // because second wheel event was in the opposite direction
+            expect(element[0].scrollTop).toBe(50); // because second wheel event was in the opposite direction
         }
 
         beforeEach(inject(function (_$timeout_) {
@@ -2123,24 +2133,31 @@ describe('Directive: snapscroll', function () {
         }));
 
         beforeEach(function () {
-            scrollMock.to = function (element, top, duration) {
-                var currentAnimation = element.data('current-animation');
-                if (currentAnimation) {
-                    $timeout.cancel(currentAnimation);
+            function stopAnimation(element) {
+                var animation = element.data('current-animation');
+                if (animation) {
+                    $timeout.cancel(animation);
                 }
-                currentAnimation = $timeout(function () {
+            }
+
+            scrollMock.to = function (element, top, duration) {
+                stopAnimation(element);
+                var animation = $timeout(function () {
                     element[0].scrollTop = top;
                 }, duration);
-                element.data('current-animation', currentAnimation);
+                element.data('current-animation', animation);
                 return {
-                    then: angular.noop
+                    then: function (success) {
+                        if (angular.isFunction(success)) {
+                            success();
+                        }
+                        return this;
+                    }
                 };
             };
+
             scrollMock.stop = function (element) {
-                var currentAnimation = element.data('current-animation');
-                if (currentAnimation) {
-                    $timeout.cancel(currentAnimation);
-                }
+                stopAnimation(element);
             };
         });
 
