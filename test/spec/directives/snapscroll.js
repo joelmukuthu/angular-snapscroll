@@ -333,6 +333,36 @@ describe('Directive: snapscroll', function () {
         expect(element[0].scrollTop).toBe(150);
     }
 
+    function testSnapsUpOnMousewheelUp(html) {
+        var element;
+        $scope.index = 3;
+        element = compileElement(html, true);
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(2);
+        expect(element[0].scrollTop).toBe(100);
+        element.triggerHandler({
+            type: 'mousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(50);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(0);
+    }
+
     function testShowsRestOfBigSnapOnMousewheelDown(html) {
         var element;
         element = compileElement(html, true);
@@ -378,36 +408,6 @@ describe('Directive: snapscroll', function () {
         });
         expect($scope.index).toBe(3);
         expect(element[0].scrollTop).toBe(225);
-    }
-
-    function testSnapsUpOnMousewheelUp(html) {
-        var element;
-        $scope.index = 3;
-        element = compileElement(html, true);
-        element.triggerHandler({
-            type: 'wheel',
-            wheelDelta: 120,
-            detail: -120,
-            deltaY: -120
-        });
-        expect($scope.index).toBe(2);
-        expect(element[0].scrollTop).toBe(100);
-        element.triggerHandler({
-            type: 'mousewheel',
-            wheelDelta: 120,
-            detail: -120,
-            deltaY: -120
-        });
-        expect($scope.index).toBe(1);
-        expect(element[0].scrollTop).toBe(50);
-        element.triggerHandler({
-            type: 'onmousewheel',
-            wheelDelta: 120,
-            detail: -120,
-            deltaY: -120
-        });
-        expect($scope.index).toBe(0);
-        expect(element[0].scrollTop).toBe(0);
     }
 
     function testShowsRestOfBigSnapOnMousewheelUp(html) {
