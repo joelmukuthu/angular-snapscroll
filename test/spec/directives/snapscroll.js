@@ -261,9 +261,8 @@ describe('Directive: snapscroll', function () {
     }
 
     function testPreventsBubblingUpOfMousewheelEventsIfElementIsStillScrollable(html) {
-        var element,
-            stopPropagation = jasmine.createSpy('stopPropagation');
-        element = compileElement(html, true);
+        var stopPropagation = jasmine.createSpy('stopPropagation');
+        var element = compileElement(html, true);
         element.triggerHandler({
             type: 'wheel',
             wheelDelta: 120,
@@ -578,6 +577,7 @@ describe('Directive: snapscroll', function () {
                         if (angular.isFunction(success)) {
                             success();
                         }
+                        return this;
                     }
                 };
             });
