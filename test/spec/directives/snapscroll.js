@@ -2,12 +2,14 @@ describe('Directive: snapscroll', function () {
 
     var $compile,
         $scope,
-        scrollMock = {};
+        scrollMock = {},
+        defaultSnapscrollScrollEasingMock = jasmine.createSpy('easing');
 
     beforeEach(module('snapscroll'));
 
     beforeEach(module(function ($provide) {
-        $provide.value('scroll', scrollMock);
+        $provide.value('scrollie', scrollMock);
+        $provide.value('defaultSnapscrollScrollEasing', defaultSnapscrollScrollEasingMock);
     }));
 
     beforeEach(inject(function (_$compile_, _$rootScope_) {
@@ -1934,6 +1936,20 @@ describe('Directive: snapscroll', function () {
             $scope.index = 1;
             $scope.$apply();
             expect(easing).toHaveBeenCalled();
+        });
+
+        it('uses the defaultSnapscrollScrollEasing if set', function () {
+            var html = [
+                '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
+            $scope.index = 1;
+            $scope.$apply();
+            expect(defaultSnapscrollScrollEasingMock).toHaveBeenCalled();
         });
     });
 
