@@ -245,6 +245,9 @@
                             return;
                         }
                         if (!isSnapIndexValid(current)) {
+                            if (!isSnapIndexValid(previous)) {
+                                previous = 0;
+                            }
                             scope.ignoreSnapIndexChange = true;
                             scope.snapIndex = previous;
                             return;

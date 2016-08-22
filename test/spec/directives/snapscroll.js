@@ -1127,6 +1127,36 @@ describe('Directive: snapscroll', function () {
             expect(element[0].scrollTop).toBe(0);
         });
 
+        it('defaults snapIndex to zero if the provided snapIndex is less than zero', function () {
+            var element,
+                html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+            $scope.index = -1;
+            element = compileElement(html, true);
+            expect($scope.index).toBe(0);
+            expect(element[0].scrollTop).toBe(0);
+        });
+
+        it('defaults snapIndex to zero if the provided snapIndex is greater than upper snapIndex limit', function () {
+            var element,
+                html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+            $scope.index = 3;
+            element = compileElement(html, true);
+            expect($scope.index).toBe(0);
+            expect(element[0].scrollTop).toBe(0);
+        });
+
         it('ignores changes to snapIndex if a non-number value is provided', function () {
             var html = [
                 '<div snapscroll="" snap-index="snapIndex" style="height: 50px; overflow: auto">',
