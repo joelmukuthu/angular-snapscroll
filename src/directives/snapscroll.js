@@ -566,8 +566,7 @@
                                     indeces.snapIndex
                                 );
                             }
-                            var enabled = current !== false;
-                            if (enabled) {
+                            if (current !== false) {
                                 if (previous === false) {
                                     updateIndecesFromScrollTop();
                                 }

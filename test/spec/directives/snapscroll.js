@@ -1203,7 +1203,7 @@ describe('Directive: snapscroll', function () {
             expect(element[0].scrollTop).toBe(0);
         });
 
-        it('allows disabling snapscroll by passing false as the snapscroll attribute value', function () {
+        it('allows disabling snapscroll by passing \'false\' as the snapscroll attribute value', function () {
             var element,
                 html = [
                     '<div snapscroll="false" snap-index="index" style="height: 50px; overflow: auto">',
