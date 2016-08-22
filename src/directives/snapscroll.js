@@ -79,9 +79,6 @@
                             for (var j = innerSnapIndex; j >= 0; j--) {
                                 innerScrollTop -= snapHeight;
                             }
-                            if (innerScrollTop < 0) {
-                                innerScrollTop = 0;
-                            }
                         } else {
                             innerScrollTop = 0;
                             for (var i = 0; i < innerSnapIndex; i++) {
@@ -143,6 +140,9 @@
                                 scrollTop
                             ];
                         } else if (angular.isUndefined(scope.snapEasing)) {
+                            // TODO: add tests for this. Will require refactoring
+                            // the default values into an object, which is a good
+                            // change anyway
                             args = [
                                 element,
                                 scrollTop,
@@ -285,9 +285,6 @@
                     }
 
                     function isInnerSnapIndexValid(innerSnapIndex) {
-                        if (angular.isUndefined(innerSnapIndex)) {
-                            innerSnapIndex = scope.innerSnapIndex;
-                        }
                         if (innerSnapIndex < 0) {
                             return isSnapIndexValid(scope.snapIndex - 1);
                         }
@@ -299,17 +296,6 @@
 
                     function innerSnapIndexChanged(current, previous) {
                         if (angular.isUndefined(current)) {
-                            return;
-                        }
-                        if (scope.ignoreInnerSnapIndexChange === true) {
-                            scope.ignoreInnerSnapIndexChange = undefined;
-                            return;
-                        }
-                        if (!isInnerSnapIndexValid(current)) {
-                            if (isNumber(previous)) {
-                                scope.ignoreInnerSnapIndexChange = true;
-                                scope.innerSnapIndex = previous;
-                            }
                             return;
                         }
                         var newInnerSnapIndex, newSnapIndex;
@@ -378,9 +364,6 @@
                     }
 
                     function bindWheel() {
-                        if (scope.wheelBound) {
-                            return;
-                        }
                         wheelie.bind(element, {
                             up: function (e) {
                                 e.preventDefault();
@@ -395,15 +378,10 @@
                                 }
                             }
                         });
-                        scope.wheelBound = true;
                     }
 
                     function unbindWheel() {
-                        if (!scope.wheelBound) {
-                            return;
-                        }
                         wheelie.unbind(element);
-                        scope.wheelBound = false;
                     }
 
                     function setHeight(angularElement, height) {
@@ -511,22 +489,16 @@
                         if (scope.preventSnappingAfterManualScroll) {
                             return;
                         }
-                        if (scope.scrollBound) {
-                            return;
-                        }
                         if (angular.isDefined(scope.snapDirection)) { // still snapping
+                            // TODO: add tests for this
                             bindScrollAfterDelay();
                             return;
                         }
                         element.on('scroll', onScroll);
-                        scope.scrollBound = true;
                     }
 
                     function unbindScroll() {
-                        if (scope.scrollBound) {
-                            element.off('scroll', onScroll);
-                            scope.scrollBound = false;
-                        }
+                        element.off('scroll', onScroll);
                     }
 
                     function bindScrollAfterDelay() {
@@ -614,8 +586,10 @@
                         });
 
                         scope.$on('$destroy', function () {
-                            unbindScroll();
-                            unbindWheel();
+                            if (scope.enabled !== false) {
+                                unbindScroll();
+                                unbindWheel();
+                            }
                         });
                     }
 
