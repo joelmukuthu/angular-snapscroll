@@ -360,7 +360,7 @@ describe('Directive: snapscroll', function () {
         $scope.beforeSnap = spy;
         var element = compileElement(html, true);
         expect(spy).toHaveBeenCalledWith(0); // initial snap
-        spy.reset();
+        spy.calls.reset();
         element.triggerHandler({
             type: 'wheel',
             wheelDelta: -120,
@@ -368,23 +368,23 @@ describe('Directive: snapscroll', function () {
             deltaY: 120
         });
         expect(spy).toHaveBeenCalledWith(1);
-        spy.reset();
+        spy.calls.reset();
         element.triggerHandler({
             type: 'mousewheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
         });
-        expect(spy).toHaveBeenCalledWith(1); // index still 1
-        spy.reset();
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
         element.triggerHandler({
             type: 'onmousewheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
         });
-        expect(spy).toHaveBeenCalledWith(1); // index still 1
-        spy.reset();
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
         element.triggerHandler({
             type: 'onmousewheel',
             wheelDelta: -120,
@@ -392,7 +392,7 @@ describe('Directive: snapscroll', function () {
             deltaY: 120
         });
         expect(spy).toHaveBeenCalledWith(2);
-        spy.reset();
+        spy.calls.reset();
         element.triggerHandler({
             type: 'onmousewheel',
             wheelDelta: -120,
@@ -400,7 +400,7 @@ describe('Directive: snapscroll', function () {
             deltaY: 120
         });
         expect(spy).toHaveBeenCalledWith(3);
-        spy.reset();
+        spy.calls.reset();
     }
 
     function testExecutesBeforeSnapOnMousewheelUp(html) {
@@ -409,7 +409,7 @@ describe('Directive: snapscroll', function () {
         $scope.index = 3;
         var element = compileElement(html, true);
         expect(spy).toHaveBeenCalledWith(3); // initial snap
-        spy.reset();
+        spy.calls.reset();
         element.triggerHandler({
             type: 'wheel',
             wheelDelta: 120,
@@ -417,7 +417,7 @@ describe('Directive: snapscroll', function () {
             deltaY: -120
         });
         expect(spy).toHaveBeenCalledWith(2);
-        spy.reset();
+        spy.calls.reset();
         element.triggerHandler({
             type: 'mousewheel',
             wheelDelta: 120,
@@ -425,23 +425,23 @@ describe('Directive: snapscroll', function () {
             deltaY: -120
         });
         expect(spy).toHaveBeenCalledWith(1);
-        spy.reset();
+        spy.calls.reset();
         element.triggerHandler({
             type: 'onmousewheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
         });
-        expect(spy).toHaveBeenCalledWith(1); // index still 1
-        spy.reset();
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
         element.triggerHandler({
             type: 'onmousewheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
         });
-        expect(spy).toHaveBeenCalledWith(1); // index still 1
-        spy.reset();
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
         element.triggerHandler({
             type: 'onmousewheel',
             wheelDelta: 120,
@@ -449,7 +449,7 @@ describe('Directive: snapscroll', function () {
             deltaY: -120
         });
         expect(spy).toHaveBeenCalledWith(0);
-        spy.reset();
+        spy.calls.reset();
     }
 
     function testDoesNotSnapDownIfBeforeSnapReturnsFalseOnMousewheelDown(html) {
@@ -1708,9 +1708,9 @@ describe('Directive: snapscroll', function () {
 
         it('executes beforeSnap on mouseheel down', function () {
             var html = [
-                '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div snapscroll="" snap-index="index" before-snap="beforeSnap(index)" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
+                '<div style="height: 125px"></div>',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
                 '</div>'
@@ -1720,9 +1720,9 @@ describe('Directive: snapscroll', function () {
 
         it('executes beforeSnap on mouseheel up', function () {
             var html = [
-                '<div snapscroll="" snap-index="index" before-snap="beforeSnap()" style="height: 50px; overflow: auto">',
+                '<div snapscroll="" snap-index="index" before-snap="beforeSnap(index)" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
+                '<div style="height: 125px"></div>',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
                 '</div>'
@@ -1732,7 +1732,7 @@ describe('Directive: snapscroll', function () {
 
         it('does not snap down if beforeSnap returns false on mouseheel down', function () {
             var html = [
-                '<div snapscroll="" snap-index="index" before-snap="beforeSnap()" style="height: 50px; overflow: auto">',
+                '<div snapscroll="" snap-index="index" before-snap="beforeSnap(index)" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
@@ -1744,7 +1744,7 @@ describe('Directive: snapscroll', function () {
 
         it('does not snap up if beforeSnap returns false on mouseheel up', function () {
             var html = [
-                '<div snapscroll="" snap-index="index" before-snap="beforeSnap()" style="height: 50px; overflow: auto">',
+                '<div snapscroll="" snap-index="index" before-snap="beforeSnap(index)" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
@@ -1756,7 +1756,7 @@ describe('Directive: snapscroll', function () {
 
         it('snaps to a different snapIndex if beforeSnap returns a number on mouseheel down', function () {
             var html = [
-                '<div snapscroll="" snap-index="index" before-snap="beforeSnap()" style="height: 50px; overflow: auto">',
+                '<div snapscroll="" snap-index="index" before-snap="beforeSnap(index)" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
@@ -1768,7 +1768,7 @@ describe('Directive: snapscroll', function () {
 
         it('snaps to a different snapIndex if beforeSnap returns a number on mouseheel up', function () {
             var html = [
-                '<div snapscroll="" snap-index="index" before-snap="beforeSnap()" style="height: 50px; overflow: auto">',
+                '<div snapscroll="" snap-index="index" before-snap="beforeSnap(index)" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
                 '<div style="height: 50px"></div>',
