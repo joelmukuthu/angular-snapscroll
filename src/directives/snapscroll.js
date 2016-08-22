@@ -14,99 +14,6 @@
         };
     }];
 
-    function isNumber(value) {
-        return angular.isNumber(value) && !isNaN(value);
-    }
-
-    function unwatchSnapHeight(scope) {
-        if (scope.unwatchSnapHeight) {
-            scope.unwatchSnapHeight();
-        }
-    }
-
-    function watchSnapHeight(scope, callback) {
-        scope.unwatchSnapHeight = scope.$watch('snapHeight',
-            function (snapHeight, previousSnapHeight) {
-                if (angular.isUndefined(snapHeight)) {
-                    return;
-                }
-                if (!isNumber(snapHeight)) {
-                    if (isNumber(previousSnapHeight)) {
-                        scope.snapHeight = previousSnapHeight;
-                    }
-                    return;
-                }
-                if (angular.isFunction(callback)) {
-                    callback(snapHeight);
-                }
-            }
-        );
-    }
-
-    function unwatchSnapIndex(scope) {
-        if (scope.unwatchSnapIndex) {
-            scope.unwatchSnapIndex();
-        }
-    }
-
-    function watchSnapIndex(scope, snapTo) {
-        scope.unwatchSnapIndex = scope.$watch('snapIndex',
-            function (snapIndex, previousSnapIndex) {
-                if (angular.isUndefined(snapIndex)) {
-                    scope.snapIndex = 0;
-                    return;
-                }
-                if (!isNumber(snapIndex)) {
-                    if (isNumber(previousSnapIndex)) {
-                        scope.snapIndex = previousSnapIndex;
-                    } else {
-                        scope.snapIndex = 0;
-                    }
-                    return;
-                }
-                if (snapIndex % 1 !== 0) {
-                    scope.snapIndex = Math.round(snapIndex);
-                    return;
-                }
-                if (scope.ignoreThisSnapIndexChange) {
-                    scope.ignoreThisSnapIndexChange = undefined;
-                    return;
-                }
-                if (!scope.isValid(snapIndex)) {
-                    scope.ignoreThisSnapIndexChange = true;
-                    scope.snapIndex = previousSnapIndex;
-                    return;
-                }
-                var beforeSnapReturnValue = scope.beforeSnap({
-                    snapIndex: snapIndex
-                });
-                if (beforeSnapReturnValue === false) {
-                    scope.ignoreThisSnapIndexChange = true;
-                    scope.snapIndex = previousSnapIndex;
-                    return;
-                }
-                if (isNumber(beforeSnapReturnValue) &&
-                    scope.isValid(beforeSnapReturnValue)) {
-                    scope.snapIndex = beforeSnapReturnValue;
-                    return;
-                }
-                if (angular.isFunction(snapTo)) {
-                    if (snapIndex > previousSnapIndex) {
-                        scope.snapDirection = 'down';
-                    } else if (snapIndex < previousSnapIndex) {
-                        scope.snapDirection = 'up';
-                    }
-                    snapTo(snapIndex, function () {
-                        scope.snapDirection = 'none';
-                        scope.afterSnap({
-                            snapIndex: snapIndex
-                        });
-                    });
-                }
-            }
-        );
-    }
-
     var snapscrollAsAnAttribute = [
         '$timeout',
         'wheelie',
@@ -129,235 +36,342 @@
                 scope: scopeObject,
                 controller: controller,
                 link: function (scope, element, attributes) {
+                    function isNumber(value) {
+                        return angular.isNumber(value) && !isNaN(value);
+                    }
+
+                    function getChildren() {
+                        return element.children();
+                    }
+
+                    function getHeight(domElement) {
+                        return domElement.offsetHeight;
+                    }
+
+                    function getChildHeight(snapIndex) {
+                        return getHeight(getChildren()[snapIndex]);
+                    }
+
+                    function getSnapHeight() {
+                        return getHeight(element[0]);
+                    }
+
+                    function getScrollTop(snapIndex) {
+                        var children = getChildren();
+                        var scrollTop = 0;
+                        for (var i = 0; i < snapIndex; i++) {
+                            scrollTop += getHeight(children[i]);
+                        }
+                        return scrollTop;
+                    }
+
+                    function getInnerScrollTop(innerSnapIndex, snapIndex) {
+                        var scrollTop = getScrollTop(snapIndex);
+                        if (innerSnapIndex === 0) {
+                            return scrollTop;
+                        }
+                        var snapHeight = getSnapHeight();
+                        var childHeight = getChildHeight(snapIndex);
+                        var innerScrollTop;
+                        if (angular.isDefined(scope.previousInnerSnapIndex) &&
+                            innerSnapIndex < scope.previousInnerSnapIndex) {
+                            innerScrollTop = childHeight;
+                            for (var j = innerSnapIndex; j >= 0; j--) {
+                                innerScrollTop -= snapHeight;
+                            }
+                            if (innerScrollTop < 0) {
+                                innerScrollTop = 0;
+                            }
+                        } else {
+                            innerScrollTop = 0;
+                            for (var i = 0; i < innerSnapIndex; i++) {
+                                innerScrollTop += snapHeight;
+                            }
+                            var overflow = innerScrollTop + snapHeight - childHeight;
+                            if (overflow > 0) {
+                                innerScrollTop -= overflow;
+                            }
+                        }
+                        return scrollTop + innerScrollTop;
+                    }
+
+                    function triggerSnapping() {
+                        if (scope.snapIndexChanged) {
+                            var returnValue = scope.beforeSnap({
+                                snapIndex: scope.snapIndex
+                            });
+                            if (returnValue === false) {
+                                if (angular.isDefined(scope.previousSnapIndex)) {
+                                    scope.ignoreSnapIndexChange = true;
+                                    scope.snapIndex = scope.previousSnapIndex;
+                                }
+                                return;
+                            }
+                            if (isNumber(returnValue)) {
+                                scope.snapIndex = returnValue;
+                                return;
+                            }
+                        }
+                        return snapTo(
+                            scope.innerSnapIndex,
+                            scope.snapIndex
+                        ).then(function () {
+                            if (scope.snapIndexChanged) {
+                                scope.afterSnap({
+                                    snapIndex: scope.snapIndex
+                                });
+                            }
+                            scope.snapIndexChanged = undefined;
+                            scope.previousSnapIndex = undefined;
+                            scope.previousInnerSnapIndex = undefined;
+                        });
+                    }
+
                     function getCurrentScrollTop() {
                         return element[0].scrollTop;
                     }
 
-                    function getCurrentSnaps() {
-                        return element.children();
-                    }
-
-                    function getSnapIndex(scrollTop) {
-                        var snapIndex = -1,
-                            snaps = getCurrentSnaps(),
-                            snapHeight;
-                        while (scrollTop > 0) {
-                            snapHeight = snaps[++snapIndex].offsetHeight;
-                            scrollTop -= snapHeight;
-                        }
-                        if ((snapHeight / 2) >= -scrollTop) {
-                            snapIndex += 1;
-                        }
-                        return snapIndex;
-                    }
-
-                    function getScrollTop(snapIndex) {
-                        var snaps = getCurrentSnaps(),
-                            combinedHeight = 0;
-                        for (var i = 0; i < snapIndex; i++) {
-                            combinedHeight += snaps[i].offsetHeight;
-                        }
-                        return combinedHeight;
-                    }
-
-                    function snapFromCurrentSrollTop() {
-                        var newSnapIndex = getSnapIndex(getCurrentScrollTop());
-                        if (scope.snapIndex === newSnapIndex) {
-                            snapTo(newSnapIndex);
-                        } else {
-                            scope.$apply(function () {
-                                scope.snapIndex = newSnapIndex;
-                            });
-                        }
-                    }
-
-                    var scrollDelay = attributes.scrollDelay;
-                    function onScroll() {
-                        scrollie.stop(element);
-                        if (scrollDelay === false) {
-                            snapFromCurrentSrollTop();
-                        } else {
-                            $timeout.cancel(scope.scrollPromise);
-                            scope.scrollPromise = $timeout(
-                                snapFromCurrentSrollTop,
-                                scrollDelay
-                            );
-                        }
-                    }
-
-                    var preventSnappingAfterManualScroll = angular.isDefined(
-                          attributes.preventSnappingAfterManualScroll
+                    function snapTo(innerSnapIndex, snapIndex) {
+                        var scrollTop = getInnerScrollTop(
+                            innerSnapIndex,
+                            snapIndex
                         );
-                    function bindScroll() {
-                        if (preventSnappingAfterManualScroll || scope.scrollBound) {
-                            return;
-                        }
-                        // if the bindScroll timeout expires while snapping is
-                        // ongoing, restart the timer
-                        if (scope.snapDirection !== 'none') {
-                            scope.bindScrollPromise = $timeout(
-                                bindScroll,
-                                defaultSnapscrollBindScrollTimeout
-                            );
-                            return;
-                        }
-                        element.on('scroll', onScroll);
-                        scope.scrollBound = true;
-                    }
-
-                    function unbindScroll() {
-                        if (scope.scrollBound) {
-                            element.off('scroll', onScroll);
-                            scope.scrollBound = false;
-                        }
-                    }
-
-                    function bindScrollAfterTimeout() {
-                        if (!preventSnappingAfterManualScroll) {
-                            // bind scroll after a timeout
-                            $timeout.cancel(scope.bindScrollPromise);
-                            scope.bindScrollPromise = $timeout(
-                                bindScroll,
-                                defaultSnapscrollBindScrollTimeout
-                            );
-                        }
-                    }
-
-                    var snapEasing = attributes.snapEasing,
-                        snapDuration = attributes.snapDuration;
-                    function scrollTo(scrollTop, afterScroll) {
                         var args;
-                        if (scope.snapAnimation) {
-                            if (angular.isDefined(snapEasing)) {
-                                args = [
-                                    element,
-                                    scrollTop,
-                                    snapDuration,
-                                    snapEasing
-                                ];
-                            } else {
-                                args = [
-                                    element,
-                                    scrollTop,
-                                    snapDuration
-                                ];
-                            }
-                        } else {
+                        if (!scope.snapAnimation) {
                             args = [
                                 element,
                                 scrollTop
                             ];
+                        } else if (angular.isUndefined(scope.snapEasing)) {
+                            args = [
+                                element,
+                                scrollTop,
+                                scope.snapDuration
+                            ];
+                        } else {
+                            args = [
+                                element,
+                                scrollTop,
+                                scope.snapDuration,
+                                scope.snapEasing
+                            ];
+                        }
+                        var currentScrollTop = getCurrentScrollTop();
+                        if (scrollTop > currentScrollTop) {
+                            scope.snapDirection = 'down';
+                        } else if (scrollTop < currentScrollTop) {
+                            scope.snapDirection = 'up';
+                        } else {
+                            scope.snapDirection = 'same';
                         }
                         unbindScroll();
                         return scrollie.to.apply(scrollie, args).then(function () {
-                            if (angular.isFunction(afterScroll)) {
-                                afterScroll();
-                            }
-                            bindScrollAfterTimeout();
+                            scope.snapDirection = undefined;
+                            bindScrollAfterDelay();
                         });
                     }
 
-                    function snapTo(snapIndex, afterSnap) {
-                        return scrollTo(getScrollTop(snapIndex), afterSnap);
+                    function isScrollable() {
+                        var snapHeight = getSnapHeight();
+                        if (!snapHeight) {
+                            return false;
+                        }
+                        var children = getChildren();
+                        if (!children.length) {
+                            return false;
+                        }
+                        var totalHeight = 0;
+                        angular.forEach(children, function (child) {
+                            totalHeight += getHeight(child);
+                        });
+                        if (totalHeight < snapHeight) {
+                            return false;
+                        }
+                        return true;
                     }
 
-                    function getCurrentSnapHeight() {
-                        var snaps = getCurrentSnaps();
-                        return snaps[scope.snapIndex].offsetHeight;
+                    function isSnapIndexValid(snapIndex) {
+                        return snapIndex >= 0 &&
+                               snapIndex <= getChildren().length - 1;
                     }
 
-                    function getSnapscrollHeight() {
-                        return element[0].offsetHeight;
+                    function trackSnapIndexChange(previous) {
+                        scope.previousSnapIndex = previous;
+                        scope.snapIndexChanged = true;
+                    }
+
+                    function updateIndeces(innerSnapIndex, snapIndex) {
+                        if (scope.snapIndex !== snapIndex) {
+                            trackSnapIndexChange(scope.snapIndex);
+                            scope.ignoreSnapIndexChange = true;
+                            scope.snapIndex = snapIndex;
+                        }
+                        if (scope.innerSnapIndex === innerSnapIndex) {
+                            return;
+                        }
+                        scope.innerSnapIndex = innerSnapIndex;
+                        return true;
+                    }
+
+                    function triggerSnappingTo(innerSnapIndex, snapIndex) {
+                        if (updateIndeces(innerSnapIndex, snapIndex)) {
+                            return;
+                        }
+                        triggerSnapping();
+                    }
+
+                    function snapIndexChanged(current, previous) {
+                        if (!isScrollable()) {
+                            return;
+                        }
+                        if (angular.isUndefined(current)) {
+                            scope.snapIndex = 0;
+                            return;
+                        }
+                        if (!isNumber(current)) {
+                            if (isNumber(previous)) {
+                                scope.snapIndex = previous;
+                            } else {
+                                scope.snapIndex = 0;
+                            }
+                            return;
+                        }
+                        if (current % 1 !== 0) {
+                            scope.snapIndex = Math.round(current);
+                            return;
+                        }
+                        if (scope.ignoreSnapIndexChange === true) {
+                            scope.ignoreSnapIndexChange = undefined;
+                            return;
+                        }
+                        if (!isSnapIndexValid(current)) {
+                            scope.ignoreSnapIndexChange = true;
+                            scope.snapIndex = previous;
+                            return;
+                        }
+                        trackSnapIndexChange(previous);
+                        triggerSnappingTo(0, current);
+                    }
+
+                    function watchSnapIndex() {
+                        scope.unwatchSnapIndex = scope.$watch(
+                            'snapIndex',
+                            snapIndexChanged
+                        );
+                    }
+
+                    function unwatchSnapIndex() {
+                        if (!angular.isFunction(scope.unwatchSnapIndex)) {
+                            return;
+                        }
+                        scope.unwatchSnapIndex();
+                        scope.unwatchSnapIndex = undefined;
+                    }
+
+                    function getMaxInnerSnapIndex(snapIndex) {
+                        var snapHeight = getSnapHeight();
+                        var childHeight = getChildHeight(snapIndex);
+                        if (childHeight <= snapHeight) {
+                            return 0;
+                        }
+                        var max = parseInt((childHeight / snapHeight), 10);
+                        if (childHeight % snapHeight === 0) {
+                            max -= 1;
+                        }
+                        return max;
+                    }
+
+                    function isInnerSnapIndexValid(innerSnapIndex) {
+                        if (angular.isUndefined(innerSnapIndex)) {
+                            innerSnapIndex = scope.innerSnapIndex;
+                        }
+                        if (innerSnapIndex < 0) {
+                            return isSnapIndexValid(scope.snapIndex - 1);
+                        }
+                        if (innerSnapIndex > getMaxInnerSnapIndex(scope.snapIndex)) {
+                            return isSnapIndexValid(scope.snapIndex + 1);
+                        }
+                        return true;
+                    }
+
+                    function innerSnapIndexChanged(current, previous) {
+                        if (angular.isUndefined(current)) {
+                            return;
+                        }
+                        if (scope.ignoreInnerSnapIndexChange === true) {
+                            scope.ignoreInnerSnapIndexChange = undefined;
+                            return;
+                        }
+                        if (!isInnerSnapIndexValid(current)) {
+                            if (isNumber(previous)) {
+                                scope.ignoreInnerSnapIndexChange = true;
+                                scope.innerSnapIndex = previous;
+                            }
+                            return;
+                        }
+                        var newInnerSnapIndex, newSnapIndex;
+                        if (current < 0) {
+                            newInnerSnapIndex = getMaxInnerSnapIndex(
+                                scope.snapIndex - 1
+                            );
+                            newSnapIndex = scope.snapIndex - 1;
+                        } else if (current > getMaxInnerSnapIndex(scope.snapIndex)) {
+                            newInnerSnapIndex = 0;
+                            newSnapIndex = scope.snapIndex + 1;
+                        }
+                        if (angular.isDefined(newInnerSnapIndex)
+                            && angular.isDefined(newSnapIndex)) {
+                            updateIndeces(newInnerSnapIndex, newSnapIndex);
+                            return;
+                        }
+                        scope.previousInnerSnapIndex = previous;
+                        triggerSnapping();
+                    }
+
+                    function watchInnerSnapIndex() {
+                        scope.unwatchInnerSnapIndex = scope.$watch(
+                            'innerSnapIndex',
+                            innerSnapIndexChanged
+                        );
+                    }
+
+                    function unwatchInnerSnapIndex() {
+                        if (!angular.isFunction(scope.unwatchInnerSnapIndex)) {
+                            return;
+                        }
+                        scope.unwatchInnerSnapIndex();
+                        scope.unwatchInnerSnapIndex = undefined;
+                    }
+
+                    function snap(direction) {
+                        if (!isScrollable()) {
+                            return;
+                        }
+                        if (scope.snapDirection === direction) {
+                            return;
+                        }
+                        var newInnerSnapIndex;
+                        if (direction === 'up') {
+                            newInnerSnapIndex = scope.innerSnapIndex - 1;
+                        }
+                        if (direction === 'down') {
+                            newInnerSnapIndex = scope.innerSnapIndex + 1;
+                        }
+                        if (!isInnerSnapIndexValid(newInnerSnapIndex)) {
+                            return;
+                        }
+                        scope.$apply(function () {
+                            scope.innerSnapIndex = newInnerSnapIndex;
+                        });
+                        return true;
                     }
 
                     function snapUp() {
-                        if (scope.snapDirection === 'up') {
-                            return;
-                        }
-
-                        var currentScrollTop = getCurrentScrollTop();
-                        if (currentScrollTop <= 0) {
-                            return;
-                        }
-
-                        var snapscrollHeight = getSnapscrollHeight();
-                        var currentSnapHeight = getCurrentSnapHeight();
-                        var newScrollTop;
-                        var newSnapIndex;
-                        if (currentSnapHeight > snapscrollHeight) {
-                            var startingScrollTop = getScrollTop(scope.snapIndex);
-                            var remaining = currentScrollTop - startingScrollTop;
-                            if (remaining > 0) {
-                                newScrollTop = currentScrollTop - Math.min(remaining, snapscrollHeight);
-                            }
-                        }
-
-                        if (angular.isUndefined(newScrollTop)) {
-                            newSnapIndex = scope.snapIndex - 1;
-                            newScrollTop = currentScrollTop - snapscrollHeight;
-                        }
-
-                        if (newScrollTop < 0) {
-                            return;
-                        }
-
-                        if (angular.isDefined(newSnapIndex)) {
-                            scope.$apply(function () {
-                                scope.ignoreThisSnapIndexChange = true;
-                                scope.snapIndex = newSnapIndex;
-                            });
-                        }
-
-                        scope.snapDirection = 'up';
-                        return scrollTo(newScrollTop, function () {
-                            scope.snapDirection = 'none';
-                        });
+                        return snap('up');
                     }
 
                     function snapDown() {
-                        if (scope.snapDirection === 'down') {
-                            return;
-                        }
-
-                        var currentScrollTop = getCurrentScrollTop();
-                        var snapscrollHeight = getSnapscrollHeight();
-                        var scrollHeight = element[0].scrollHeight;
-
-                        if (currentScrollTop >= scrollHeight - snapscrollHeight) {
-                            return;
-                        }
-
-                        var currentSnapHeight = getCurrentSnapHeight();
-                        var newScrollTop;
-                        var newSnapIndex;
-                        if (currentSnapHeight > snapscrollHeight) {
-                            var startingScrollTop = getScrollTop(scope.snapIndex);
-                            var remaining = startingScrollTop + currentSnapHeight - currentScrollTop - snapscrollHeight;
-                            if (remaining > 0) {
-                                newScrollTop = currentScrollTop + Math.min(remaining, snapscrollHeight);
-                            }
-                        }
-
-                        if (angular.isUndefined(newScrollTop)) {
-                            newSnapIndex = scope.snapIndex + 1;
-                            newScrollTop = currentScrollTop + snapscrollHeight;
-                        }
-
-                        if (newScrollTop >= scrollHeight) {
-                            return;
-                        }
-
-                        if (angular.isDefined(newSnapIndex)) {
-                            scope.$apply(function () {
-                                scope.ignoreThisSnapIndexChange = true;
-                                scope.snapIndex = newSnapIndex;
-                            });
-                        }
-
-                        scope.snapDirection = 'down';
-                        return scrollTo(newScrollTop, function () {
-                            scope.snapDirection = 'none';
-                        });
+                        return snap('down');
                     }
 
                     function bindWheel() {
@@ -382,97 +396,224 @@
                     }
 
                     function unbindWheel() {
-                        if (scope.wheelBound) {
-                            wheelie.unbind(element);
-                            scope.wheelBound = false;
-                        }
-                    }
-
-                    function updateSnapHeight(snapHeight) {
-                        element.css('height', snapHeight + 'px');
-                        var snaps = getCurrentSnaps();
-                        if (snaps.length) {
-                            angular.forEach(snaps, function (snap) {
-                                angular.element(snap).css(
-                                    'height',
-                                    snapHeight + 'px'
-                                );
-                            });
-                        }
-                        snapTo(scope.snapIndex);
-                    }
-
-                    function updateSnapIndexFromScrollTop() {
-                        if (preventSnappingAfterManualScroll) {
+                        if (!scope.wheelBound) {
                             return;
                         }
-                        var currentScrollTop = getCurrentScrollTop();
-                        if (currentScrollTop !== 0) {
-                            scope.snapIndex = getSnapIndex(currentScrollTop);
+                        wheelie.unbind(element);
+                        scope.wheelBound = false;
+                    }
+
+                    function setHeight(angularElement, height) {
+                        angularElement.css('height', height + 'px');
+                    }
+
+                    function snapHeightChanged(current, previous) {
+                        if (angular.isUndefined(current)) {
+                            return;
                         }
+                        if (!isNumber(current)) {
+                            if (isNumber(previous)) {
+                                scope.snapHeight = previous;
+                            }
+                            return;
+                        }
+                        setHeight(element, current);
+                        angular.forEach(getChildren(), function (child) {
+                            setHeight(angular.element(child), current);
+                        });
+                        if (angular.isDefined(scope.snapIndex)) {
+                            var innerSnapIndex = scope.innerSnapIndex;
+                            if (angular.isUndefined(innerSnapIndex)) {
+                                innerSnapIndex = 0;
+                            }
+                            triggerSnappingTo(innerSnapIndex, scope.snapIndex);
+                        }
+                    }
+
+                    function watchSnapHeight() {
+                        scope.unwatchSnapHeight = scope.$watch(
+                            'snapHeight',
+                            snapHeightChanged
+                        );
+                    }
+
+                    function unwatchSnapHeight() {
+                        if (!angular.isFunction(scope.unwatchSnapHeight)) {
+                            return;
+                        }
+                        scope.unwatchSnapHeight();
+                        scope.unwatchSnapHeight = undefined;
+                    }
+
+                    function getIndeces(scrollTop) {
+                        var snapIndex = 0;
+                        var innerSnapIndex = 0;
+
+                        if (scrollTop > 0) {
+                            snapIndex = -1;
+                            var children = getChildren();
+                            var childHeight;
+                            while (scrollTop > 0) {
+                                childHeight = getHeight(children[++snapIndex]);
+                                scrollTop -= childHeight;
+                            }
+                            var snapHeight = getSnapHeight();
+                            if (childHeight > snapHeight) {
+                                scrollTop += childHeight - snapHeight;
+                                if (scrollTop >= snapHeight) {
+                                    innerSnapIndex++;
+                                }
+                                while (scrollTop > 0) {
+                                    innerSnapIndex++;
+                                    scrollTop -= snapHeight;
+                                }
+                                if ((snapHeight / 2) >= -scrollTop) {
+                                    innerSnapIndex += 1;
+                                }
+                            } else if ((childHeight / 2) >= -scrollTop) {
+                                snapIndex += 1;
+                            }
+                        }
+
+                        return {
+                            snapIndex: snapIndex,
+                            innerSnapIndex: innerSnapIndex
+                        };
+                    }
+
+                    function onScroll() {
+                        function snapFromSrollTop() {
+                            var indeces = getIndeces(getCurrentScrollTop());
+                            triggerSnappingTo(
+                                indeces.innerSnapIndex,
+                                indeces.snapIndex
+                            );
+                        }
+                        scrollie.stop(element);
+                        if (scope.scrollDelay === false) {
+                            snapFromSrollTop();
+                        } else {
+                            $timeout.cancel(scope.scrollPromise);
+                            scope.scrollPromise = $timeout(
+                                function () {
+                                    snapFromSrollTop();
+                                    scope.scrollPromise = undefined;
+                                },
+                                scope.scrollDelay
+                            );
+                        }
+                    }
+
+                    function bindScroll() {
+                        if (scope.preventSnappingAfterManualScroll) {
+                            return;
+                        }
+                        if (scope.scrollBound) {
+                            return;
+                        }
+                        if (angular.isDefined(scope.snapDirection)) { // still snapping
+                            bindScrollAfterDelay();
+                            return;
+                        }
+                        element.on('scroll', onScroll);
+                        scope.scrollBound = true;
+                    }
+
+                    function unbindScroll() {
+                        if (scope.scrollBound) {
+                            element.off('scroll', onScroll);
+                            scope.scrollBound = false;
+                        }
+                    }
+
+                    function bindScrollAfterDelay() {
+                        if (scope.preventSnappingAfterManualScroll) {
+                            return;
+                        }
+                        if (scope.bindScrollPromise) {
+                            $timeout.cancel(scope.bindScrollPromise);
+                        }
+                        scope.bindScrollPromise = $timeout(
+                            function () {
+                                bindScroll();
+                                scope.bindScrollPromise = undefined;
+                            },
+                            defaultSnapscrollBindScrollTimeout
+                        );
                     }
 
                     function init() {
+                        var scrollDelay = attributes.scrollDelay;
                         if (scrollDelay === 'false') {
-                            scrollDelay = false;
+                            scope.scrollDelay = false;
                         } else {
                             scrollDelay = parseInt(scrollDelay, 10);
                             if (isNaN(scrollDelay)) {
                                 scrollDelay = defaultSnapscrollScrollDelay;
                             }
+                            scope.scrollDelay = scrollDelay;
                         }
 
+                        var snapEasing = attributes.snapEasing;
                         if (angular.isDefined(snapEasing)) {
-                            snapEasing = scope.$parent.$eval(snapEasing);
+                            scope.snapEasing = scope.$parent.$eval(snapEasing);
                         } else if (angular.isFunction(defaultSnapscrollScrollEasing)) {
-                            snapEasing = defaultSnapscrollScrollEasing;
+                            scope.snapEasing = defaultSnapscrollScrollEasing;
                         }
 
-                        snapDuration = parseInt(snapDuration, 10);
+                        var snapDuration = parseInt(attributes.snapDuration, 10);
                         if (isNaN(snapDuration)) {
                             snapDuration = defaultSnapscrollSnapDuration;
                         }
+                        scope.snapDuration = snapDuration;
 
-                        scope.$watch('snapAnimation', function (animation) {
-                            if (animation === undefined) {
-                                scope.snapAnimation = true;
-                            }
-                        });
+                        // TODO: perform initial snap without animation
+                        if (angular.isUndefined(scope.snapAnimation)) {
+                            scope.snapAnimation = true;
+                        }
 
-                        scope.snapIndexMin = function () {
-                            return 0;
-                        };
-
-                        scope.scopeIndexMax = function () {
-                            return getCurrentSnaps().length - 1;
-                        };
-
-                        scope.isValid = function (snapIndex) {
-                            return snapIndex >= scope.snapIndexMin() &&
-                                   snapIndex <= scope.scopeIndexMax();
-                        };
+                        scope.preventSnappingAfterManualScroll = angular.isDefined(
+                            attributes.preventSnappingAfterManualScroll
+                        );
 
                         if (element.css('overflowY') !== 'scroll') {
                             element.css('overflowY', 'auto');
                         }
 
-                        scope.$watch('enabled', function (enabled) {
-                            if (enabled === false) {
-                                unwatchSnapHeight(scope);
-                                unwatchSnapIndex(scope);
-                                unbindScroll();
-                                unbindWheel();
-                            } else {
-                                updateSnapIndexFromScrollTop();
-                                watchSnapHeight(scope, updateSnapHeight);
-                                watchSnapIndex(scope, snapTo);
+                        scope.$watch('enabled', function (current, previous) {
+                            function updateIndecesFromScrollTop() {
+                                if (scope.preventSnappingAfterManualScroll) {
+                                    return;
+                                }
+                                var indeces = getIndeces(getCurrentScrollTop());
+                                updateIndeces(
+                                    indeces.innerSnapIndex,
+                                    indeces.snapIndex
+                                );
+                            }
+                            var enabled = current !== false;
+                            if (enabled) {
+                                if (previous === false) {
+                                    updateIndecesFromScrollTop();
+                                }
+                                watchInnerSnapIndex();
+                                watchSnapIndex();
+                                watchSnapHeight();
                                 bindScroll();
                                 bindWheel();
+                            } else {
+                                unwatchInnerSnapIndex();
+                                unwatchSnapIndex();
+                                unwatchSnapHeight();
+                                unbindScroll();
+                                unbindWheel();
                             }
                         });
 
-                        scope.$on('$destroy', unbindScroll);
-                        scope.$on('$destroy', unbindWheel);
+                        scope.$on('$destroy', function () {
+                            unbindScroll();
+                            unbindWheel();
+                        });
                     }
 
                     init();
