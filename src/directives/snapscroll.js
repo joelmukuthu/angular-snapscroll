@@ -56,22 +56,17 @@
                         return getHeight(element[0]);
                     }
 
-                    function getScrollTop(snapIndex) {
-                        var children = getChildren();
+                    function getScrollTop(innerSnapIndex, snapIndex) {
                         var scrollTop = 0;
+                        var children = getChildren();
                         for (var i = 0; i < snapIndex; i++) {
                             scrollTop += getHeight(children[i]);
                         }
-                        return scrollTop;
-                    }
-
-                    function getInnerScrollTop(innerSnapIndex, snapIndex) {
-                        var scrollTop = getScrollTop(snapIndex);
                         if (innerSnapIndex === 0) {
                             return scrollTop;
                         }
                         var snapHeight = getSnapHeight();
-                        var childHeight = getChildHeight(snapIndex);
+                        var childHeight = getHeight(children[snapIndex]);
                         var innerScrollTop;
                         if (angular.isDefined(scope.previousInnerSnapIndex) &&
                             innerSnapIndex < scope.previousInnerSnapIndex) {
@@ -81,7 +76,7 @@
                             }
                         } else {
                             innerScrollTop = 0;
-                            for (var i = 0; i < innerSnapIndex; i++) {
+                            for (var k = 0; k < innerSnapIndex; k++) {
                                 innerScrollTop += snapHeight;
                             }
                             var overflow = innerScrollTop + snapHeight - childHeight;
@@ -129,10 +124,7 @@
                     }
 
                     function snapTo(innerSnapIndex, snapIndex) {
-                        var scrollTop = getInnerScrollTop(
-                            innerSnapIndex,
-                            snapIndex
-                        );
+                        var scrollTop = getScrollTop(innerSnapIndex, snapIndex);
                         var args;
                         if (!scope.snapAnimation) {
                             args = [
@@ -308,8 +300,8 @@
                             newInnerSnapIndex = 0;
                             newSnapIndex = scope.snapIndex + 1;
                         }
-                        if (angular.isDefined(newInnerSnapIndex)
-                            && angular.isDefined(newSnapIndex)) {
+                        if (angular.isDefined(newInnerSnapIndex) &&
+                            angular.isDefined(newSnapIndex)) {
                             updateIndeces(newInnerSnapIndex, newSnapIndex);
                             return;
                         }
