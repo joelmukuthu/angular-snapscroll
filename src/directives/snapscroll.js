@@ -477,7 +477,8 @@
                     }
 
                     function bindScroll() {
-                        if (scope.preventSnappingAfterManualScroll) {
+                        if (scope.preventSnappingAfterManualScroll ||
+                            scope.scrollBound) {
                             return;
                         }
                         if (angular.isDefined(scope.snapDirection)) { // still snapping
@@ -486,10 +487,15 @@
                             return;
                         }
                         element.on('scroll', onScroll);
+                        scope.scrollBound = true;
                     }
 
                     function unbindScroll() {
+                        if (!scope.scrollBound) {
+                            return;
+                        }
                         element.off('scroll', onScroll);
+                        scope.scrollBound = false;
                     }
 
                     function bindScrollAfterDelay() {
