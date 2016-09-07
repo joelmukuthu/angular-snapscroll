@@ -2717,6 +2717,27 @@ describe('Directive: snapscroll', function () {
             expect(scrollMock.to.calls.count()).toEqual(2); // not called again
         }
 
+        function testStopsPropagationIfCurrentlySnappingInTheDirectionOfANewMousewheel(html) {
+            var element = compileElement(html, true);
+            var stopPropagation = jasmine.createSpy('stopPropagation');
+            element.triggerHandler({
+                type: 'wheel',
+                wheelDelta: -120,
+                detail: 120,
+                deltaY: 120,
+                stopPropagation: stopPropagation
+            }); // snap down to 50
+            expect(stopPropagation.calls.count()).toBe(1);
+            element.triggerHandler({
+                type: 'wheel',
+                wheelDelta: -120,
+                detail: 120,
+                deltaY: 120,
+                stopPropagation: stopPropagation
+            }); // while snapping, snap down to 100
+            expect(stopPropagation.calls.count()).toBe(2);
+        }
+
         function testAllowsSnapingInTheOppositeDirectionOnNewMousewheelIfCurrentlySnapping(html) {
             var element;
             element = compileElement(html, true);
@@ -2760,7 +2781,7 @@ describe('Directive: snapscroll', function () {
             });
         });
 
-        it('doesn\'t snap in the same direction as a new mousewheel event if currently snapping', function () {
+        it('doesn\'t snap in the same direction on a new mousewheel event if currently snapping', function () {
             var html = [
                 '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
@@ -2770,6 +2791,18 @@ describe('Directive: snapscroll', function () {
                 '</div>'
             ].join('');
             testDoesntSnapInTheSameDirectionOnNewMousewheelIfCurrentlySnapping(html);
+        });
+
+        it('doesn\'t bubble up the mousewheel event if currently snapping in the direction of a new mousewheel event', function () {
+            var html = [
+                '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testStopsPropagationIfCurrentlySnappingInTheDirectionOfANewMousewheel(html);
         });
 
         it('allows snapping in the opposite direction as a new mousewheel event if currently snapping', function () {

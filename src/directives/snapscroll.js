@@ -329,7 +329,7 @@
                             return;
                         }
                         if (scope.snapDirection === direction) {
-                            return;
+                            return true;
                         }
                         var newInnerSnapIndex;
                         if (direction === 'up') {
