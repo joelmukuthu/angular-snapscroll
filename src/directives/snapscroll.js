@@ -104,10 +104,10 @@
                                 return;
                             }
                         }
-                        return snapTo(
+                        return scrollTo(getScrollTop(
                             scope.innerSnapIndex,
                             scope.snapIndex
-                        ).then(function () {
+                        )).then(function () {
                             if (scope.snapIndexChanged) {
                                 scope.afterSnap({
                                     snapIndex: scope.snapIndex
@@ -123,8 +123,7 @@
                         return element[0].scrollTop;
                     }
 
-                    function snapTo(innerSnapIndex, snapIndex) {
-                        var scrollTop = getScrollTop(innerSnapIndex, snapIndex);
+                    function scrollTo(scrollTop) {
                         var args;
                         if (!scope.snapAnimation) {
                             args = [
