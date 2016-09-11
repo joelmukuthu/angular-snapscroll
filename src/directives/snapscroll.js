@@ -56,6 +56,18 @@
                         return getHeight(element[0]);
                     }
 
+                    function getScrollHeight() {
+                        return element[0].scrollHeight;
+                    }
+
+                    function rectifyScrollTop(scrollTop) {
+                        var maxScrollTop = getScrollHeight() - getSnapHeight();
+                        if (scrollTop > maxScrollTop) {
+                            return maxScrollTop;
+                        }
+                        return scrollTop;
+                    }
+
                     function getScrollTop(compositeIndex, previousCompositeIndex) {
                         var snapIndex = compositeIndex[0];
                         var innerSnapIndex = compositeIndex[1];
@@ -67,7 +79,7 @@
                         }
 
                         if (innerSnapIndex === 0) {
-                            return scrollTop;
+                            return rectifyScrollTop(scrollTop);
                         }
 
                         var snapHeight = getSnapHeight();
@@ -90,7 +102,7 @@
                             }
                         }
 
-                        return scrollTop + innerScrollTop;
+                        return rectifyScrollTop(scrollTop + innerScrollTop);
                     }
 
                     function snapTo(compositeIndex, previousCompositeIndex) {

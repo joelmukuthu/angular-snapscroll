@@ -2036,6 +2036,26 @@ describe('Directive: snapscroll', function () {
             testUsesTheOriginalBrowserMousewheelEvents(html);
         });
 
+        describe('with smaller-height elements', function () {
+            it('does not try to scroll to set scrollTop to a value greater than the max available scrollHeight', inject(function (defaultSnapscrollSnapDuration, defaultSnapscrollScrollEasing) {
+                var html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 25px"></div>',
+                    '</div>'
+                ].join('');
+                $scope.index = 0;
+                var element = compileElement(html, true);
+                scrollMock.to.calls.reset(); // reset calls from initial snap
+                $scope.$apply(function () {
+                    $scope.index = 2;
+                });
+                expect(element[0].scrollTop).toBe(75);
+                expect(scrollMock.to).toHaveBeenCalledWith(element, 75, defaultSnapscrollSnapDuration, defaultSnapscrollScrollEasing);
+            }));
+        });
+
         // new test suite for tests to do with manual scrolling
         describe('', function () {
             var $timeout;
