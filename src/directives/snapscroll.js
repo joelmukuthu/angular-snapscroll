@@ -1,4 +1,13 @@
 (function () {
+    function isNumber(value) {
+        return angular.isNumber(value) && !isNaN(value);
+    }
+
+    var isDefined = angular.isDefined;
+    var isUndefined = angular.isUndefined;
+    var isFunction = angular.isFunction;
+    var forEach = angular.forEach;
+
     var scopeObject = {
         enabled: '=snapscroll',
         snapIndex: '=?',
@@ -36,10 +45,6 @@
                 scope: scopeObject,
                 controller: controller,
                 link: function (scope, element, attributes) {
-                    function isNumber(value) {
-                        return angular.isNumber(value) && !isNaN(value);
-                    }
-
                     function getChildren() {
                         return element.children();
                     }
@@ -85,7 +90,7 @@
                         var snapHeight = getSnapHeight();
                         var childHeight = getHeight(children[snapIndex]);
                         var innerScrollTop;
-                        if (angular.isDefined(previousCompositeIndex) &&
+                        if (isDefined(previousCompositeIndex) &&
                             innerSnapIndex < previousCompositeIndex[1]) {
                             innerScrollTop = childHeight;
                             for (var j = innerSnapIndex; j >= 0; j--) {
@@ -107,14 +112,14 @@
 
                     function snapTo(compositeIndex, previousCompositeIndex) {
                         var snapIndex = compositeIndex[0];
-                        var isSnapIndexChanged = angular.isUndefined(previousCompositeIndex) ||
+                        var isSnapIndexChanged = isUndefined(previousCompositeIndex) ||
                             snapIndex !== previousCompositeIndex[0];
                         if (isSnapIndexChanged) {
                             var returnValue = scope.beforeSnap({
                                 snapIndex: snapIndex
                             });
                             if (returnValue === false) {
-                                if (angular.isDefined(previousCompositeIndex)) {
+                                if (isDefined(previousCompositeIndex)) {
                                     scope.ignoreCompositeIndexChange = true;
                                     scope.compositeIndex = previousCompositeIndex;
                                 }
@@ -149,7 +154,7 @@
                                 element,
                                 scrollTop
                             ];
-                        } else if (angular.isUndefined(scope.snapEasing)) {
+                        } else if (isUndefined(scope.snapEasing)) {
                             // TODO: add tests for this. Will require refactoring
                             // the default values into an object, which is a good
                             // change anyway
@@ -193,7 +198,7 @@
                             return false;
                         }
                         var totalHeight = 0;
-                        angular.forEach(children, function (child) {
+                        forEach(children, function (child) {
                             totalHeight += getHeight(child);
                         });
                         if (totalHeight < snapHeight) {
@@ -211,7 +216,7 @@
                         if (!isScrollable()) {
                             return;
                         }
-                        if (angular.isUndefined(current)) {
+                        if (isUndefined(current)) {
                             scope.snapIndex = 0;
                             return;
                         }
@@ -250,7 +255,7 @@
                     }
 
                     function unwatchSnapIndex() {
-                        if (!angular.isFunction(scope.unwatchSnapIndex)) {
+                        if (!isFunction(scope.unwatchSnapIndex)) {
                             return;
                         }
                         scope.unwatchSnapIndex();
@@ -258,7 +263,7 @@
                     }
 
                     function compositeIndexChanged(current, previous) {
-                        if (angular.isUndefined(current)) {
+                        if (isUndefined(current)) {
                             return;
                         }
                         var snapIndex = current[0];
@@ -281,7 +286,7 @@
                     }
 
                     function unwatchCompositeIndex() {
-                        if (!angular.isFunction(scope.unwatchCompositeIndex)) {
+                        if (!isFunction(scope.unwatchCompositeIndex)) {
                             return;
                         }
                         scope.unwatchCompositeIndex();
@@ -394,7 +399,7 @@
                     }
 
                     function snapHeightChanged(current, previous) {
-                        if (angular.isUndefined(current)) {
+                        if (isUndefined(current)) {
                             return;
                         }
                         if (!isNumber(current)) {
@@ -405,12 +410,12 @@
                         }
 
                         setHeight(element, current);
-                        angular.forEach(getChildren(), function (child) {
+                        forEach(getChildren(), function (child) {
                             setHeight(angular.element(child), current);
                         });
 
-                        if (angular.isDefined(scope.snapIndex)) {
-                            if (angular.isUndefined(scope.compositeIndex)) {
+                        if (isDefined(scope.snapIndex)) {
+                            if (isUndefined(scope.compositeIndex)) {
                                 scope.compositeIndex = [scope.snapIndex, 0];
                             }
                             snapTo(scope.compositeIndex);
@@ -425,7 +430,7 @@
                     }
 
                     function unwatchSnapHeight() {
-                        if (!angular.isFunction(scope.unwatchSnapHeight)) {
+                        if (!isFunction(scope.unwatchSnapHeight)) {
                             return;
                         }
                         scope.unwatchSnapHeight();
@@ -500,7 +505,7 @@
                             scope.scrollBound) {
                             return;
                         }
-                        if (angular.isDefined(scope.snapDirection)) { // still snapping
+                        if (isDefined(scope.snapDirection)) { // still snapping
                             // TODO: add tests for this
                             bindScrollAfterDelay();
                             return;
@@ -546,9 +551,9 @@
                         }
 
                         var snapEasing = attributes.snapEasing;
-                        if (angular.isDefined(snapEasing)) {
+                        if (isDefined(snapEasing)) {
                             scope.snapEasing = scope.$parent.$eval(snapEasing);
-                        } else if (angular.isFunction(defaultSnapscrollScrollEasing)) {
+                        } else if (isFunction(defaultSnapscrollScrollEasing)) {
                             scope.snapEasing = defaultSnapscrollScrollEasing;
                         }
 
@@ -559,11 +564,11 @@
                         scope.snapDuration = snapDuration;
 
                         // TODO: perform initial snap without animation
-                        if (angular.isUndefined(scope.snapAnimation)) {
+                        if (isUndefined(scope.snapAnimation)) {
                             scope.snapAnimation = true;
                         }
 
-                        scope.preventSnappingAfterManualScroll = angular.isDefined(
+                        scope.preventSnappingAfterManualScroll = isDefined(
                             attributes.preventSnappingAfterManualScroll
                         );
 
