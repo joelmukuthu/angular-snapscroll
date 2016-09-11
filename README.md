@@ -5,7 +5,7 @@ angular-snapscroll adds vertical scroll-and-snap functionality to angular.
 
 - JS-only implementation
 - Only requires angular core
-- 5.7kB when minified, 2.1kB when gzipped
+- 6.2kB when minified, 2.3kB when gzipped
 
 ### [Demo](http://joelmukuthu.github.io/angular-snapscroll/)
 

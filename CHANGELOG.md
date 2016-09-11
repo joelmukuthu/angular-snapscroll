@@ -10,10 +10,12 @@ now only called if snapIndex changes
 [`before-snap`](DOCS.md#before-snap)
 - Support [disabling/enabling](DOCS.md#snapscroll-directive) snapscroll
 programmatically
+- Support child elements whose height is greater than the snapscroll element
 
 ### Fixes
 - [`snap-index`](DOCS.md#snap-index) is not initialized if the element is not
 scrollable
+- Ensure snapscroll never tries to set scrollTop to a value that is out of bounds
 
 ## 0.3.0
 
