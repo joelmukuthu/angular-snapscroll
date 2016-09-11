@@ -1828,7 +1828,7 @@ describe('Directive: snapscroll', function () {
             testPreventsBubblingUpOfMousewheelEventsIfElementIsStillScrollable(html);
         });
 
-        describe('on mouseheel down', function () {
+        describe('on mousewheel down', function () {
             it('snaps down', function () {
                 var html = [
                     '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
@@ -1851,7 +1851,7 @@ describe('Directive: snapscroll', function () {
 
             it('executes beforeSnap', function () {
                 var html = [
-                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(index)" style="height: 50px; overflow: auto">',
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
                     '<div style="height: 50px"></div>',
                     '<div style="height: 125px"></div>',
                     '<div style="height: 50px"></div>',
@@ -1863,7 +1863,7 @@ describe('Directive: snapscroll', function () {
 
             it('does not snap down if beforeSnap returns false', function () {
                 var html = [
-                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(index)" style="height: 50px; overflow: auto">',
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
                     '<div style="height: 50px"></div>',
                     '<div style="height: 50px"></div>',
                     '<div style="height: 50px"></div>',
@@ -1875,7 +1875,7 @@ describe('Directive: snapscroll', function () {
 
             it('snaps to a different snapIndex if beforeSnap returns a number', function () {
                 var html = [
-                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(index)" style="height: 50px; overflow: auto">',
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
                     '<div style="height: 50px"></div>',
                     '<div style="height: 50px"></div>',
                     '<div style="height: 50px"></div>',
@@ -1920,7 +1920,7 @@ describe('Directive: snapscroll', function () {
             });
         });
 
-        describe('on mouseheel down', function () {
+        describe('on mousewheel up', function () {
             it('snaps up', function () {
                 var html = [
                     '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
@@ -1943,7 +1943,7 @@ describe('Directive: snapscroll', function () {
 
             it('executes beforeSnap', function () {
                 var html = [
-                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(index)" style="height: 50px; overflow: auto">',
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
                     '<div style="height: 50px"></div>',
                     '<div style="height: 125px"></div>',
                     '<div style="height: 50px"></div>',
@@ -1955,7 +1955,7 @@ describe('Directive: snapscroll', function () {
 
             it('does not snap up if beforeSnap returns false', function () {
                 var html = [
-                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(index)" style="height: 50px; overflow: auto">',
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
                     '<div style="height: 50px"></div>',
                     '<div style="height: 50px"></div>',
                     '<div style="height: 50px"></div>',
@@ -1967,7 +1967,7 @@ describe('Directive: snapscroll', function () {
 
             it('snaps to a different snapIndex if beforeSnap returns a number', function () {
                 var html = [
-                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(index)" style="height: 50px; overflow: auto">',
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
                     '<div style="height: 50px"></div>',
                     '<div style="height: 50px"></div>',
                     '<div style="height: 50px"></div>',

@@ -56,20 +56,25 @@
                         return getHeight(element[0]);
                     }
 
-                    function getScrollTop(innerSnapIndex, snapIndex) {
+                    function getScrollTop(compositeIndex, previousCompositeIndex) {
+                        var snapIndex = compositeIndex[0];
+                        var innerSnapIndex = compositeIndex[1];
+
                         var scrollTop = 0;
                         var children = getChildren();
                         for (var i = 0; i < snapIndex; i++) {
                             scrollTop += getHeight(children[i]);
                         }
+
                         if (innerSnapIndex === 0) {
                             return scrollTop;
                         }
+
                         var snapHeight = getSnapHeight();
                         var childHeight = getHeight(children[snapIndex]);
                         var innerScrollTop;
-                        if (angular.isDefined(scope.previousInnerSnapIndex) &&
-                            innerSnapIndex < scope.previousInnerSnapIndex) {
+                        if (angular.isDefined(previousCompositeIndex) &&
+                            innerSnapIndex < previousCompositeIndex[1]) {
                             innerScrollTop = childHeight;
                             for (var j = innerSnapIndex; j >= 0; j--) {
                                 innerScrollTop -= snapHeight;
@@ -84,18 +89,22 @@
                                 innerScrollTop -= overflow;
                             }
                         }
+
                         return scrollTop + innerScrollTop;
                     }
 
-                    function triggerSnapping() {
-                        if (scope.snapIndexChanged) {
+                    function snapTo(compositeIndex, previousCompositeIndex) {
+                        var snapIndex = compositeIndex[0];
+                        var isSnapIndexChanged = angular.isUndefined(previousCompositeIndex) ||
+                            snapIndex !== previousCompositeIndex[0];
+                        if (isSnapIndexChanged) {
                             var returnValue = scope.beforeSnap({
-                                snapIndex: scope.snapIndex
+                                snapIndex: snapIndex
                             });
                             if (returnValue === false) {
-                                if (angular.isDefined(scope.previousSnapIndex)) {
-                                    scope.ignoreSnapIndexChange = true;
-                                    scope.snapIndex = scope.previousSnapIndex;
+                                if (angular.isDefined(previousCompositeIndex)) {
+                                    scope.ignoreCompositeIndexChange = true;
+                                    scope.compositeIndex = previousCompositeIndex;
                                 }
                                 return;
                             }
@@ -104,18 +113,16 @@
                                 return;
                             }
                         }
+
                         return scrollTo(getScrollTop(
-                            scope.innerSnapIndex,
-                            scope.snapIndex
+                            compositeIndex,
+                            previousCompositeIndex
                         )).then(function () {
-                            if (scope.snapIndexChanged) {
+                            if (isSnapIndexChanged) {
                                 scope.afterSnap({
-                                    snapIndex: scope.snapIndex
+                                    snapIndex: snapIndex
                                 });
                             }
-                            scope.snapIndexChanged = undefined;
-                            scope.previousSnapIndex = undefined;
-                            scope.previousInnerSnapIndex = undefined;
                         });
                     }
 
@@ -147,6 +154,7 @@
                                 scope.snapEasing
                             ];
                         }
+
                         var currentScrollTop = getCurrentScrollTop();
                         if (scrollTop > currentScrollTop) {
                             scope.snapDirection = 'down';
@@ -155,6 +163,7 @@
                         } else {
                             scope.snapDirection = 'same';
                         }
+
                         unbindScroll();
                         return scrollie.to.apply(scrollie, args).then(function () {
                             scope.snapDirection = undefined;
@@ -184,31 +193,6 @@
                     function isSnapIndexValid(snapIndex) {
                         return snapIndex >= 0 &&
                                snapIndex <= getChildren().length - 1;
-                    }
-
-                    function trackSnapIndexChange(previous) {
-                        scope.previousSnapIndex = previous;
-                        scope.snapIndexChanged = true;
-                    }
-
-                    function updateIndeces(innerSnapIndex, snapIndex) {
-                        if (scope.snapIndex !== snapIndex) {
-                            trackSnapIndexChange(scope.snapIndex);
-                            scope.ignoreSnapIndexChange = true;
-                            scope.snapIndex = snapIndex;
-                        }
-                        if (scope.innerSnapIndex === innerSnapIndex) {
-                            return;
-                        }
-                        scope.innerSnapIndex = innerSnapIndex;
-                        return true;
-                    }
-
-                    function triggerSnappingTo(innerSnapIndex, snapIndex) {
-                        if (updateIndeces(innerSnapIndex, snapIndex)) {
-                            return;
-                        }
-                        triggerSnapping();
                     }
 
                     function snapIndexChanged(current, previous) {
@@ -243,8 +227,7 @@
                             scope.snapIndex = previous;
                             return;
                         }
-                        trackSnapIndexChange(previous);
-                        triggerSnappingTo(0, current);
+                        scope.compositeIndex = [current, 0];
                     }
 
                     function watchSnapIndex() {
@@ -262,6 +245,37 @@
                         scope.unwatchSnapIndex = undefined;
                     }
 
+                    function compositeIndexChanged(current, previous) {
+                        if (angular.isUndefined(current)) {
+                            return;
+                        }
+                        var snapIndex = current[0];
+                        if (scope.snapIndex !== snapIndex) {
+                            scope.ignoreSnapIndexChange = true;
+                            scope.snapIndex = snapIndex;
+                        }
+                        if (scope.ignoreCompositeIndexChange === true) {
+                            scope.ignoreCompositeIndexChange = undefined;
+                            return;
+                        }
+                        snapTo(current, previous);
+                    }
+
+                    function watchCompositeIndex() {
+                        scope.unwatchCompositeIndex = scope.$watchCollection(
+                            'compositeIndex',
+                            compositeIndexChanged
+                        );
+                    }
+
+                    function unwatchCompositeIndex() {
+                        if (!angular.isFunction(scope.unwatchCompositeIndex)) {
+                            return;
+                        }
+                        scope.unwatchCompositeIndex();
+                        scope.unwatchCompositeIndex = undefined;
+                    }
+
                     function getMaxInnerSnapIndex(snapIndex) {
                         var snapHeight = getSnapHeight();
                         var childHeight = getChildHeight(snapIndex);
@@ -275,73 +289,61 @@
                         return max;
                     }
 
-                    function isInnerSnapIndexValid(innerSnapIndex) {
+                    function isCompositeIndexValid(compositeIndex) {
+                        var snapIndex = compositeIndex[0];
+                        var innerSnapIndex = compositeIndex[1];
                         if (innerSnapIndex < 0) {
-                            return isSnapIndexValid(scope.snapIndex - 1);
+                            return isSnapIndexValid(snapIndex - 1);
                         }
-                        if (innerSnapIndex > getMaxInnerSnapIndex(scope.snapIndex)) {
-                            return isSnapIndexValid(scope.snapIndex + 1);
+                        if (innerSnapIndex > getMaxInnerSnapIndex(snapIndex)) {
+                            return isSnapIndexValid(snapIndex + 1);
                         }
                         return true;
                     }
 
-                    function innerSnapIndexChanged(current, previous) {
-                        if (angular.isUndefined(current)) {
-                            return;
+                    function rectifyCompositeIndex(compositeIndex) {
+                        var snapIndex = compositeIndex[0];
+                        var innerSnapIndex = compositeIndex[1];
+                        if (innerSnapIndex < 0) {
+                            return [
+                                snapIndex - 1,
+                                getMaxInnerSnapIndex(snapIndex - 1)
+                            ];
                         }
-                        var newInnerSnapIndex, newSnapIndex;
-                        if (current < 0) {
-                            newInnerSnapIndex = getMaxInnerSnapIndex(
-                                scope.snapIndex - 1
-                            );
-                            newSnapIndex = scope.snapIndex - 1;
-                        } else if (current > getMaxInnerSnapIndex(scope.snapIndex)) {
-                            newInnerSnapIndex = 0;
-                            newSnapIndex = scope.snapIndex + 1;
+                        if (innerSnapIndex > getMaxInnerSnapIndex(snapIndex)) {
+                            return [snapIndex + 1, 0];
                         }
-                        if (angular.isDefined(newInnerSnapIndex) &&
-                            angular.isDefined(newSnapIndex)) {
-                            updateIndeces(newInnerSnapIndex, newSnapIndex);
-                            return;
-                        }
-                        scope.previousInnerSnapIndex = previous;
-                        triggerSnapping();
-                    }
-
-                    function watchInnerSnapIndex() {
-                        scope.unwatchInnerSnapIndex = scope.$watch(
-                            'innerSnapIndex',
-                            innerSnapIndexChanged
-                        );
-                    }
-
-                    function unwatchInnerSnapIndex() {
-                        if (!angular.isFunction(scope.unwatchInnerSnapIndex)) {
-                            return;
-                        }
-                        scope.unwatchInnerSnapIndex();
-                        scope.unwatchInnerSnapIndex = undefined;
+                        return compositeIndex;
                     }
 
                     function snap(direction) {
                         if (!isScrollable()) {
                             return;
                         }
+
                         if (scope.snapDirection === direction) {
                             return true;
                         }
+
+                        var snapIndex = scope.compositeIndex[0];
+                        var innerSnapIndex = scope.compositeIndex[1];
                         var newInnerSnapIndex;
                         if (direction === 'up') {
-                            newInnerSnapIndex = scope.innerSnapIndex - 1;
+                            newInnerSnapIndex = innerSnapIndex - 1;
                         }
                         if (direction === 'down') {
-                            newInnerSnapIndex = scope.innerSnapIndex + 1;
+                            newInnerSnapIndex = innerSnapIndex + 1;
                         }
-                        if (!isInnerSnapIndexValid(newInnerSnapIndex)) {
+
+                        var newCompositeIndex = [snapIndex, newInnerSnapIndex];
+                        if (!isCompositeIndexValid(newCompositeIndex)) {
                             return;
                         }
+
                         scope.$apply(function () {
-                            scope.innerSnapIndex = newInnerSnapIndex;
+                            scope.compositeIndex = rectifyCompositeIndex(
+                                newCompositeIndex
+                            );
                         });
                         return true;
                     }
@@ -389,16 +391,17 @@
                             }
                             return;
                         }
+
                         setHeight(element, current);
                         angular.forEach(getChildren(), function (child) {
                             setHeight(angular.element(child), current);
                         });
+
                         if (angular.isDefined(scope.snapIndex)) {
-                            var innerSnapIndex = scope.innerSnapIndex;
-                            if (angular.isUndefined(innerSnapIndex)) {
-                                innerSnapIndex = 0;
+                            if (angular.isUndefined(scope.compositeIndex)) {
+                                scope.compositeIndex = [scope.snapIndex, 0];
                             }
-                            triggerSnappingTo(innerSnapIndex, scope.snapIndex);
+                            snapTo(scope.compositeIndex);
                         }
                     }
 
@@ -417,7 +420,7 @@
                         scope.unwatchSnapHeight = undefined;
                     }
 
-                    function getIndeces(scrollTop) {
+                    function getCompositeIndex(scrollTop) {
                         var snapIndex = 0;
                         var innerSnapIndex = 0;
 
@@ -447,20 +450,24 @@
                             }
                         }
 
-                        return {
-                            snapIndex: snapIndex,
-                            innerSnapIndex: innerSnapIndex
-                        };
+                        return rectifyCompositeIndex([snapIndex, innerSnapIndex]);
                     }
 
                     function onScroll() {
                         function snapFromSrollTop() {
-                            var indeces = getIndeces(getCurrentScrollTop());
-                            triggerSnappingTo(
-                                indeces.innerSnapIndex,
-                                indeces.snapIndex
+                            var compositeIndex = getCompositeIndex(
+                                getCurrentScrollTop()
                             );
+                            if (scope.compositeIndex[0] === compositeIndex[0] &&
+                                scope.compositeIndex[1] === compositeIndex[1]) {
+                                snapTo(scope.compositeIndex);
+                            } else {
+                                scope.$apply(function () {
+                                    scope.compositeIndex = compositeIndex;
+                                });
+                            }
                         }
+
                         scrollie.stop(element);
                         if (scope.scrollDelay === false) {
                             snapFromSrollTop();
@@ -553,27 +560,25 @@
                         }
 
                         scope.$watch('enabled', function (current, previous) {
-                            function updateIndecesFromScrollTop() {
+                            function updateCompositeIndexFromScrollTop() {
                                 if (scope.preventSnappingAfterManualScroll) {
                                     return;
                                 }
-                                var indeces = getIndeces(getCurrentScrollTop());
-                                updateIndeces(
-                                    indeces.innerSnapIndex,
-                                    indeces.snapIndex
+                                scope.compositeIndex = getCompositeIndex(
+                                    getCurrentScrollTop()
                                 );
                             }
                             if (current !== false) {
                                 if (previous === false) {
-                                    updateIndecesFromScrollTop();
+                                    updateCompositeIndexFromScrollTop();
                                 }
-                                watchInnerSnapIndex();
+                                watchCompositeIndex();
                                 watchSnapIndex();
                                 watchSnapHeight();
                                 bindScroll();
                                 bindWheel();
                             } else {
-                                unwatchInnerSnapIndex();
+                                unwatchCompositeIndex();
                                 unwatchSnapIndex();
                                 unwatchSnapHeight();
                                 unbindScroll();
