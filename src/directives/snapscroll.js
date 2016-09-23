@@ -221,11 +221,10 @@
                             return;
                         }
                         if (!isNumber(current)) {
-                            if (isNumber(previous)) {
-                                scope.snapIndex = previous;
-                            } else {
-                                scope.snapIndex = 0;
+                            if (!isNumber(previous)) {
+                                previous = 0;
                             }
+                            scope.snapIndex = previous;
                             return;
                         }
                         if (current % 1 !== 0) {
