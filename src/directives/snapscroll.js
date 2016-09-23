@@ -25,6 +25,7 @@
 
     var snapscrollAsAnAttribute = [
         '$timeout',
+        '$document',
         'wheelie',
         'scrollie',
         'defaultSnapscrollScrollEasing',
@@ -33,6 +34,7 @@
         'defaultSnapscrollBindScrollTimeout',
         function (
             $timeout,
+            $document,
             wheelie,
             scrollie,
             defaultSnapscrollScrollEasing,
@@ -559,7 +561,7 @@
                         if (!scope.enableArrowKeys || scope.arrowKeysBound) {
                             return;
                         }
-                        element.on('keydown', onKeyDown);
+                        $document.on('keydown', onKeyDown);
                         scope.arrowKeysBound = true;
                     }
 
@@ -567,7 +569,7 @@
                         if (!scope.arrowKeysBound) {
                             return;
                         }
-                        element.off('keydown', onKeyDown);
+                        $document.off('keydown', onKeyDown);
                         scope.arrowKeysBound = false;
                     }
 
