@@ -2036,6 +2036,312 @@ describe('Directive: snapscroll', function () {
             testUsesTheOriginalBrowserMousewheelEvents(html);
         });
 
+        describe('with enable-arrow-keys set', function () {
+            describe('on up-arrow', function () {
+                it('snaps up', function () {
+                    var html = [
+                        '<div snapscroll="" enable-arrow-keys="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                    var element;
+                    $scope.index = 1;
+                    element = compileElement(html, true);
+                    element.triggerHandler({
+                        type: 'keydown',
+                        keyCode: 38,
+                        preventDefault: angular.noop
+                    });
+                    expect($scope.index).toBe(0);
+                    expect(element[0].scrollTop).toBe(0);
+                });
+
+                it('prevents default', function () {
+                    var html = [
+                        '<div snapscroll="" enable-arrow-keys="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                    var element;
+                    var preventDefault = jasmine.createSpy('preventDefault');
+                    $scope.index = 1;
+                    element = compileElement(html, true);
+                    element.triggerHandler({
+                        type: 'keydown',
+                        keyCode: 38,
+                        preventDefault: preventDefault
+                    });
+                    expect(preventDefault).toHaveBeenCalled();
+                });
+
+                it('shows the rest of a bigger-height child', function () {
+                    var html = [
+                        '<div snapscroll="" enable-arrow-keys="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 125px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                    var element;
+                    $scope.index = 1;
+                    element = compileElement(html, true);
+                    element.triggerHandler({
+                        type: 'keydown',
+                        keyCode: 38,
+                        preventDefault: angular.noop
+                    });
+                    expect($scope.index).toBe(0);
+                    expect(element[0].scrollTop).toBe(75);
+                    element.triggerHandler({
+                        type: 'keydown',
+                        keyCode: 38,
+                        preventDefault: angular.noop
+                    });
+                    expect($scope.index).toBe(0);
+                    expect(element[0].scrollTop).toBe(25);
+                });
+
+                it('does nothing when snapscroll is disabled', function () {
+                    var html = [
+                        '<div snapscroll="false" enable-arrow-keys="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                    var element;
+                    var preventDefault = jasmine.createSpy('preventDefault');
+                    $scope.index = 1;
+                    element = compileElement(html, true);
+                    element[0].scrollTop = 50;
+                    element.triggerHandler({
+                        type: 'keydown',
+                        keyCode: 38,
+                        preventDefault: preventDefault
+                    });
+                    expect($scope.index).toBe(1);
+                    expect(element[0].scrollTop).toBe(50);
+                    expect(preventDefault).not.toHaveBeenCalled();
+                });
+
+                it('snaps up again when snapscroll is re-enabled', function () {
+                    var html = [
+                        '<div snapscroll="enabled" enable-arrow-keys="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                    var element;
+                    var preventDefault = jasmine.createSpy('preventDefault');
+                    $scope.index = 1;
+                    $scope.enabled = false;
+                    element = compileElement(html, true);
+                    element[0].scrollTop = 50;
+                    element.triggerHandler({
+                        type: 'keydown',
+                        keyCode: 38,
+                        preventDefault: preventDefault
+                    });
+                    expect($scope.index).toBe(1);
+                    expect(element[0].scrollTop).toBe(50);
+                    expect(preventDefault).not.toHaveBeenCalled();
+                    $scope.$apply(function () {
+                        $scope.enabled = true;
+                    });
+                    element.triggerHandler({
+                        type: 'keydown',
+                        keyCode: 38,
+                        preventDefault: preventDefault
+                    });
+                    expect($scope.index).toBe(0);
+                    expect(element[0].scrollTop).toBe(0);
+                    expect(preventDefault).toHaveBeenCalled();
+                });
+            });
+
+            describe('on down-arrow', function () {
+                it('snaps down', function () {
+                    var html = [
+                        '<div snapscroll="" enable-arrow-keys="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                    var element;
+                    element = compileElement(html, true);
+                    element.triggerHandler({
+                        type: 'keydown',
+                        keyCode: 40,
+                        preventDefault: angular.noop
+                    });
+                    expect($scope.index).toBe(1);
+                    expect(element[0].scrollTop).toBe(50);
+                });
+
+                it('prevents default', function () {
+                    var html = [
+                        '<div snapscroll="" enable-arrow-keys="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                    var element;
+                    var preventDefault = jasmine.createSpy('preventDefault');
+                    element = compileElement(html, true);
+                    element.triggerHandler({
+                        type: 'keydown',
+                        keyCode: 40,
+                        preventDefault: preventDefault
+                    });
+                    expect(preventDefault).toHaveBeenCalled();
+                });
+
+                it('shows the rest of a bigger-height child', function () {
+                    var html = [
+                        '<div snapscroll="" enable-arrow-keys="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 125px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                    var element;
+                    element = compileElement(html, true);
+                    element.triggerHandler({
+                        type: 'keydown',
+                        keyCode: 40,
+                        preventDefault: angular.noop
+                    });
+                    expect($scope.index).toBe(0);
+                    expect(element[0].scrollTop).toBe(50);
+                });
+
+                it('does nothing when snapscroll is disabled', function () {
+                    var html = [
+                        '<div snapscroll="false" enable-arrow-keys="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                    var element;
+                    var preventDefault = jasmine.createSpy('preventDefault');
+                    $scope.index = 0;
+                    element = compileElement(html, true);
+                    element.triggerHandler({
+                        type: 'keydown',
+                        keyCode: 40,
+                        preventDefault: preventDefault
+                    });
+                    expect($scope.index).toBe(0);
+                    expect(element[0].scrollTop).toBe(0);
+                    expect(preventDefault).not.toHaveBeenCalled();
+                });
+
+                it('snaps down again when snapscroll is re-enabled', function () {
+                    var html = [
+                        '<div snapscroll="enabled" enable-arrow-keys="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                    var element;
+                    var preventDefault = jasmine.createSpy('preventDefault');
+                    $scope.index = 0;
+                    $scope.enabled = false;
+                    element = compileElement(html, true);
+                    element.triggerHandler({
+                        type: 'keydown',
+                        keyCode: 40,
+                        preventDefault: preventDefault
+                    });
+                    expect($scope.index).toBe(0);
+                    expect(element[0].scrollTop).toBe(0);
+                    expect(preventDefault).not.toHaveBeenCalled();
+                    $scope.$apply(function () {
+                        $scope.enabled = true;
+                    });
+                    element.triggerHandler({
+                        type: 'keydown',
+                        keyCode: 40,
+                        preventDefault: preventDefault
+                    });
+                    expect($scope.index).toBe(1);
+                    expect(element[0].scrollTop).toBe(50);
+                    expect(preventDefault).toHaveBeenCalled();
+                });
+            });
+
+            it('uses the original event if e.originalEvent is set', function () {
+                var html = [
+                    '<div snapscroll="" enable-arrow-keys="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                var element;
+                var preventDefault = jasmine.createSpy('preventDefault');
+                element = compileElement(html, true);
+                element.triggerHandler({
+                    type: 'keydown',
+                    originalEvent: {
+                        keyCode: 40,
+                        preventDefault: preventDefault
+                    }
+                });
+                expect($scope.index).toBe(1);
+                expect(element[0].scrollTop).toBe(50);
+                expect(preventDefault).toHaveBeenCalled();
+            });
+
+            it('does nothing on keydown events from other keys', function () {
+                var html = [
+                    '<div snapscroll="" enable-arrow-keys="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                var element;
+                var preventDefault = jasmine.createSpy('preventDefault');
+                element = compileElement(html, true);
+                element.triggerHandler({
+                    type: 'keydown',
+                    keyCode: 39,
+                    preventDefault: preventDefault
+                });
+                expect($scope.index).toBe(0);
+                expect(element[0].scrollTop).toBe(0);
+                expect(preventDefault).not.toHaveBeenCalled();
+            });
+
+            it('stops listening to keydown when scope is destroyed', function () {
+                var html = [
+                    '<div snapscroll="" enable-arrow-keys="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                var element;
+                var preventDefault = jasmine.createSpy('preventDefault');
+                element = compileElement(html, true);
+                element.triggerHandler({
+                    type: 'keydown',
+                    keyCode: 40,
+                    preventDefault: preventDefault
+                });
+                expect($scope.index).toBe(1);
+                expect(element[0].scrollTop).toBe(50);
+                expect(preventDefault).toHaveBeenCalled();
+                $scope.$destroy();
+                preventDefault.calls.reset();
+                element.triggerHandler({
+                    type: 'keydown',
+                    keyCode: 38,
+                    preventDefault: preventDefault
+                });
+                expect($scope.index).toBe(1);
+                expect(element[0].scrollTop).toBe(50);
+                expect(preventDefault).not.toHaveBeenCalled();
+            });
+        });
+
         describe('with smaller-height elements', function () {
             it('does not try to scroll to set scrollTop to a value greater than the max available scrollHeight', inject(function (defaultSnapscrollSnapDuration, defaultSnapscrollScrollEasing) {
                 var html = [

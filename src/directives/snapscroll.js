@@ -537,6 +537,40 @@
                         );
                     }
 
+                    function onKeyDown(e) {
+                        if (e.originalEvent) {
+                            e = e.originalEvent;
+                        }
+                        var handler;
+                        var keyCode = e.keyCode;
+                        if (keyCode === 38) {
+                            handler = snapUp;
+                        }
+                        if (keyCode === 40) {
+                            handler = snapDown;
+                        }
+                        if (handler) {
+                            e.preventDefault();
+                            handler();
+                        }
+                    }
+
+                    function bindArrowKeys() {
+                        if (!scope.enableArrowKeys || scope.arrowKeysBound) {
+                            return;
+                        }
+                        element.on('keydown', onKeyDown);
+                        scope.arrowKeysBound = true;
+                    }
+
+                    function unbindArrowKeys() {
+                        if (!scope.arrowKeysBound) {
+                            return;
+                        }
+                        element.off('keydown', onKeyDown);
+                        scope.arrowKeysBound = false;
+                    }
+
                     function init() {
                         var scrollDelay = attributes.scrollDelay;
                         if (scrollDelay === 'false') {
@@ -567,6 +601,10 @@
                             scope.snapAnimation = true;
                         }
 
+                        scope.enableArrowKeys = isDefined(
+                            attributes.enableArrowKeys
+                        );
+
                         scope.preventSnappingAfterManualScroll = isDefined(
                             attributes.preventSnappingAfterManualScroll
                         );
@@ -593,12 +631,14 @@
                                 watchSnapHeight();
                                 bindScroll();
                                 bindWheel();
+                                bindArrowKeys();
                             } else {
                                 unwatchCompositeIndex();
                                 unwatchSnapIndex();
                                 unwatchSnapHeight();
                                 unbindScroll();
                                 unbindWheel();
+                                unbindArrowKeys();
                             }
                         });
 
@@ -606,6 +646,7 @@
                             if (scope.enabled !== false) {
                                 unbindScroll();
                                 unbindWheel();
+                                unbindArrowKeys();
                             }
                         });
                     }
