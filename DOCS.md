@@ -61,6 +61,13 @@ automatically if the window is resized.
 <div snapscroll="" fit-window-height=""> ... </div>
 ```
 
+#### enable-arrow-keys
+enable support for snapping up and down when the up and down keyboard keys are
+pressed, respectively.
+```html
+<div snapscroll="" enable-arrow-keys=""> ... </div>
+```
+
 #### before-snap
 is a callback executed before snapping occurs. the callback is passed a
 `snapIndex` parameter, which is the index being snapped to. returning `false`

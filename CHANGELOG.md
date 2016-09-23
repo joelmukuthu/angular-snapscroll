@@ -11,6 +11,7 @@ now only called if snapIndex changes
 - Support [disabling/enabling](DOCS.md#snapscroll-directive) snapscroll
 programmatically
 - Support child elements whose height is greater than the snapscroll element
+- Support for arrow keys using [`enable-arrow-keys`](DOCS.md#enable-arrow-keys)
 
 ### Fixes
 - [`snap-index`](DOCS.md#snap-index) is not initialized if the element is not
