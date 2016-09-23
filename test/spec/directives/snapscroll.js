@@ -45,7 +45,7 @@ describe('Directive: snapscroll', function () {
         $scope.beforeSnap = function () {
             test = 1;
         };
-        compileElement(html);
+        compileElement(html, true);
         $scope.snapIndex = 1;
         $scope.$apply();
         expect(test).toBe(1);
@@ -56,28 +56,20 @@ describe('Directive: snapscroll', function () {
         $scope.beforeSnap = function () {
             test = 1;
         };
-        compileElement(html);
+        compileElement(html, true);
         expect(test).toBe(1);
     }
 
     function testCorrectSnapIndexPassedToBeforeSnap(html) {
-        var first = true,
-            second = false;
+        var spy = jasmine.createSpy('beforeSnap');
         $scope.snapIndex = 0;
-        $scope.beforeSnap = function (snapIndex) {
-            // this would work, but isn't very transparent
-            // expect(snapIndex).toEqual($scope.snapIndex);
-            if (first) {
-                expect(snapIndex).toBe(0);
-            } else if (second) {
-                expect(snapIndex).toBe(1);
-            }
-        };
-        compileElement(html);
-        first = false;
-        second = true;
+        $scope.beforeSnap = spy;
+        compileElement(html, true);
         $scope.snapIndex = 1;
         $scope.$apply();
+        var calls = spy.calls.all();
+        expect(calls[0].args).toEqual([0]);
+        expect(calls[1].args).toEqual([1]);
     }
 
     function testAllowsPreventingSnapping(html) {
@@ -90,7 +82,7 @@ describe('Directive: snapscroll', function () {
             test += 1;
         };
         expect(test).toBe(0);
-        compileElement(html);
+        compileElement(html, true);
         expect(test).toBe(1);
         $scope.$apply(function () {
             $scope.snapIndex = 1;
@@ -111,7 +103,7 @@ describe('Directive: snapscroll', function () {
                 return snapIndexOverride;
             }
         };
-        compileElement(html);
+        compileElement(html, true);
         expect($scope.snapIndex).toBe(0);
         snapIndexOverride = 2;
         $scope.$apply(function () {
@@ -127,7 +119,7 @@ describe('Directive: snapscroll', function () {
                 return snapIndexOverride;
             }
         };
-        compileElement(html);
+        compileElement(html, true);
         expect($scope.snapIndex).toBe(0);
         snapIndexOverride = 'meh';
         $scope.$apply(function () {
@@ -147,7 +139,7 @@ describe('Directive: snapscroll', function () {
                 return snapIndexOverride;
             }
         };
-        compileElement(html);
+        compileElement(html, true);
         expect($scope.snapIndex).toBe(0);
         snapIndexOverride = 10;
         $scope.$apply(function () {
@@ -163,7 +155,7 @@ describe('Directive: snapscroll', function () {
                 return false;
             }
         };
-        compileElement(html);
+        compileElement(html, true);
         $scope.snapIndex = 1;
         $scope.$apply();
         expect($scope.snapIndex).toBe(1);
@@ -178,7 +170,7 @@ describe('Directive: snapscroll', function () {
         $scope.afterSnap = function () {
             test = 1;
         };
-        compileElement(html);
+        compileElement(html, true);
         $scope.snapIndex = 1;
         $scope.$apply();
         expect(test).toBe(1);
@@ -189,19 +181,20 @@ describe('Directive: snapscroll', function () {
         $scope.afterSnap = function () {
             test = 1;
         };
-        compileElement(html);
+        compileElement(html, true);
         expect(test).toBe(1);
     }
 
     function testCorrectSnapIndexPassedToAfterSnap(html) {
+        var spy = jasmine.createSpy('afterSnap');
         $scope.snapIndex = 0;
-        $scope.afterSnap = function (snapIndex) {
-            // see note on: testCorrectSnapIndexPassedToBeforeSnap()
-            expect(snapIndex).toEqual($scope.snapIndex);
-        };
-        compileElement(html);
+        $scope.afterSnap = spy;
+        compileElement(html, true);
         $scope.snapIndex = 1;
         $scope.$apply();
+        var calls = spy.calls.all();
+        expect(calls[0].args).toEqual([0]);
+        expect(calls[1].args).toEqual([1]);
     }
 
     function triggerThreeMousewheelEvents(element, preventDefault) {
@@ -261,9 +254,8 @@ describe('Directive: snapscroll', function () {
     }
 
     function testPreventsBubblingUpOfMousewheelEventsIfElementIsStillScrollable(html) {
-        var element,
-            stopPropagation = jasmine.createSpy('stopPropagation');
-        element = compileElement(html, true);
+        var stopPropagation = jasmine.createSpy('stopPropagation');
+        var element = compileElement(html, true);
         element.triggerHandler({
             type: 'wheel',
             wheelDelta: 120,
@@ -333,6 +325,21 @@ describe('Directive: snapscroll', function () {
         expect(element[0].scrollTop).toBe(150);
     }
 
+    function testDoesntSnapDownIfElementIsNotScrollable(html) {
+        var element;
+        element = compileElement(html, true);
+        expect($scope.index).toBeUndefined();
+        expect(element[0].scrollTop).toBe(0);
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBeUndefined();
+        expect(element[0].scrollTop).toBe(0);
+    }
+
     function testSnapsUpOnMousewheelUp(html) {
         var element;
         $scope.index = 3;
@@ -347,6 +354,287 @@ describe('Directive: snapscroll', function () {
         expect(element[0].scrollTop).toBe(100);
         element.triggerHandler({
             type: 'mousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(50);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(0);
+    }
+
+    function testDoesntSnapUpIfElementIsNotScrollable(html) {
+        var element;
+        element = compileElement(html, true);
+        expect($scope.index).toBeUndefined();
+        expect(element[0].scrollTop).toBe(0);
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBeUndefined();
+        expect(element[0].scrollTop).toBe(0);
+    }
+
+    function testExecutesBeforeSnapOnMousewheelDown(html) {
+        var spy = jasmine.createSpy('beforeSnap');
+        $scope.beforeSnap = spy;
+        var element = compileElement(html, true);
+        expect(spy).toHaveBeenCalledWith(0); // initial snap
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).toHaveBeenCalledWith(1);
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'mousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).toHaveBeenCalledWith(2);
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).toHaveBeenCalledWith(3);
+        spy.calls.reset();
+    }
+
+    function testExecutesBeforeSnapOnMousewheelUp(html) {
+        var spy = jasmine.createSpy('beforeSnap');
+        $scope.beforeSnap = spy;
+        $scope.index = 3;
+        var element = compileElement(html, true);
+        expect(spy).toHaveBeenCalledWith(3); // initial snap
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).toHaveBeenCalledWith(2);
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'mousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).toHaveBeenCalledWith(1);
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).toHaveBeenCalledWith(0);
+        spy.calls.reset();
+    }
+
+    function testDoesNotSnapDownIfBeforeSnapReturnsFalseOnMousewheelDown(html) {
+        var spy = jasmine.createSpy('beforeSnap').and.callFake(function (snapIndex) {
+            if (snapIndex === 1) {
+                return false;
+            }
+        });
+        $scope.beforeSnap = spy;
+        var element = compileElement(html, true);
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).toHaveBeenCalledWith(1);
+        expect($scope.index).toBe(0);
+    }
+
+    function testDoesNotSnapUpIfBeforeSnapReturnsFalseOnMousewheelUp(html) {
+        var spy = jasmine.createSpy('beforeSnap').and.callFake(function (snapIndex) {
+            if (snapIndex === 2) {
+                return false;
+            }
+        });
+        $scope.beforeSnap = spy;
+        $scope.index = 3;
+        var element = compileElement(html, true);
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).toHaveBeenCalledWith(2);
+        expect($scope.index).toBe(3);
+    }
+
+    function testSnapsToADifferentSnapIndexIfBeforeSnapReturnsNumberOnMousewheelDown(html) {
+        var spy = jasmine.createSpy('beforeSnap').and.callFake(function (snapIndex) {
+            if (snapIndex === 1) {
+                return 2;
+            }
+        });
+        $scope.beforeSnap = spy;
+        var element = compileElement(html, true);
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).toHaveBeenCalledWith(1);
+        expect($scope.index).toBe(2);
+    }
+
+    function testSnapsToADifferentSnapIndexIfBeforeSnapReturnsNumberOnMousewheelUp(html) {
+        var spy = jasmine.createSpy('beforeSnap').and.callFake(function (snapIndex) {
+            if (snapIndex === 2) {
+                return 1;
+            }
+        });
+        $scope.beforeSnap = spy;
+        $scope.index = 3;
+        var element = compileElement(html, true);
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).toHaveBeenCalledWith(2);
+        expect($scope.index).toBe(1);
+    }
+
+    function testShowsRestOfBigSnapOnMousewheelDown(html) {
+        var element;
+        element = compileElement(html, true);
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(0);
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(50);
+        element.triggerHandler({
+            type: 'mousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(100);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(125);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(2);
+        expect(element[0].scrollTop).toBe(175);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(3);
+        expect(element[0].scrollTop).toBe(225);
+    }
+
+    function testShowsRestOfBigSnapOnMousewheelUp(html) {
+        var element;
+        $scope.index = 3;
+        element = compileElement(html, true);
+        expect($scope.index).toBe(3);
+        expect(element[0].scrollTop).toBe(225);
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(2);
+        expect(element[0].scrollTop).toBe(175);
+        element.triggerHandler({
+            type: 'mousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(125);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(75);
+        element.triggerHandler({
+            type: 'onmousewheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -406,6 +694,85 @@ describe('Directive: snapscroll', function () {
         });
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(50);
+    }
+
+    function testDoesntSnapDownIfBiggerHeightChildIsScrolledToTheEnd(html) {
+        var element;
+        element = compileElement(html, true);
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(0);
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(50);
+        element.triggerHandler({
+            type: 'mousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(100);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(125);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(125);
+    }
+
+    function testDoesntSnapDownIfBiggerHeightChildIsScrolledToTheBeginning(html) {
+        var element;
+        $scope.index = 1;
+        element = compileElement(html, true);
+        expect($scope.index).toBe(1);
+        expect(element[0].scrollTop).toBe(125);
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(75);
+        element.triggerHandler({
+            type: 'mousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(25);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(0);
+        element.triggerHandler({
+            type: 'onmousewheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect($scope.index).toBe(0);
+        expect(element[0].scrollTop).toBe(0);
     }
 
     function testStopsListeningToMousewheelWhenScopeIsDestroyed(html) {
@@ -483,6 +850,7 @@ describe('Directive: snapscroll', function () {
                         if (angular.isFunction(success)) {
                             success();
                         }
+                        return this;
                     }
                 };
             });
@@ -525,7 +893,56 @@ describe('Directive: snapscroll', function () {
         });
 
         it('defaults snapIndex to zero', function () {
-            compileElement('<div snapscroll="" snap-index="snapIndex"></div>');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
+            expect($scope.snapIndex).toBe(0);
+        });
+
+        it('does not update snapIndex if the element\'s height is 0', function () {
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" style="height: 0; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
+            expect($scope.snapIndex).toBeUndefined();
+        });
+
+        it('does not update snapIndex if the element has no children', function () {
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" style="height: 50px; overflow: auto">',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
+            expect($scope.snapIndex).toBeUndefined();
+        });
+
+        it('does not update snapIndex if the element\'s children\'s combined height is less than the element\'s height', function () {
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" style="height: 50px; overflow: auto">',
+                '<div style="height: 10px"></div>',
+                '<div style="height: 10px"></div>',
+                '<div style="height: 10px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
+            expect($scope.snapIndex).toBeUndefined();
+        });
+
+        it('updates the snapIndex if the element\'s children\'s combined height is greater than the element\'s height', function () {
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" style="height: 50px; overflow: auto">',
+                '<div style="height: 10px"></div>',
+                '<div style="height: 60px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
             expect($scope.snapIndex).toBe(0);
         });
 
@@ -608,7 +1025,7 @@ describe('Directive: snapscroll', function () {
             expect(element[0].scrollTop).toBe(100);
         });
 
-        it('doesn\'t fire before and afterSnap callbacks while resetting the scrollTop', inject(function ($timeout) {
+        it('doesn\'t fire before and afterSnap callbacks while resetting the scrollTop unless snapIndex is changed', inject(function ($timeout) {
             var element,
                 test = 0,
                 html = [
@@ -710,6 +1127,36 @@ describe('Directive: snapscroll', function () {
             expect(element[0].scrollTop).toBe(0);
         });
 
+        it('defaults snapIndex to zero if the provided snapIndex is less than zero', function () {
+            var element,
+                html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+            $scope.index = -1;
+            element = compileElement(html, true);
+            expect($scope.index).toBe(0);
+            expect(element[0].scrollTop).toBe(0);
+        });
+
+        it('defaults snapIndex to zero if the provided snapIndex is greater than upper snapIndex limit', function () {
+            var element,
+                html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+            $scope.index = 3;
+            element = compileElement(html, true);
+            expect($scope.index).toBe(0);
+            expect(element[0].scrollTop).toBe(0);
+        });
+
         it('ignores changes to snapIndex if a non-number value is provided', function () {
             var html = [
                 '<div snapscroll="" snap-index="snapIndex" style="height: 50px; overflow: auto">',
@@ -756,7 +1203,7 @@ describe('Directive: snapscroll', function () {
             expect(element[0].scrollTop).toBe(0);
         });
 
-        it('allows disabling snapscroll by passing false as the snapscroll attribute value', function () {
+        it('allows disabling snapscroll by passing \'false\' as the snapscroll attribute value', function () {
             var element,
                 html = [
                     '<div snapscroll="false" snap-index="index" style="height: 50px; overflow: auto">',
@@ -792,42 +1239,46 @@ describe('Directive: snapscroll', function () {
                 ].join('');
             $scope.enabled = false;
             element = compileElement(html, true);
-            $scope.enabled = true;
+            $scope.$apply(function () {
+                $scope.enabled = true;
+            });
             $scope.$apply(function () {
                 $scope.index = 1;
+            });
+            expect(element[0].scrollTop).toBe(50);
+            $scope.$apply(function () {
+                $scope.enabled = false;
+            });
+            $scope.$apply(function () {
+                $scope.index = 0;
             });
             expect(element[0].scrollTop).toBe(50);
         });
 
         it('does not set snapIndex when disabled', function () {
-            compileElement('<div snapscroll="false" snap-index="snapIndex"></div>');
+            var html = [
+                '<div snapscroll="false" snap-index="snapIndex" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            compileElement(html, true);
             expect($scope.snapIndex).toBe(undefined);
         });
 
         it('sets snapIndex when snapscroll is re-enabled', function () {
+            var html = [
+                '<div snapscroll="enabled" snap-index="snapIndex" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
             $scope.enabled = false;
-            compileElement('<div snapscroll="enabled" snap-index="snapIndex"></div>');
+            compileElement(html, true);
             $scope.$apply(function () {
                 $scope.enabled = true;
             });
             expect($scope.snapIndex).toBe(0);
-        });
-
-        it('automatically snaps to the current snapIndex when snapscroll is re-enabled', function () {
-            var element,
-                html = [
-                    '<div snapscroll="enabled" snap-index="index" style="height: 50px; overflow: auto">',
-                    '<div style="height: 50px"></div>',
-                    '<div style="height: 50px"></div>',
-                    '</div>'
-                ].join('');
-            $scope.enabled = false;
-            element = compileElement(html, true);
-            $scope.index = 1;
-            $scope.$apply(function () {
-                $scope.enabled = true;
-            });
-            expect(element[0].scrollTop).toBe(50);
         });
 
         it('automatically snaps to the initial snap-index when snapscroll is re-enabled', function () {
@@ -861,6 +1312,22 @@ describe('Directive: snapscroll', function () {
                 $scope.enabled = true;
             });
             expect($scope.index).toBe(1);
+        });
+
+        it('resets the snapIndex from the scrollTop when snapscroll is re-enabled', function () {
+            var html = [
+                '<div snapscroll="enabled" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            $scope.enabled = false;
+            compileElement(html, true);
+            $scope.index = 1;
+            $scope.$apply(function () {
+                $scope.enabled = true;
+            });
+            expect($scope.index).toBe(0);
         });
 
         it('does not update snapIndex from the current scrollTop when snapscroll is re-enabled if prevent-snapping-after-manual-scroll is also set', function () {
@@ -1197,47 +1664,124 @@ describe('Directive: snapscroll', function () {
         });
 
         it('can execute a beforeSnap callback', function () {
-            testBeforeSnap('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div></div>');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testBeforeSnap(html);
         });
 
         it('executes the beforeSnap callback on the initial snap', function () {
-            testExecutesBeforeSnapOnInitialSnap('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div></div>');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testExecutesBeforeSnapOnInitialSnap(html);
         });
 
         it('passes the incoming snapIndex to the beforeSnap callback', function () {
-            testCorrectSnapIndexPassedToBeforeSnap('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap(snapIndex)"></div>');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testCorrectSnapIndexPassedToBeforeSnap(html);
         });
 
         it('allows preventing snapping by returning \'false\' from the beforeSnap callback', function () {
-            testAllowsPreventingSnapping('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div><div></div></div>');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testAllowsPreventingSnapping(html);
         });
 
         it('allows snapping to a different index by returning a number from the beforeSnap callback', function () {
-            testAllowsSnappingToADifferentSnapIndex('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div><div></div><div></div></div>');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testAllowsSnappingToADifferentSnapIndex(html);
         });
 
         it('does not snap to a different snapIndex if the beforeSnap return value is not a number', function () {
-            testIgnoresSnapIndexOverrideIfNotANumber('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div><div></div><div></div></div>');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testIgnoresSnapIndexOverrideIfNotANumber(html);
         });
 
         it('does not snap to a different snapIndex if the beforeSnap return value is not a valid snapIndex', function () {
-            testIgnoresInvalidSnapIndexOverride('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div><div></div><div></div></div>');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testIgnoresInvalidSnapIndexOverride(html);
         });
 
         it('resets the snapIndex if snapping is prevented', function () {
-            testResetsSnapIndexIfSnappingPrevented('<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()"><div></div><div></div></div>');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" before-snap="beforeSnap()" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testResetsSnapIndexIfSnappingPrevented(html);
         });
 
         it('can execute an afterSnap callback', function () {
-            testAfterSnap('<div snapscroll="" snap-index="snapIndex" after-snap="afterSnap()"><div></div></div>');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" after-snap="afterSnap()" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testAfterSnap(html);
         });
 
         it('executes the afterSnap callback on the initial snap', function () {
-            testExecutesAfterSnapOnInitialSnap('<div snapscroll="" snap-index="snapIndex" after-snap="afterSnap()"><div></div></div>');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" after-snap="afterSnap()" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testExecutesAfterSnapOnInitialSnap(html);
         });
 
         it('passes the new snapIndex to the afterSnap callback', function () {
-            testCorrectSnapIndexPassedToAfterSnap('<div snapscroll="" snap-index="snapIndex" after-snap="afterSnap(snapIndex)"></div>');
+            var html = [
+                '<div snapscroll="" snap-index="snapIndex" after-snap="afterSnap(snapIndex)" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testCorrectSnapIndexPassedToAfterSnap(html);
         });
 
         it('prevents normal scrolling using the mousewheel', function () {
@@ -1284,52 +1828,188 @@ describe('Directive: snapscroll', function () {
             testPreventsBubblingUpOfMousewheelEventsIfElementIsStillScrollable(html);
         });
 
-        it('snaps down on mouseheel down', function () {
-            var html = [
-                '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '</div>'
-            ].join('');
-            testSnapsDownOnMousewheelDown(html);
+        describe('on mousewheel down', function () {
+            it('snaps down', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testSnapsDownOnMousewheelDown(html);
+            });
+
+            it('does not snap down if the element is not scrollable', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '</div>'
+                ].join('');
+                testDoesntSnapDownIfElementIsNotScrollable(html);
+            });
+
+            it('executes beforeSnap', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 125px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testExecutesBeforeSnapOnMousewheelDown(html);
+            });
+
+            it('does not snap down if beforeSnap returns false', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testDoesNotSnapDownIfBeforeSnapReturnsFalseOnMousewheelDown(html);
+            });
+
+            it('snaps to a different snapIndex if beforeSnap returns a number', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testSnapsToADifferentSnapIndexIfBeforeSnapReturnsNumberOnMousewheelDown(html);
+            });
+
+            it('shows the rest of a snap for a bigger-height child', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 125px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testShowsRestOfBigSnapOnMousewheelDown(html);
+            });
+
+            it('doens\'t snap downif the element is already scrolled to the end', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testDoesntSnapDownOnNewDownMousewheelIfAlreadyScrolledToBottom(html);
+            });
+
+            it('does not snap down if a bigger-height child is scrolled to the end', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 125px"></div>',
+                    '</div>'
+                ].join('');
+                testDoesntSnapDownIfBiggerHeightChildIsScrolledToTheEnd(html);
+            });
         });
 
-        it('snaps up on mouseheel up', function () {
-            var html = [
-                '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '</div>'
-            ].join('');
-            testSnapsUpOnMousewheelUp(html);
-        });
+        describe('on mousewheel up', function () {
+            it('snaps up', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testSnapsUpOnMousewheelUp(html);
+            });
 
-        it('doens\'t snap down on a new down-mousewheel event if the element is already scrolled to the end', function () {
-            var html = [
-                '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '</div>'
-            ].join('');
-            testDoesntSnapDownOnNewDownMousewheelIfAlreadyScrolledToBottom(html);
-        });
+            it('does not snap up if the element is not scrollable', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '</div>'
+                ].join('');
+                testDoesntSnapUpIfElementIsNotScrollable(html);
+            });
 
-        it('doens\'t snap up on a new up-mousewheel event if the element\'s scrollTop is 0', function () {
-            var html = [
-                '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '</div>'
-            ].join('');
-            testDoesntSnapUpOnNewDownMousewheelIfAlreadyScrolltopIsZero(html);
+            it('executes beforeSnap', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 125px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testExecutesBeforeSnapOnMousewheelUp(html);
+            });
+
+            it('does not snap up if beforeSnap returns false', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testDoesNotSnapUpIfBeforeSnapReturnsFalseOnMousewheelUp(html);
+            });
+
+            it('snaps to a different snapIndex if beforeSnap returns a number', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testSnapsToADifferentSnapIndexIfBeforeSnapReturnsNumberOnMousewheelUp(html);
+            });
+
+            it('shows the rest of a snap instead of snapping up if it\'s greater than the snapHeight', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 125px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testShowsRestOfBigSnapOnMousewheelUp(html);
+            });
+
+            it('doens\'t snap up if the element\'s scrollTop is 0', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testDoesntSnapUpOnNewDownMousewheelIfAlreadyScrolltopIsZero(html);
+            });
+
+            it('does not snap up if a bigger-height child is scrolled to the beginning', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 125px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testDoesntSnapDownIfBiggerHeightChildIsScrolledToTheBeginning(html);
+            });
         });
 
         it('stops listening to mousewheel events when scope is destroyed', function () {
@@ -1354,6 +2034,26 @@ describe('Directive: snapscroll', function () {
                 '</div>'
             ].join('');
             testUsesTheOriginalBrowserMousewheelEvents(html);
+        });
+
+        describe('with smaller-height elements', function () {
+            it('does not try to scroll to set scrollTop to a value greater than the max available scrollHeight', inject(function (defaultSnapscrollSnapDuration, defaultSnapscrollScrollEasing) {
+                var html = [
+                    '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 25px"></div>',
+                    '</div>'
+                ].join('');
+                $scope.index = 0;
+                var element = compileElement(html, true);
+                scrollMock.to.calls.reset(); // reset calls from initial snap
+                $scope.$apply(function () {
+                    $scope.index = 2;
+                });
+                expect(element[0].scrollTop).toBe(75);
+                expect(scrollMock.to).toHaveBeenCalledWith(element, 75, defaultSnapscrollSnapDuration, defaultSnapscrollScrollEasing);
+            }));
         });
 
         // new test suite for tests to do with manual scrolling
@@ -1501,7 +2201,7 @@ describe('Directive: snapscroll', function () {
                     html = [
                         '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
                         '<div style="height: 50px"></div>',
-                        '<div style="height: 150px"></div>',
+                        '<div style="height: 50px"></div>',
                         '<div style="height: 50px"></div>',
                         '</div>'
                     ].join('');
@@ -1514,11 +2214,11 @@ describe('Directive: snapscroll', function () {
                 expect(element[0].scrollTop).toBe(50);
                 // flush the timeout on bindScroll() first
                 $timeout.flush();
-                element[0].scrollTop = 126;
+                element[0].scrollTop = 76;
                 element.triggerHandler('scroll');
                 $timeout.flush();
                 expect($scope.index).toBe(2);
-                expect(element[0].scrollTop).toBe(200);
+                expect(element[0].scrollTop).toBe(100);
                 // flush the timeout on bindScroll() first
                 $timeout.flush();
                 element[0].scrollTop = 24;
@@ -1526,6 +2226,88 @@ describe('Directive: snapscroll', function () {
                 $timeout.flush();
                 expect($scope.index).toBe(0);
                 expect(element[0].scrollTop).toBe(0);
+            });
+
+            it('resets the scrollTop to the visible inner snap after a scroll event if a child height is greater than the snapscroll element height', function () {
+                var element,
+                    html = [
+                        '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 100px"></div>',
+                        '<div style="height: 125px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                element = compileElement2(html, true);
+                expect($scope.index).toBe(0);
+                element[0].scrollTop = 25;
+                element.triggerHandler('scroll');
+                $timeout.flush();
+                expect($scope.index).toBe(1);
+                expect(element[0].scrollTop).toBe(50);
+                // flush the timeout on bindScroll() first
+                $timeout.flush();
+                element[0].scrollTop = 74;
+                element.triggerHandler('scroll');
+                $timeout.flush();
+                expect($scope.index).toBe(1);
+                expect(element[0].scrollTop).toBe(50);
+                // flush the timeout on bindScroll() first
+                $timeout.flush();
+                element[0].scrollTop = 76;
+                element.triggerHandler('scroll');
+                $timeout.flush();
+                expect($scope.index).toBe(1);
+                expect(element[0].scrollTop).toBe(100);
+                // flush the timeout on bindScroll() first
+                $timeout.flush();
+                element[0].scrollTop = 124;
+                element.triggerHandler('scroll');
+                $timeout.flush();
+                expect($scope.index).toBe(1);
+                expect(element[0].scrollTop).toBe(100);
+                // flush the timeout on bindScroll() first
+                $timeout.flush();
+                element[0].scrollTop = 125;
+                element.triggerHandler('scroll');
+                $timeout.flush();
+                expect($scope.index).toBe(2);
+                expect(element[0].scrollTop).toBe(150);
+                // flush the timeout on bindScroll() first
+                $timeout.flush();
+                element[0].scrollTop = 224;
+                element.triggerHandler('scroll');
+                $timeout.flush();
+                expect($scope.index).toBe(2);
+                expect(element[0].scrollTop).toBe(200);
+                // flush the timeout on bindScroll() first
+                $timeout.flush();
+                element[0].scrollTop = 226;
+                element.triggerHandler('scroll');
+                $timeout.flush();
+                expect($scope.index).toBe(2);
+                expect(element[0].scrollTop).toBe(225);
+                // flush the timeout on bindScroll() first
+                $timeout.flush();
+                element[0].scrollTop = 249;
+                element.triggerHandler('scroll');
+                $timeout.flush();
+                expect($scope.index).toBe(2);
+                expect(element[0].scrollTop).toBe(225);
+                // flush the timeout on bindScroll() first
+                $timeout.flush();
+                element[0].scrollTop = 250;
+                element.triggerHandler('scroll');
+                $timeout.flush();
+                expect($scope.index).toBe(3);
+                expect(element[0].scrollTop).toBe(275);
+                // flush the timeout on bindScroll() first
+                $timeout.flush();
+                element[0].scrollTop = 274;
+                element.triggerHandler('scroll');
+                $timeout.flush();
+                expect($scope.index).toBe(3);
+                expect(element[0].scrollTop).toBe(275);
             });
 
             it('stays snapped to the current snapIndex when the element\'s height is changed', function () {
@@ -1551,7 +2333,7 @@ describe('Directive: snapscroll', function () {
                 expect(element[0].scrollTop).toBe(50);
             });
 
-            it('stays snapped to the current snapIndex when a child element\'s height is changed', function () {
+            it('updates the snapIndex from the scrollTop when a child element\'s height is changed', function () {
                 var element,
                     html = [
                         '<div snapscroll="" snap-index="index" snap-height="height" style="height: 50px; overflow: auto">',
@@ -1571,8 +2353,8 @@ describe('Directive: snapscroll', function () {
                 // on the browser, an element resize triggers a scroll
                 element.triggerHandler('scroll');
                 $timeout.flush();
-                expect($scope.index).toBe(1);
-                expect(element[0].scrollTop).toBe(100);
+                expect($scope.index).toBe(0);
+                expect(element[0].scrollTop).toBe(50);
             });
 
             it('stops listening on scroll event when scope is destroyed', function () {
@@ -1702,14 +2484,12 @@ describe('Directive: snapscroll', function () {
 
     // different test suite for animations
     describe('as an attribute', function () {
-        var snapDurationMock,
-            snapEasingMock;
+        var snapDurationMock;
 
         beforeEach(inject(function ($q) {
             var deferred = $q.defer();
 
             snapDurationMock = undefined;
-            snapEasingMock = undefined;
 
             scrollMock.to = jasmine.createSpy('scroll.to').and.callFake(function (element, top, duration, easing) {
                 if (angular.isDefined(duration)) {
@@ -1719,9 +2499,6 @@ describe('Directive: snapscroll', function () {
                 }
                 if (angular.isFunction(easing)) {
                     easing.call();
-                    snapEasingMock = 1;
-                } else {
-                    snapEasingMock = undefined;
                 }
                 element[0].scrollTop = top;
                 deferred.resolve();
@@ -1906,7 +2683,6 @@ describe('Directive: snapscroll', function () {
             expect(snapDurationMock).toBe(defaultSnapscrollSnapDuration);
         }));
 
-        // TODO: is this functionality really necessary??
         it('allows setting the snapAnimation easing (snapEasing)', function () {
             var html = [
                 '<div snapscroll="" snap-index="index" snap-easing="easing" style="height: 50px; overflow: auto">',
@@ -1915,30 +2691,15 @@ describe('Directive: snapscroll', function () {
                 '<div style="height: 50px"></div>',
                 '</div>'
             ].join('');
-            $scope.easing = function () {};
+            var spy = jasmine.createSpy('easing');
+            $scope.easing = spy;
             compileElement(html, true);
             $scope.index = 1;
             $scope.$apply();
-            expect(snapEasingMock).toBe(1);
+            expect(spy).toHaveBeenCalled();
         });
 
-        it('uses whichever snapEasing is provided', function () {
-            var easing = jasmine.createSpy('easing');
-            var html = [
-                '<div snapscroll="" snap-index="index" snap-easing="easing" style="height: 50px; overflow: auto">',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '<div style="height: 50px"></div>',
-                '</div>'
-            ].join('');
-            $scope.easing = easing;
-            compileElement(html, true);
-            $scope.index = 1;
-            $scope.$apply();
-            expect(easing).toHaveBeenCalled();
-        });
-
-        it('uses the defaultSnapscrollScrollEasing if set', function () {
+        it('uses the defaultSnapscrollScrollEasing as the easing if\'s set to a function', function () {
             var html = [
                 '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
@@ -1958,45 +2719,70 @@ describe('Directive: snapscroll', function () {
         var $timeout;
 
         function testDoesntSnapInTheSameDirectionOnNewMousewheelIfCurrentlySnapping(html) {
-            var element;
-            element = compileElement(html, true);
-            $timeout.flush(); // flush timeout for initial snap
+            var element = compileElement(html, true);
+            expect(scrollMock.to.calls.count()).toEqual(1); // initial snap
             element.triggerHandler({
                 type: 'wheel',
                 wheelDelta: -120,
                 detail: 120,
                 deltaY: 120
-            });
-            expect(element[0].scrollTop).toBe(0); // because animation is in progress
+            }); // snap down to 50
+            expect(scrollMock.to.calls.count()).toEqual(2);
             element.triggerHandler({
                 type: 'wheel',
                 wheelDelta: -120,
                 detail: 120,
                 deltaY: 120
-            });
-            $timeout.flush(); // flush all animations
-            expect(element[0].scrollTop).toBe(50); // because second wheel event was ignored
+            }); // while snapping, snap down to 100
+            expect(scrollMock.to.calls.count()).toEqual(2); // not called again
+        }
+
+        function testStopsPropagationIfCurrentlySnappingInTheDirectionOfANewMousewheel(html) {
+            var element = compileElement(html, true);
+            var stopPropagation = jasmine.createSpy('stopPropagation');
+            element.triggerHandler({
+                type: 'wheel',
+                wheelDelta: -120,
+                detail: 120,
+                deltaY: 120,
+                stopPropagation: stopPropagation
+            }); // snap down to 50
+            expect(stopPropagation.calls.count()).toBe(1);
+            element.triggerHandler({
+                type: 'wheel',
+                wheelDelta: -120,
+                detail: 120,
+                deltaY: 120,
+                stopPropagation: stopPropagation
+            }); // while snapping, snap down to 100
+            expect(stopPropagation.calls.count()).toBe(2);
         }
 
         function testAllowsSnapingInTheOppositeDirectionOnNewMousewheelIfCurrentlySnapping(html) {
             var element;
             element = compileElement(html, true);
-            $timeout.flush(); // flush timeout for initial snap
+            expect(scrollMock.to.calls.count()).toEqual(1); // initial snap
             element.triggerHandler({
                 type: 'wheel',
                 wheelDelta: -120,
                 detail: 120,
                 deltaY: 120
-            });
-            expect(element[0].scrollTop).toBe(0); // because animation is in progress
+            }); // snap down to 50
+            expect(scrollMock.to.calls.count()).toEqual(2);
+            element.triggerHandler({
+                type: 'wheel',
+                wheelDelta: -120,
+                detail: 120,
+                deltaY: 120
+            }); // while snapping, snap down to 100
+            expect(scrollMock.to.calls.count()).toEqual(2); // not called again
             element.triggerHandler({
                 type: 'wheel',
                 wheelDelta: 120,
                 detail: -120,
                 deltaY: -120
-            });
-            $timeout.flush(); // flush all animations
-            expect(element[0].scrollTop).toBe(0); // because second wheel event was in the opposite direction
+            });  // snap back up to 50
+            expect(scrollMock.to.calls.count()).toEqual(3);
         }
 
         beforeEach(inject(function (_$timeout_) {
@@ -2004,28 +2790,18 @@ describe('Directive: snapscroll', function () {
         }));
 
         beforeEach(function () {
-            scrollMock.to = function (element, top, duration) {
-                var currentAnimation = element.data('current-animation');
-                if (currentAnimation) {
-                    $timeout.cancel(currentAnimation);
-                }
-                currentAnimation = $timeout(function () {
-                    element[0].scrollTop = top;
-                }, duration);
-                element.data('current-animation', currentAnimation);
+            scrollMock.to = jasmine.createSpy().and.callFake(function (element, scrollTop, duration) {
+                element[0].scrollTop = scrollTop;
                 return {
-                    then: angular.noop
+                    then: function (success) {
+                        $timeout(success, duration);
+                        return this;
+                    }
                 };
-            };
-            scrollMock.stop = function (element) {
-                var currentAnimation = element.data('current-animation');
-                if (currentAnimation) {
-                    $timeout.cancel(currentAnimation);
-                }
-            };
+            });
         });
 
-        it('doesn\'t snap in the same direction as a new mousewheel event if currently snapping', function () {
+        it('doesn\'t snap in the same direction on a new mousewheel event if currently snapping', function () {
             var html = [
                 '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
                 '<div style="height: 50px"></div>',
@@ -2035,6 +2811,18 @@ describe('Directive: snapscroll', function () {
                 '</div>'
             ].join('');
             testDoesntSnapInTheSameDirectionOnNewMousewheelIfCurrentlySnapping(html);
+        });
+
+        it('doesn\'t bubble up the mousewheel event if currently snapping in the direction of a new mousewheel event', function () {
+            var html = [
+                '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '<div style="height: 50px"></div>',
+                '</div>'
+            ].join('');
+            testStopsPropagationIfCurrentlySnappingInTheDirectionOfANewMousewheel(html);
         });
 
         it('allows snapping in the opposite direction as a new mousewheel event if currently snapping', function () {
