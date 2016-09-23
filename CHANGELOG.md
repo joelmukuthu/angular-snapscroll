@@ -1,4 +1,4 @@
-## next release
+## 1.0.0
 
 ### Breaking changes
 - Dependency on [angular-scrollie](https://github.com/joelmukuthu/angular-scrollie)
