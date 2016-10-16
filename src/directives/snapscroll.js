@@ -185,6 +185,9 @@
 
                         unbindScroll();
                         return scrollie.to.apply(scrollie, args).then(function () {
+                            if (args[1] !== 0) {
+                                scope.preventSnap = true;
+                            }
                             scope.snapDirection = undefined;
                             bindScrollAfterDelay();
                         });
@@ -339,6 +342,19 @@
                             return;
                         }
 
+                        if (scope.scrollStopTimeout) {
+                            $timeout.cancel(scope.scrollStopTimeout);
+                        }
+
+                        if (scope.preventSnap) {
+                            return false;
+                        }
+
+                        scope.scrollStopTimeout = $timeout(function () {
+                            scope.scrollStopTimeout = null;
+                            scope.preventSnap = false;
+                        }, 100);
+
                         if (scope.snapDirection === direction) {
                             return true;
                         }
@@ -358,11 +374,13 @@
                             return;
                         }
 
+
                         scope.$apply(function () {
                             scope.compositeIndex = rectifyCompositeIndex(
                                 newCompositeIndex
                             );
                         });
+
                         return true;
                     }
 
@@ -378,12 +396,20 @@
                         wheelie.bind(element, {
                             up: function (e) {
                                 e.preventDefault();
+                                if (Math.abs(e.wheelDelta) > scope.oldWheelDelta) {
+                                    scope.preventSnap = false;
+                                }
+                                scope.oldWheelDelta = Math.abs(e.wheelDelta);
                                 if (snapUp()) {
                                     e.stopPropagation();
                                 }
                             },
                             down: function (e) {
                                 e.preventDefault();
+                                if (Math.abs(e.wheelDelta) > scope.oldWheelDelta) {
+                                    scope.preventSnap = false;
+                                }
+                                scope.oldWheelDelta = Math.abs(e.wheelDelta);
                                 if (snapDown()) {
                                     e.stopPropagation();
                                 }
