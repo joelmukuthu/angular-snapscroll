@@ -34,6 +34,9 @@ describe('Module: snapscroll', function () {
             expect(angular.isNumber(defaultSnapscrollBindScrollTimeout)).toBe(true);
         }));
 
+        it('defaultSnapscrollPreventDoubleSnapDelay', inject(function (defaultSnapscrollPreventDoubleSnapDelay) {
+            expect(angular.isNumber(defaultSnapscrollPreventDoubleSnapDelay)).toBe(true);
+        }));
     });
 
 });

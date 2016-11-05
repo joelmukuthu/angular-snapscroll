@@ -2064,6 +2064,149 @@ describe('Directive: snapscroll', function () {
             testUsesTheOriginalBrowserMousewheelEvents(html, $timeout);
         }));
 
+        describe('prevent-double-snap-delay attribute', function () {
+            var $timeout;
+
+            beforeEach(inject(function (_$timeout_) {
+                $timeout = _$timeout_;
+            }));
+
+            it('allows setting the preventDoubleSnapDelay timeout', function () {
+                var element,
+                    html = [
+                        '<div snapscroll="" snap-index="index" prevent-double-snap-delay="400" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                element = compileElement(html, true);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                expect($scope.index).toBe(1);
+                $timeout.flush(399);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                expect($scope.index).toBe(1);
+                $timeout.flush(1);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                expect($scope.index).toBe(2);
+            });
+
+            it('defaults the preventDoubleSnapDelay timeout to the value of defaultSnapscrollPreventDoubleSnapDelay', inject(function (defaultSnapscrollPreventDoubleSnapDelay) {
+                var element,
+                    html = [
+                        '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                element = compileElement(html, true);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                expect($scope.index).toBe(1);
+                $timeout.flush(defaultSnapscrollPreventDoubleSnapDelay - 1);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                expect($scope.index).toBe(1);
+                $timeout.flush(1);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                expect($scope.index).toBe(2);
+            }));
+
+            it('does not allow setting the preventDoubleSnapDelay timeout using expressions', function () {
+                var element,
+                    html = [
+                        '<div snapscroll="" snap-index="index" prevent-double-snap-delay="200 + 200" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                element = compileElement(html, true);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                expect($scope.index).toBe(1);
+                // TODO: not the best test for this. preventDoubleSnapDelay is set to 200 in this case
+                $timeout.flush(250);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                expect($scope.index).toBe(2);
+                $timeout.flush(150);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                expect($scope.index).toBe(2);
+            });
+
+            it('allows turning off the preventDoubleSnapDelay timeout if passed \'false\'', function () {
+                var element,
+                    html = [
+                        '<div snapscroll="" snap-index="index" prevent-double-snap-delay="false" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                element = compileElement(html, true);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                $timeout.flush(); // flush the timeout on bindScroll() first
+                expect(function () {
+                    $timeout.flush();
+                }).toThrow();
+            });
+
+            it('defaults the the preventDoubleSnapDelay timeout to the value of defaultSnapscrollPreventDoubleSnapDelay if a non-number preventDoubleSnapDelay is provided', inject(function (defaultSnapscrollPreventDoubleSnapDelay) {
+                var element,
+                    html = [
+                        '<div snapscroll="" snap-index="index" scroll-delay="\'bad\'" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+                element = compileElement(html, true);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                $timeout.flush(defaultSnapscrollPreventDoubleSnapDelay - 1);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                expect($scope.index).toBe(1);
+                $timeout.flush(1);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                expect($scope.index).toBe(2);
+            }));
+        });
+
         describe('with enable-arrow-keys set', function () {
             describe('on up-arrow', function () {
                 it('snaps up', inject(function ($document) {
