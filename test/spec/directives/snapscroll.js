@@ -206,14 +206,14 @@ describe('Directive: snapscroll', function () {
             preventDefault: preventDefault
         }); // mousewheel down
         element.triggerHandler({
-            type: 'mousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120,
             preventDefault: preventDefault
         }); // mousewheel up
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120,
@@ -268,7 +268,7 @@ describe('Directive: snapscroll', function () {
             $scope.index = 2;
         });
         element.triggerHandler({
-            type: 'mousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120,
@@ -279,14 +279,14 @@ describe('Directive: snapscroll', function () {
             $scope.index = 1;
         });
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120,
             stopPropagation: stopPropagation
         }); // try to snap up
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120,
@@ -308,7 +308,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(50);
         element.triggerHandler({
-            type: 'mousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -316,7 +316,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(2);
         expect(element[0].scrollTop).toBe(100);
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -353,7 +353,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(2);
         expect(element[0].scrollTop).toBe(100);
         element.triggerHandler({
-            type: 'mousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -361,7 +361,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(50);
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -400,7 +400,7 @@ describe('Directive: snapscroll', function () {
         expect(spy).toHaveBeenCalledWith(1);
         spy.calls.reset();
         element.triggerHandler({
-            type: 'mousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -408,7 +408,7 @@ describe('Directive: snapscroll', function () {
         expect(spy).not.toHaveBeenCalled(); // index still 1
         spy.calls.reset();
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -416,7 +416,7 @@ describe('Directive: snapscroll', function () {
         expect(spy).not.toHaveBeenCalled(); // index still 1
         spy.calls.reset();
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -424,7 +424,7 @@ describe('Directive: snapscroll', function () {
         expect(spy).toHaveBeenCalledWith(2);
         spy.calls.reset();
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -449,7 +449,7 @@ describe('Directive: snapscroll', function () {
         expect(spy).toHaveBeenCalledWith(2);
         spy.calls.reset();
         element.triggerHandler({
-            type: 'mousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -457,7 +457,7 @@ describe('Directive: snapscroll', function () {
         expect(spy).toHaveBeenCalledWith(1);
         spy.calls.reset();
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -465,7 +465,7 @@ describe('Directive: snapscroll', function () {
         expect(spy).not.toHaveBeenCalled(); // index still 1
         spy.calls.reset();
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -473,7 +473,7 @@ describe('Directive: snapscroll', function () {
         expect(spy).not.toHaveBeenCalled(); // index still 1
         spy.calls.reset();
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -570,7 +570,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(50);
         element.triggerHandler({
-            type: 'mousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -578,7 +578,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(100);
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -586,7 +586,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(125);
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -594,7 +594,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(2);
         expect(element[0].scrollTop).toBe(175);
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -618,7 +618,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(2);
         expect(element[0].scrollTop).toBe(175);
         element.triggerHandler({
-            type: 'mousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -626,7 +626,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(125);
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -634,7 +634,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(75);
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -642,7 +642,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(50);
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -665,7 +665,7 @@ describe('Directive: snapscroll', function () {
         expect(element[0].scrollTop).toBe(150);
         // try to wheel up then..
         element.triggerHandler({
-            type: 'mousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -687,7 +687,7 @@ describe('Directive: snapscroll', function () {
         expect(element[0].scrollTop).toBe(0);
         // try to wheel down then..
         element.triggerHandler({
-            type: 'mousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -710,7 +710,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(50);
         element.triggerHandler({
-            type: 'mousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -718,7 +718,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(100);
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -726,7 +726,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(125);
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: -120,
             detail: 120,
             deltaY: 120
@@ -750,7 +750,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(0);
         expect(element[0].scrollTop).toBe(75);
         element.triggerHandler({
-            type: 'mousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -758,7 +758,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(0);
         expect(element[0].scrollTop).toBe(25);
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -766,7 +766,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(0);
         expect(element[0].scrollTop).toBe(0);
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             wheelDelta: 120,
             detail: -120,
             deltaY: -120
@@ -814,7 +814,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(2);
         expect(element[0].scrollTop).toBe(100);
         element.triggerHandler({
-            type: 'mousewheel',
+            type: 'wheel',
             originalEvent: {
                 wheelDelta: 120,
                 detail: -120,
@@ -826,7 +826,7 @@ describe('Directive: snapscroll', function () {
         expect($scope.index).toBe(1);
         expect(element[0].scrollTop).toBe(50);
         element.triggerHandler({
-            type: 'onmousewheel',
+            type: 'wheel',
             originalEvent: {
                 wheelDelta: 120,
                 detail: -120,

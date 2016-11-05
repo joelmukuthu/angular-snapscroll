@@ -36,8 +36,8 @@
   },
   "dependencies": {
     "angular": "^1.2.24",
-    "angular-wheelie": "^1.1.0",
-    "angular-scrollie": "^1.0.0"
+    "angular-scrollie": "^1.0.0",
+    "angular-wheelie": "^2.0.0"
   },
   "repository": {
     "type": "git",
