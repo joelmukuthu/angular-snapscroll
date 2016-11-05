@@ -142,6 +142,12 @@
                                     snapIndex: snapIndex
                                 });
                             }
+                            if (scope.preventUp || scope.preventDown) {
+                                $timeout(function () {
+                                    scope.preventUp = false;
+                                    scope.preventDown = false;
+                                }, 1000);
+                            }
                         });
                     }
 
@@ -185,9 +191,6 @@
 
                         unbindScroll();
                         return scrollie.to.apply(scrollie, args).then(function () {
-                            if (args[1] !== 0) {
-                                scope.preventSnap = true;
-                            }
                             scope.snapDirection = undefined;
                             bindScrollAfterDelay();
                         });
@@ -342,20 +345,11 @@
                             return;
                         }
 
-                        if (scope.scrollStopTimeout) {
-                            $timeout.cancel(scope.scrollStopTimeout);
-                        }
-
-                        if (scope.preventSnap) {
-                            return false;
-                        }
-
-                        scope.scrollStopTimeout = $timeout(function () {
-                            scope.scrollStopTimeout = null;
-                            scope.preventSnap = false;
-                        }, 100);
-
                         if (scope.snapDirection === direction) {
+                            return true;
+                        }
+
+                        if (scope.preventUp || scope.preventDown) {
                             return true;
                         }
 
@@ -374,7 +368,6 @@
                             return;
                         }
 
-
                         scope.$apply(function () {
                             scope.compositeIndex = rectifyCompositeIndex(
                                 newCompositeIndex
@@ -385,10 +378,12 @@
                     }
 
                     function snapUp() {
+                        scope.preventDown = false;
                         return snap('up');
                     }
 
                     function snapDown() {
+                        scope.preventUp = false;
                         return snap('down');
                     }
 
@@ -396,22 +391,16 @@
                         wheelie.bind(element, {
                             up: function (e) {
                                 e.preventDefault();
-                                if (Math.abs(e.wheelDelta) > scope.oldWheelDelta) {
-                                    scope.preventSnap = false;
-                                }
-                                scope.oldWheelDelta = Math.abs(e.wheelDelta);
                                 if (snapUp()) {
                                     e.stopPropagation();
+                                    scope.preventUp = true;
                                 }
                             },
                             down: function (e) {
                                 e.preventDefault();
-                                if (Math.abs(e.wheelDelta) > scope.oldWheelDelta) {
-                                    scope.preventSnap = false;
-                                }
-                                scope.oldWheelDelta = Math.abs(e.wheelDelta);
                                 if (snapDown()) {
                                     e.stopPropagation();
+                                    scope.preventDown = true;
                                 }
                             }
                         });
