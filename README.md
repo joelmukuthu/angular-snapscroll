@@ -84,7 +84,6 @@ examples, view the source on the [demo site](http://joelmukuthu.github.io/angula
 - snapscroll as an element - would allow use of templates and ngAnimate for
 animations. Currently this repo has a (rather outdated) 'as-element' branch for
 this.
-- more browser tests
 
 ### Contributing
 Contributions are welcomed! Here are the [contribution guidelines](CONTRIBUTING.md).
