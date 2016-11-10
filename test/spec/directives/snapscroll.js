@@ -2207,6 +2207,210 @@ describe('Directive: snapscroll', function () {
             }));
         });
 
+        describe('ignore-wheel-class attribute', function () {
+            function createWheelEvent(deltaObject) {
+                // ideally: return new WheelEvent('wheel', deltaObject); but
+                // PhantomJS doesn't support it: https://github.com/ariya/phantomjs/issues/11289
+                var event = document.createEvent('WheelEvent');
+                event.initEvent('wheel', true, true);
+                Object.keys(deltaObject).forEach(function (key) {
+                    event[key] = deltaObject[key];
+                });
+                return event;
+            }
+
+            function triggerWheel(element, event) {
+                // would use triggerHandler but it doesn't bubble the event up
+                element.dispatchEvent(event);
+            }
+
+            function triggerUp(element) {
+                var event = createWheelEvent({
+                    deltaY: -120
+                });
+                triggerWheel(element, event);
+            }
+
+            function triggerDown(element) {
+                var event = createWheelEvent({
+                    deltaY: 120
+                });
+                triggerWheel(element, event);
+            }
+
+            describe('when the wheel event comes from an element containing the class', function () {
+                it('does not snap up on mousewheel up', function () {
+                    var html = [
+                        '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto" ignore-wheel-class="ignore-me">',
+                        '<div style="height: 50px" class="ignore-me"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+
+                    $scope.index = 3;
+                    var element = compileElement(html, true);
+                    expect($scope.index).toBe(3);
+                    expect(element[0].scrollTop).toBe(150);
+
+                    var ignoredElement = document.querySelector('div.ignore-me');
+                    triggerUp(ignoredElement);
+                    expect($scope.index).toBe(3);
+                    expect(element[0].scrollTop).toBe(150);
+                });
+
+                it('does not snap down on mousewheel down', function () {
+                    var html = [
+                        '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto" ignore-wheel-class="ignore-me">',
+                        '<div style="height: 50px" class="ignore-me"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+
+                    var element = compileElement(html, true);
+                    expect($scope.index).toBe(0);
+                    expect(element[0].scrollTop).toBe(0);
+
+                    var ignoredElement = document.querySelector('div.ignore-me');
+                    triggerDown(ignoredElement);
+                    expect($scope.index).toBe(0);
+                    expect(element[0].scrollTop).toBe(0);
+                });
+            });
+
+            describe('when the wheel event comes from an element not containing the class', function () {
+                it('does not snap up on mousewheel up', function () {
+                    var html = [
+                        '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto" ignore-wheel-class="ignore-me">',
+                        '<div style="height: 50px" class="ignore-me"></div>',
+                        '<div style="height: 50px" class="do-not-ignore-me"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+
+                    $scope.index = 3;
+                    var element = compileElement(html, true);
+                    expect($scope.index).toBe(3);
+                    expect(element[0].scrollTop).toBe(150);
+
+                    var ignoredElement = document.querySelector('div.do-not-ignore-me');
+                    triggerUp(ignoredElement);
+                    expect($scope.index).toBe(2);
+                    expect(element[0].scrollTop).toBe(100);
+                });
+
+                it('does not snap down on mousewheel down', function () {
+                    var html = [
+                        '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto" ignore-wheel-class="ignore-me">',
+                        '<div style="height: 50px" class="ignore-me"></div>',
+                        '<div style="height: 50px" class="do-not-ignore-me"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+
+                    var element = compileElement(html, true);
+                    expect($scope.index).toBe(0);
+                    expect(element[0].scrollTop).toBe(0);
+
+                    var ignoredElement = document.querySelector('div.do-not-ignore-me');
+                    triggerDown(ignoredElement);
+                    expect($scope.index).toBe(1);
+                    expect(element[0].scrollTop).toBe(50);
+                });
+            });
+
+            describe('when the value is an empty string', function () {
+                it('does not snap up on mousewheel up', function () {
+                    var html = [
+                        '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto" ignore-wheel-class="">',
+                        '<div style="height: 50px" class="ignore-me"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+
+                    $scope.index = 3;
+                    var element = compileElement(html, true);
+                    expect($scope.index).toBe(3);
+                    expect(element[0].scrollTop).toBe(150);
+
+                    var ignoredElement = document.querySelector('div.ignore-me');
+                    triggerUp(ignoredElement);
+                    expect($scope.index).toBe(2);
+                    expect(element[0].scrollTop).toBe(100);
+                });
+
+                it('does not snap down on mousewheel down', function () {
+                    var html = [
+                        '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto" ignore-wheel-class="">',
+                        '<div style="height: 50px" class="ignore-me"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+
+                    var element = compileElement(html, true);
+                    expect($scope.index).toBe(0);
+                    expect(element[0].scrollTop).toBe(0);
+
+                    var ignoredElement = document.querySelector('div.ignore-me');
+                    triggerDown(ignoredElement);
+                    expect($scope.index).toBe(1);
+                    expect(element[0].scrollTop).toBe(50);
+                });
+            });
+
+            describe('when the attribute is not set', function () {
+                it('does not snap up on mousewheel up', function () {
+                    var html = [
+                        '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px" class="ignore-me"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+
+                    $scope.index = 3;
+                    var element = compileElement(html, true);
+                    expect($scope.index).toBe(3);
+                    expect(element[0].scrollTop).toBe(150);
+
+                    var ignoredElement = document.querySelector('div.ignore-me');
+                    triggerUp(ignoredElement);
+                    expect($scope.index).toBe(2);
+                    expect(element[0].scrollTop).toBe(100);
+                });
+
+                it('does not snap down on mousewheel down', function () {
+                    var html = [
+                        '<div snapscroll="" snap-index="index" style="height: 50px; overflow: auto">',
+                        '<div style="height: 50px" class="ignore-me"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '<div style="height: 50px"></div>',
+                        '</div>'
+                    ].join('');
+
+                    var element = compileElement(html, true);
+                    expect($scope.index).toBe(0);
+                    expect(element[0].scrollTop).toBe(0);
+
+                    var ignoredElement = document.querySelector('div.ignore-me');
+                    triggerDown(ignoredElement);
+                    expect($scope.index).toBe(1);
+                    expect(element[0].scrollTop).toBe(50);
+                });
+            });
+        });
+
         describe('with enable-arrow-keys set', function () {
             describe('on up-arrow', function () {
                 it('snaps up', inject(function ($document) {
