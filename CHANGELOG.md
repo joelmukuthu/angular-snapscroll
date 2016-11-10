@@ -1,3 +1,9 @@
+## next version
+
+### Features
+- Support ignoring wheel events from specified elements with
+[`ignore-wheel-class`](DOCS.md#ignore-wheel-class)
+
 ## 1.0.2
 
 ### Fixes

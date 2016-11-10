@@ -68,6 +68,20 @@ pressed, respectively.
 <div snapscroll="" enable-arrow-keys=""> ... </div>
 ```
 
+#### ignore-wheel-class
+snapscroll takes over the wheel events for the element it's bound to and
+translates them to snapping up/down. to allow the normal scrolling on a nested
+element (i.e. prevent snapping when the wheel event comes from that element),
+add a class to the element and provide that class-name as the value for the
+`ignore-wheel-class` attribute.
+```html
+<div snapscroll="" enable-arrow-keys="" ignore-wheel-class="ignore-me">
+    <div>
+        <div class="ignore-me">normal scrolling here</div>
+    </div>
+</div>
+```
+
 #### before-snap
 is a callback executed before snapping occurs. the callback is passed a
 `snapIndex` parameter, which is the index being snapped to. returning `false`
