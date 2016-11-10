@@ -1,9 +1,9 @@
 /**
  * angular-snapscroll
- * Version: 1.0.2
+ * Version: 1.1.0
  * (c) 2014-2016 Joel Mukuthu
  * MIT License
- * Built on: 10-11-2016 11:54:12 GMT+0100
+ * Built on: 10-11-2016 18:25:46 GMT+0100
  **/
 
 (function () {
@@ -498,7 +498,7 @@
                                     e.stopPropagation();
                                 }
                             }
-                        });
+                        }, scope.ignoreWheelClass);
                     }
 
                     function unbindWheel() {
@@ -738,6 +738,8 @@
                         scope.preventSnappingAfterManualScroll = isDefined(
                             attributes.preventSnappingAfterManualScroll
                         );
+
+                        scope.ignoreWheelClass = attributes.ignoreWheelClass;
 
                         if (element.css('overflowY') !== 'scroll') {
                             element.css('overflowY', 'auto');
