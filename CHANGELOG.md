@@ -6,6 +6,12 @@ a double snap anymore (thanks @reco). There's a 1 second delay that prevents the
 next snap, which can be changed (or disabled) with
 [`prevent-double-snap-delay`](DOCS.md#prevent-double-snap-delay)
 
+## 1.0.1
+
+## Fixes
+- Do not translate left/right scroll to up/down scroll
+(https://github.com/joelmukuthu/angular-snapscroll/issues/37)
+
 ## 1.0.0
 
 ### Breaking changes
