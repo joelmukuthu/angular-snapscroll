@@ -421,7 +421,7 @@
                                     e.stopPropagation();
                                 }
                             }
-                        });
+                        }, scope.ignoreWheelClass);
                     }
 
                     function unbindWheel() {
@@ -661,6 +661,8 @@
                         scope.preventSnappingAfterManualScroll = isDefined(
                             attributes.preventSnappingAfterManualScroll
                         );
+
+                        scope.ignoreWheelClass = attributes.ignoreWheelClass;
 
                         if (element.css('overflowY') !== 'scroll') {
                             element.css('overflowY', 'auto');
