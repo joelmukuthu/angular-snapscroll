@@ -1,4 +1,4 @@
-## next version
+## 1.1.0
 
 ### Features
 - Support ignoring wheel events from specified elements with
