@@ -90,7 +90,8 @@
         snapHeight: '=?',
         beforeSnap: '&',
         afterSnap: '&',
-        snapAnimation: '=?'
+        snapAnimation: '=?',
+        preventDoubleSnap: '=?'
     };
 
     var controller = ['$scope', function ($scope) {
@@ -263,6 +264,9 @@
                         return scrollie.to.apply(scrollie, args).then(function () {
                             scope.snapDirection = undefined;
                             bindScrollAfterDelay();
+                            if (args[1] !== 0) {
+                                scope.preventSnap = true
+                            }
                         });
                     }
 
@@ -415,6 +419,22 @@
                             return;
                         }
 
+                        if(scope.scrollStopTimeout) {
+                            $timeout.cancel(scope.scrollStopTimeout);
+                        }
+
+                        if (scope.preventDoubleSnap) {
+                            scope.scrollStopTimeout = $timeout(function(){
+                                scope.scrollStopTimeout = null;
+                                scope.preventSnap = false
+                                console.log('scrollstop');
+                            }, 100);
+
+                            if (scope.preventSnap) {
+                                return;
+                            }
+                        }
+
                         if (scope.snapDirection === direction) {
                             return true;
                         }
@@ -453,12 +473,20 @@
                     function bindWheel() {
                         wheelie.bind(element, {
                             up: function (e) {
+                                if (Math.abs(e.wheelDelta) > scope.oldWheelDelta ) {
+                                    scope.preventSnap = false;
+                                }
+                                scope.oldWheelDelta = Math.abs(e.wheelDelta)
                                 e.preventDefault();
                                 if (snapUp()) {
                                     e.stopPropagation();
                                 }
                             },
                             down: function (e) {
+                                if (Math.abs(e.wheelDelta) > scope.oldWheelDelta ) {
+                                    scope.preventSnap = false;
+                                }
+                                scope.oldWheelDelta = Math.abs(e.wheelDelta)
                                 e.preventDefault();
                                 if (snapDown()) {
                                     e.stopPropagation();
@@ -673,6 +701,11 @@
                             snapDuration = defaultSnapscrollSnapDuration;
                         }
                         scope.snapDuration = snapDuration;
+
+                        var preventDoubleSnap = attributes.preventDoubleSnap;
+                        if (preventDoubleSnap === 'true') {
+                            scope.preventDoubleSnap = true
+                        }
 
                         // TODO: perform initial snap without animation
                         if (isUndefined(scope.snapAnimation)) {

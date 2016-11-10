@@ -32,6 +32,7 @@
         'defaultSnapscrollScrollDelay',
         'defaultSnapscrollSnapDuration',
         'defaultSnapscrollBindScrollTimeout',
+        'defaultSnapscrollPreventDoubleSnapDelay',
         function (
             $timeout,
             $document,
@@ -40,7 +41,8 @@
             defaultSnapscrollScrollEasing,
             defaultSnapscrollScrollDelay,
             defaultSnapscrollSnapDuration,
-            defaultSnapscrollBindScrollTimeout
+            defaultSnapscrollBindScrollTimeout,
+            defaultSnapscrollPreventDoubleSnapDelay
         ) {
             return {
                 restrict: 'A',
@@ -187,7 +189,25 @@
                         return scrollie.to.apply(scrollie, args).then(function () {
                             scope.snapDirection = undefined;
                             bindScrollAfterDelay();
+                            allowNextSnapAfterDelay();
                         });
+                    }
+
+                    function allowNextSnapAfterDelay() {
+                        function allowNextSnap() {
+                            scope.preventUp = false;
+                            scope.preventDown = false;
+                        }
+                        if (scope.preventUp || scope.preventDown) {
+                            if (scope.preventDoubleSnapDelay === false) {
+                                allowNextSnap();
+                            } else {
+                                $timeout(
+                                    allowNextSnap,
+                                    scope.preventDoubleSnapDelay
+                                );
+                            }
+                        }
                     }
 
                     function isScrollable() {
@@ -334,12 +354,19 @@
                         return compositeIndex;
                     }
 
-                    function snap(direction) {
+                    function snap(direction, source) {
                         if (!isScrollable()) {
                             return;
                         }
 
+                        direction === 'up' && (scope.preventDown = false);
+                        direction === 'down' && (scope.preventUp = false);
+
                         if (scope.snapDirection === direction) {
+                            return true;
+                        }
+
+                        if (scope.preventUp || scope.preventDown) {
                             return true;
                         }
 
@@ -358,33 +385,39 @@
                             return;
                         }
 
+                        if (source === 'wheel') {
+                            direction === 'up' && (scope.preventUp = true);
+                            direction === 'down' && (scope.preventDown = true);
+                        }
+
                         scope.$apply(function () {
                             scope.compositeIndex = rectifyCompositeIndex(
                                 newCompositeIndex
                             );
                         });
+
                         return true;
                     }
 
-                    function snapUp() {
-                        return snap('up');
+                    function snapUp(source) {
+                        return snap('up', source);
                     }
 
-                    function snapDown() {
-                        return snap('down');
+                    function snapDown(source) {
+                        return snap('down', source);
                     }
 
                     function bindWheel() {
                         wheelie.bind(element, {
                             up: function (e) {
                                 e.preventDefault();
-                                if (snapUp()) {
+                                if (snapUp('wheel')) {
                                     e.stopPropagation();
                                 }
                             },
                             down: function (e) {
                                 e.preventDefault();
-                                if (snapDown()) {
+                                if (snapDown('wheel')) {
                                     e.stopPropagation();
                                 }
                             }
@@ -583,6 +616,24 @@
                                 scrollDelay = defaultSnapscrollScrollDelay;
                             }
                             scope.scrollDelay = scrollDelay;
+                        }
+
+                        var preventDoubleSnapDelay = (
+                            attributes.preventDoubleSnapDelay
+                        );
+                        if (preventDoubleSnapDelay === 'false') {
+                            scope.preventDoubleSnapDelay = false;
+                        } else {
+                            preventDoubleSnapDelay = parseInt(
+                                preventDoubleSnapDelay,
+                                10
+                            );
+                            if (isNaN(preventDoubleSnapDelay)) {
+                                preventDoubleSnapDelay = (
+                                    defaultSnapscrollPreventDoubleSnapDelay
+                                );
+                            }
+                            scope.preventDoubleSnapDelay = preventDoubleSnapDelay;
                         }
 
                         var snapEasing = attributes.snapEasing;

@@ -1,3 +1,11 @@
+## next release
+
+### Fixes
+- On trackpads with high sensitivity (e.g. Macs), swiping once does not lead to
+a double snap anymore (thanks @reco). There's a 1 second delay that prevents the
+next snap, which can be changed (or disabled) with
+[`prevent-double-snap-delay`](DOCS.md#prevent-double-snap-delay)
+
 ## 1.0.0
 
 ### Breaking changes

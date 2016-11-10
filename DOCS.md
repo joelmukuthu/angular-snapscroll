@@ -203,3 +203,18 @@ the default value:
 angular.module('myapp', ['snapscroll'])
     .value('defaultSnapscrollResizeDelay', 400);
 ```
+
+#### prevent-double-snap-delay
+In order to prevent snapping twice in the same direction on trackpads with high
+sensitivity, there is a 1 second delay that disables snapping to the same
+direction. This can be altered using this attribute or disabled altogether by
+passing `false`.
+```html
+<div snapscroll="" prevent-double-snap-delay="400"> ... </div>
+```
+the scroll-delay can also be changed for all snapscroll instances by changing
+the default value:
+```javascript
+angular.module('myapp', ['snapscroll'])
+    .value('defaultSnapscrollPreventDoubleSnapDelay', 400);
+```
