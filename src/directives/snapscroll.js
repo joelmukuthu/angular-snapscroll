@@ -120,7 +120,8 @@
                             snapIndex !== previousCompositeIndex[0];
                         if (isSnapIndexChanged) {
                             var returnValue = scope.beforeSnap({
-                                snapIndex: snapIndex
+                                snapIndex: snapIndex,
+                                $event: scope.sourceEvent
                             });
                             if (returnValue === false) {
                                 if (isDefined(previousCompositeIndex)) {
@@ -141,9 +142,11 @@
                         )).then(function () {
                             if (isSnapIndexChanged) {
                                 scope.afterSnap({
-                                    snapIndex: snapIndex
+                                    snapIndex: snapIndex,
+                                    $event: scope.sourceEvent
                                 });
                             }
+                            scope.sourceEvent = undefined;
                         });
                     }
 
@@ -354,7 +357,7 @@
                         return compositeIndex;
                     }
 
-                    function snap(direction, source) {
+                    function snap(direction, event) {
                         if (!isScrollable()) {
                             return;
                         }
@@ -385,12 +388,13 @@
                             return;
                         }
 
-                        if (source === 'wheel') {
+                        if (event.type === 'wheel') {
                             direction === 'up' && (scope.preventUp = true);
                             direction === 'down' && (scope.preventDown = true);
                         }
 
                         scope.$apply(function () {
+                            scope.sourceEvent = event;
                             scope.compositeIndex = rectifyCompositeIndex(
                                 newCompositeIndex
                             );
@@ -399,25 +403,25 @@
                         return true;
                     }
 
-                    function snapUp(source) {
-                        return snap('up', source);
+                    function snapUp(event) {
+                        return snap('up', event);
                     }
 
-                    function snapDown(source) {
-                        return snap('down', source);
+                    function snapDown(event) {
+                        return snap('down', event);
                     }
 
                     function bindWheel() {
                         wheelie.bind(element, {
                             up: function (e) {
                                 e.preventDefault();
-                                if (snapUp('wheel')) {
+                                if (snapUp(e)) {
                                     e.stopPropagation();
                                 }
                             },
                             down: function (e) {
                                 e.preventDefault();
-                                if (snapDown('wheel')) {
+                                if (snapDown(e)) {
                                     e.stopPropagation();
                                 }
                             }
@@ -586,7 +590,7 @@
                         }
                         if (handler) {
                             e.preventDefault();
-                            handler();
+                            handler(e);
                         }
                     }
 

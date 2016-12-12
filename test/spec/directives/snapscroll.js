@@ -441,6 +441,192 @@ describe('Directive: snapscroll', function () {
         spy.calls.reset();
     }
 
+    function testCallsBeforeSnapOnMousewheelDownWithWheelEvent(html, $timeout) {
+        var spy = jasmine.createSpy('beforeSnap');
+        $scope.beforeSnap = spy;
+        var element = compileElement(html, true);
+        expect(spy).toHaveBeenCalledWith(0, undefined); // initial snap
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).toHaveBeenCalledWith(1, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        }));
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventDown
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventDown
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventDown
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).toHaveBeenCalledWith(2, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        }));
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventDown
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).toHaveBeenCalledWith(3, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        }));
+        spy.calls.reset();
+    }
+
+    function testCallsAfterSnapOnMousewheelDownWithWheelEvent(html, $timeout) {
+        var spy = jasmine.createSpy('afterSnap');
+        $scope.afterSnap = spy;
+        var element = compileElement(html, true);
+        expect(spy).toHaveBeenCalledWith(0, undefined); // initial snap
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).toHaveBeenCalledWith(1, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        }));
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventDown
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventDown
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventDown
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).toHaveBeenCalledWith(2, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        }));
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventDown
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).toHaveBeenCalledWith(3, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        }));
+        spy.calls.reset();
+    }
+
+    function testCallsBeforeSnapOnMousewheelDownWithWheelEventOnlyWhenAvailable(html, $timeout) {
+        var spy = jasmine.createSpy('beforeSnap');
+        $scope.beforeSnap = spy;
+        var element = compileElement(html, true);
+        expect(spy).toHaveBeenCalledWith(0, undefined); // initial snap
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).toHaveBeenCalledWith(1, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        }));
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventDown
+        $scope.$apply(function () {
+            $scope.index = 2;
+        });
+        expect(spy).toHaveBeenCalledWith(2, undefined);
+    }
+
+    function testCallsAfterSnapOnMousewheelDownWithWheelEventOnlyWhenAvailable(html, $timeout) {
+        var spy = jasmine.createSpy('afterSnap');
+        $scope.afterSnap = spy;
+        var element = compileElement(html, true);
+        expect(spy).toHaveBeenCalledWith(0, undefined); // initial snap
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        });
+        expect(spy).toHaveBeenCalledWith(1, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: -120,
+            detail: 120,
+            deltaY: 120
+        }));
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventDown
+        $scope.$apply(function () {
+            $scope.index = 2;
+        });
+        expect(spy).toHaveBeenCalledWith(2, undefined);
+    }
+
     function testExecutesBeforeSnapOnMousewheelUp(html, $timeout) {
         var spy = jasmine.createSpy('beforeSnap');
         $scope.beforeSnap = spy;
@@ -492,6 +678,196 @@ describe('Directive: snapscroll', function () {
         });
         expect(spy).toHaveBeenCalledWith(0);
         spy.calls.reset();
+    }
+
+    function testCallsBeforeSnapOnMousewheelUpWithWheelEvent(html, $timeout) {
+        var spy = jasmine.createSpy('beforeSnap');
+        $scope.beforeSnap = spy;
+        $scope.index = 3;
+        var element = compileElement(html, true);
+        expect(spy).toHaveBeenCalledWith(3, undefined); // initial snap
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).toHaveBeenCalledWith(2, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        }));
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventUp
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).toHaveBeenCalledWith(1, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        }));
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventUp
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventUp
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventUp
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).toHaveBeenCalledWith(0, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        }));
+        spy.calls.reset();
+    }
+
+    function testCallsAfterSnapOnMousewheelUpWithWheelEvent(html, $timeout) {
+        var spy = jasmine.createSpy('afterSnap');
+        $scope.afterSnap = spy;
+        $scope.index = 3;
+        var element = compileElement(html, true);
+        expect(spy).toHaveBeenCalledWith(3, undefined); // initial snap
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).toHaveBeenCalledWith(2, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        }));
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventUp
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).toHaveBeenCalledWith(1, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        }));
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventUp
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventUp
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).not.toHaveBeenCalled(); // index still 1
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventUp
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).toHaveBeenCalledWith(0, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        }));
+        spy.calls.reset();
+    }
+
+    function testCallsBeforeSnapOnMousewheelUpWithWheelEventOnlyWhenAvailable(html, $timeout) {
+        var spy = jasmine.createSpy('beforeSnap');
+        $scope.beforeSnap = spy;
+        $scope.index = 3;
+        var element = compileElement(html, true);
+        expect(spy).toHaveBeenCalledWith(3, undefined); // initial snap
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).toHaveBeenCalledWith(2, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        }));
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventDown
+        $scope.$apply(function () {
+            $scope.index = 1;
+        });
+        expect(spy).toHaveBeenCalledWith(1, undefined);
+    }
+
+    function testCallsAfterSnapOnMousewheelUpWithWheelEventOnlyWhenAvailable(html, $timeout) {
+        var spy = jasmine.createSpy('afterSnap');
+        $scope.afterSnap = spy;
+        $scope.index = 3;
+        var element = compileElement(html, true);
+        expect(spy).toHaveBeenCalledWith(3, undefined); // initial snap
+        spy.calls.reset();
+        element.triggerHandler({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        });
+        expect(spy).toHaveBeenCalledWith(2, jasmine.objectContaining({
+            type: 'wheel',
+            wheelDelta: 120,
+            detail: -120,
+            deltaY: -120
+        }));
+        spy.calls.reset();
+        $timeout.flush(); // flush the timeout on preventDown
+        $scope.$apply(function () {
+            $scope.index = 1;
+        });
+        expect(spy).toHaveBeenCalledWith(1, undefined);
     }
 
     function testDoesNotSnapDownIfBeforeSnapReturnsFalseOnMousewheelDown(html) {
@@ -1889,6 +2265,54 @@ describe('Directive: snapscroll', function () {
                 testExecutesBeforeSnapOnMousewheelDown(html, $timeout);
             }));
 
+            it('calls beforeSnap with the mousewheel event', inject(function ($timeout) {
+                var html = [
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex, $event)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 125px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testCallsBeforeSnapOnMousewheelDownWithWheelEvent(html, $timeout);
+            }));
+
+            it('calls afterSnap with the mousewheel event', inject(function ($timeout) {
+                var html = [
+                    '<div snapscroll="" snap-index="index" after-snap="afterSnap(snapIndex, $event)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 125px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testCallsAfterSnapOnMousewheelDownWithWheelEvent(html, $timeout);
+            }));
+
+            it('calls beforeSnap with the mousewheel event only when snapping is triggered with the mousewheel', inject(function ($timeout) {
+                var html = [
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex, $event)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 125px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testCallsBeforeSnapOnMousewheelDownWithWheelEventOnlyWhenAvailable(html, $timeout);
+            }));
+
+            it('calls afterSnap with the mousewheel event only when snapping is triggered with the mousewheel', inject(function ($timeout) {
+                var html = [
+                    '<div snapscroll="" snap-index="index" after-snap="afterSnap(snapIndex, $event)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 125px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testCallsAfterSnapOnMousewheelDownWithWheelEventOnlyWhenAvailable(html, $timeout);
+            }));
+
             it('does not snap down if beforeSnap returns false', function () {
                 var html = [
                     '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex)" style="height: 50px; overflow: auto">',
@@ -1979,6 +2403,54 @@ describe('Directive: snapscroll', function () {
                     '</div>'
                 ].join('');
                 testExecutesBeforeSnapOnMousewheelUp(html, $timeout);
+            }));
+
+            it('calls beforeSnap with the mousewheel event', inject(function ($timeout) {
+                var html = [
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex, $event)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 125px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testCallsBeforeSnapOnMousewheelUpWithWheelEvent(html, $timeout);
+            }));
+
+            it('calls afterSnap with the mousewheel event', inject(function ($timeout) {
+                var html = [
+                    '<div snapscroll="" snap-index="index" after-snap="afterSnap(snapIndex, $event)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 125px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testCallsAfterSnapOnMousewheelUpWithWheelEvent(html, $timeout);
+            }));
+
+            it('calls beforeSnap with the mousewheel event only when snapping is triggered with the mousewheel', inject(function ($timeout) {
+                var html = [
+                    '<div snapscroll="" snap-index="index" before-snap="beforeSnap(snapIndex, $event)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 125px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testCallsBeforeSnapOnMousewheelUpWithWheelEventOnlyWhenAvailable(html, $timeout);
+            }));
+
+            it('calls afterSnap with the mousewheel event only when snapping is triggered with the mousewheel', inject(function ($timeout) {
+                var html = [
+                    '<div snapscroll="" snap-index="index" after-snap="afterSnap(snapIndex, $event)" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 125px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                testCallsAfterSnapOnMousewheelUpWithWheelEventOnlyWhenAvailable(html, $timeout);
             }));
 
             it('does not snap up if beforeSnap returns false', function () {

@@ -107,9 +107,11 @@ add a class to the element and provide that class-name as the value for the
 
 ### before-snap
 is a callback executed before snapping occurs. the callback is passed a
-`snapIndex` parameter, which is the index being snapped to. returning `false`
-from this callback will prevent snapping. you can also override the next
-`snapIndex` by returning a number.
+`snapIndex` parameter, which is the index being snapped to, and an `$event`
+parameter, which is the event triggering the snapping, if available (e.g.
+WheelEvent if it was the mousewheel or KeyboardEvent if it was an arrow key).
+returning `false` from this callback will prevent snapping. you can also override
+the next `snapIndex` by returning a number.
 ```javascript
 angular.controller('MainCtrl', function ($scope) {
     $scope.beforeSnap = function (snapIndex) {
@@ -131,7 +133,9 @@ angular.controller('MainCtrl', function ($scope) {
 
 ### after-snap
 is a callback executed after snapping occurs. the callback is passed a
-`snapIndex` parameter, which is the index just snapped to. any return value from
+`snapIndex` parameter, which is the index just snapped to, and an `$event`
+parameter, which is the event triggering the snapping if available ( e.g.
+WheelEvent if it was the mousewheel or KeyboardEvent if it was an arrow key). any return value from
 this callback is ignored.
 ```javascript
 angular.controller('MainCtrl', function ($scope) {
