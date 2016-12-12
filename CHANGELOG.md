@@ -1,3 +1,11 @@
+## 1.2.0
+
+### Features
+- Support passing events to [`before-snap`](DOCS.md#before-snap) and
+[`after-snap`](DOCS.md#after-snap) callbacks
+- Support disabling wheel and trackpad events with
+[`disable-wheel-binding`](DOCS.md#disable-wheel-binding)
+
 ## 1.1.0
 
 ### Features
