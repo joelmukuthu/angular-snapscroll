@@ -412,6 +412,9 @@
                     }
 
                     function bindWheel() {
+                        if (scope.disableWheelBinding || scope.wheelBound) {
+                            return;
+                        }
                         wheelie.bind(element, {
                             up: function (e) {
                                 e.preventDefault();
@@ -426,10 +429,15 @@
                                 }
                             }
                         }, scope.ignoreWheelClass);
+                        scope.wheelBound = true;
                     }
 
                     function unbindWheel() {
+                        if (!scope.wheelBound) {
+                            return;
+                        }
                         wheelie.unbind(element);
+                        scope.wheelBound = false;
                     }
 
                     function setHeight(angularElement, height) {
@@ -657,6 +665,10 @@
                         if (isUndefined(scope.snapAnimation)) {
                             scope.snapAnimation = true;
                         }
+
+                        scope.disableWheelBinding = isDefined(
+                            attributes.disableWheelBinding
+                        );
 
                         scope.enableArrowKeys = isDefined(
                             attributes.enableArrowKeys

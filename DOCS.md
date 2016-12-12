@@ -8,6 +8,7 @@
     - [snap-height](#snap-height)
     - [fit-window-height](#fit-window-height)
     - [enable-arrow-keys](#enable-arrow-keys)
+    - [disable-wheel-binding](#disable-wheel-binding)
     - [ignore-wheel-class](#ignore-wheel-class)
     - [before-snap](#before-snap)
     - [after-snap](#after-snap)
@@ -90,6 +91,24 @@ pressed, respectively.
 ```html
 <div snapscroll="" enable-arrow-keys=""> ... </div>
 ```
+
+### disable-wheel-binding
+by default, wheel (and trackpad) events will lead to the element being snapped
+up or down. you can disable this functionality using this attribute, which means
+that wheel events will lead to the element being scrolled normally instead of
+being snap-scrolled.
+```html
+<div snapscroll="" disable-wheel-binding=""> ... </div>
+```
+note that you will still be able to control snapping using the
+[`snap-index`](#snap-index) binding and using the keyboard arrow keys if
+[`enable-arrow-keys`](#enable-arrow-keys) is set.
+
+also note that when the element is scrolled normally, snapscroll will try to
+reset the `scrollTop` so that the current snap is fully visible. So to ensure
+wheel events have completely no side-effects, also set the
+[`prevent-snapping-after-manual-scroll`](#prevent-snapping-after-manual-scroll)
+attribute.
 
 ### ignore-wheel-class
 snapscroll takes over the wheel events for the element it's bound to and

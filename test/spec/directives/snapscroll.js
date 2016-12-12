@@ -2883,6 +2883,92 @@ describe('Directive: snapscroll', function () {
             });
         });
 
+        describe('with disable-wheel-binding set', function () {
+            it('does not snap up on mousewheel up', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" disable-wheel-binding="" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                $scope.index = 3;
+                var element = compileElement(html, true);
+                expect($scope.index).toBe(3);
+                expect(element[0].scrollTop).toBe(150);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: -120
+                });
+                expect($scope.index).toBe(3);
+                expect(element[0].scrollTop).toBe(150);
+            });
+
+            it('does not snap down on mousewheel down', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" disable-wheel-binding="" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+
+                var element = compileElement(html, true);
+                expect($scope.index).toBe(0);
+                expect(element[0].scrollTop).toBe(0);
+                element.triggerHandler({
+                    type: 'wheel',
+                    deltaY: 120
+                });
+                expect($scope.index).toBe(0);
+                expect(element[0].scrollTop).toBe(0);
+            });
+
+            it('can still snap using the snap-index binding', function () {
+                var html = [
+                    '<div snapscroll="" snap-index="index" disable-wheel-binding="" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                $scope.index = 3;
+                var element = compileElement(html, true);
+                expect($scope.index).toBe(3);
+                expect(element[0].scrollTop).toBe(150);
+                $scope.$apply(function () {
+                    $scope.index = 2;
+                });
+                expect($scope.index).toBe(2);
+                expect(element[0].scrollTop).toBe(100);
+            });
+
+            it('can still snap using arrow keys if enable-arrow-keys is set', inject(function ($document) {
+                var html = [
+                    '<div snapscroll="" snap-index="index" disable-wheel-binding="" enable-arrow-keys="" style="height: 50px; overflow: auto">',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '<div style="height: 50px"></div>',
+                    '</div>'
+                ].join('');
+                $scope.index = 3;
+                var element = compileElement(html, true);
+                expect($scope.index).toBe(3);
+                expect(element[0].scrollTop).toBe(150);
+                $document.triggerHandler({
+                    type: 'keydown',
+                    keyCode: 38, // up
+                    preventDefault: angular.noop
+                });
+                expect($scope.index).toBe(2);
+                expect(element[0].scrollTop).toBe(100);
+            }));
+        });
+
         describe('with enable-arrow-keys set', function () {
             describe('on up-arrow', function () {
                 it('snaps up', inject(function ($document) {
