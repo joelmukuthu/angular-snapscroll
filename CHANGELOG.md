@@ -60,3 +60,13 @@ or equal to the snapscroll element
 - If `overflow-y` on the snapscroll element is set to `scroll`, then it is not
 changed to `auto`
 - Change angular dep version to the lowest supported version (`1.2.24`)
+
+## 0.2.5
+
+### Features
+- Support for installation with npm
+
+## 0.2.4
+
+### Fixes
+- Fix wheel event when jQuery is also included on the page
