@@ -1,3 +1,7 @@
+if (typeof exports === 'object') {
+    module.exports = 'snapscroll';
+}
+
 angular
     .module('snapscroll', ['wheelie', 'scrollie'])
     .value('defaultSnapscrollScrollEasing', undefined)
