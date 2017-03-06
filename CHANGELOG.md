@@ -1,3 +1,8 @@
+## 1.3.0
+
+### Features
+- Add module exports (https://github.com/joelmukuthu/angular-snapscroll/issues/46)
+
 ## 1.2.0
 
 ### Features
