@@ -45,7 +45,7 @@ angular.controller('MainCtrl', function ($scope, $window) {
 <div style="height: 200px;" snapscroll="false"> ... </div>
 <!-- disabled programmatically -->
 <div ng-controller="MainCtrl">
-  <div snapscroll="" snapscroll="snapscrollEnabled"> ... </div>
+  <div snapscroll="snapscrollEnabled"> ... </div>
 </div>
 ```
 
@@ -123,6 +123,9 @@ add a class to the element and provide that class-name as the value for the
     </div>
 </div>
 ```
+note that if you wish to ignore wheel events from an element with children, then
+the class-name must also be added to the child elements. that's because in this
+case wheel events will bubble from the child elements.
 
 ### before-snap
 is a callback executed before snapping occurs. the callback is passed a
