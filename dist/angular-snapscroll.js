@@ -1,9 +1,9 @@
 /**
  * angular-snapscroll
- * Version: 1.3.0
+ * Version: 1.3.1
  * (c) 2014-2017 Joel Mukuthu
  * MIT License
- * Built on: 06-03-2017 12:22:02 GMT+0100
+ * Built on: 10-03-2017 17:26:46 GMT+0100
  **/
 
 if (typeof exports === 'object') {
