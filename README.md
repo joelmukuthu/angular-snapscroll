@@ -1,4 +1,6 @@
 # angular-snapscroll
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/joelmukuthu/angular-snapscroll.svg)](https://greenkeeper.io/)
 [![Build Status](https://travis-ci.org/joelmukuthu/angular-snapscroll.svg?branch=master)](https://travis-ci.org/joelmukuthu/angular-snapscroll) [![Dependency Status](https://david-dm.org/joelmukuthu/angular-snapscroll.svg)](https://david-dm.org/joelmukuthu/angular-snapscroll) [![Licence](https://img.shields.io/npm/l/angular-snapscroll.svg)](https://github.com/joelmukuthu/angular-snapscroll/blob/master/LICENSE.md) [![Coverage Status](https://coveralls.io/repos/joelmukuthu/angular-snapscroll/badge.svg)](https://coveralls.io/r/joelmukuthu/angular-snapscroll) [![Bower version](https://img.shields.io/bower/v/angular-snapscroll.svg)](https://github.com/joelmukuthu/angular-snapscroll) [![npm version](https://img.shields.io/npm/v/angular-snapscroll.svg)](https://www.npmjs.com/package/angular-snapscroll)
 
 angular-snapscroll adds vertical scroll-and-snap functionality to angular.
