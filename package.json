@@ -18,7 +18,7 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-uglify": "^3.0.0",
     "grunt-contrib-watch": "^1.0.0",
-    "grunt-eslint": "^19.0.0",
+    "grunt-eslint": "^20.2.0",
     "grunt-karma": "^2.0.0",
     "grunt-newer": "^1.2.0",
     "grunt-release-it": "^1.0.1",
