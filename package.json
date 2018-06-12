@@ -35,7 +35,7 @@
     "angular": "^1.2.24"
   },
   "dependencies": {
-    "angular": "^1.2.24",
+    "angular": "1.7.1",
     "angular-scrollie": "^1.1.1",
     "angular-wheelie": "^3.0.1"
   },
