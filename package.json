@@ -19,7 +19,7 @@
     "grunt-contrib-uglify": "^3.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-eslint": "^19.0.0",
-    "grunt-karma": "^2.0.0",
+    "grunt-karma": "^3.0.0",
     "grunt-newer": "^1.2.0",
     "grunt-release-it": "^1.0.1",
     "jasmine-core": "^2.4.1",
