@@ -28,7 +28,7 @@
     "karma-coveralls": "^2.0.0",
     "karma-jasmine": "^2.0.0",
     "karma-phantomjs-launcher": "^1.0.0",
-    "load-grunt-tasks": "^4.0.0",
+    "load-grunt-tasks": "^5.1.0",
     "phantomjs-prebuilt": "^2.1.7"
   },
   "peerDependencies": {
